@@ -22,6 +22,9 @@ public:
   void setBackgroundColor( const QColor &color );
   bool eventFilter(QObject *obj, QEvent *evt);
 
+signals:
+  void updateStatus(QString text, int timeout = 0 );
+
 public slots:
   void setGridLayout( );
   void setHorizontalLayout( );

@@ -1,13 +1,25 @@
+#include "controller.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ) {
+#include <QGraphicsPixmapItem>
+
+MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ),
+  controller( new Controller ) {
   ui->setupUi( this );
 
-  ui->logoView->hide( );
+  ui->controlsWidget->installImageViewer( ui->imageViewer );
 
-  ui->controlsWidget->installImageViewer(ui->imageViewer);
+  setupLogoview( );
 
+  createConnections( );
+
+  updateMenus( );
+}
+
+void MainWindow::createConnections( ) {
+
+  /* Layout */
   connect( ui->actionGrid, &QAction::triggered, ui->imageViewer, &ImageViewer::setGridLayout );
   connect( ui->actionHorizontal, &QAction::triggered, ui->imageViewer, &ImageViewer::setHorizontalLayout );
   connect( ui->actionVertical, &QAction::triggered, ui->imageViewer, &ImageViewer::setVerticalLayout );
@@ -18,8 +30,30 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set3Views );
   connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set4Views );
+
+  /* Show/Hide docks */
+
+  connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible);
+  connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible);
+
+
+  connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
+  connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
+
+  /* Dynamic functions */
+
+  connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
+
+  connect( controller, &Controller::imageChanged, this, &MainWindow::updateMenus );
 }
 
+void MainWindow::setupLogoview( ) {
+  QGraphicsScene *scn = new QGraphicsScene( this );
+  QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem( QPixmap( ":/icons/logo_shadow.png" ) );
+  scn->addItem( pixmapItem );
+  scn->setSceneRect( 0, 0, pixmapItem->pixmap( ).width( ), pixmapItem->pixmap( ).height( ) );
+  ui->logoView->setScene( scn );
+}
 
 MainWindow::~MainWindow( ) {
   delete ui;
@@ -43,4 +77,13 @@ void MainWindow::on_actionBlack_background_triggered( ) {
 
 void MainWindow::on_actionWhite_background_triggered( ) {
   ui->imageViewer->setBackgroundColor( Qt::white );
+}
+
+void MainWindow::updateMenus( ) {
+  if( controller->CurrentImage( ) == nullptr ) {
+    ui->logoView->show( );
+    ui->imageViewer->hide( );
+    ui->controlsDock->hide( );
+    ui->thumbsDock->hide( );
+  }
 }

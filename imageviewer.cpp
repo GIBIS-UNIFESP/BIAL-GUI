@@ -101,9 +101,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
     }
   }
   if( mouseEvt ) {
-    std::cout <<
-    QString( "Scene %3 = (%1, %2)" ).arg( mouseEvt->scenePos( ).x( ) ).arg( mouseEvt->scenePos( ).y( ) ).arg(scene).toStdString( )
-              << std::endl;
+    emit updateStatus( QString( "Scene %3 position: (%1, %2)" ).arg( mouseEvt->scenePos( ).x( ) ).arg( mouseEvt->scenePos( ).y( ) ).arg(scene), 100 );
   }
   return( QWidget::eventFilter( obj, evt ) );
 }
