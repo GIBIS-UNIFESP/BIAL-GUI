@@ -645,6 +645,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton4Views">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="toolTip">
              <string>Four views</string>
             </property>

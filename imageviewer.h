@@ -37,8 +37,9 @@ public slots:
   void setView1( );
   void setView2( );
   void setView3( );
-  void set3Views( );
-  void set4Views( );
+  void setViews012( );
+  void setViews123( );
+  void set0123Views( );
 
 };
 

@@ -29,13 +29,14 @@ void MainWindow::createConnections( ) {
   connect( ui->actionSagittal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
 
 
+  //PPM
   connect( ui->actionAll_channels, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
   connect( ui->actionRed_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
   connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
   connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
 
-  connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set3Views );
-  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set4Views );
+  connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews123 );
+  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set0123Views );
 
   /* Show/Hide docks */
 

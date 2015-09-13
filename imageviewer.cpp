@@ -15,16 +15,16 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
     views[ i ]->scene( )->installEventFilter( this );
   }
   layout = new QGridLayout( this );
-  layout->setVerticalSpacing(10);
-  layout->setHorizontalSpacing(10);
+  layout->setVerticalSpacing( 10 );
+  layout->setHorizontalSpacing( 10 );
   setGridLayout( );
 
-  //FIXME: Temporary code:
+  /* FIXME: Temporary code: */
 
-  views[ 0 ]->setBackgroundColor( Qt::white );
-  views[ 1 ]->setBackgroundColor( Qt::red );
-  views[ 2 ]->setBackgroundColor( Qt::green );
-  views[ 3 ]->setBackgroundColor( Qt::blue );
+//  views[ 0 ]->setBackgroundColor( Qt::black );
+//  views[ 1 ]->setBackgroundColor( Qt::red );
+//  views[ 2 ]->setBackgroundColor( Qt::green );
+//  views[ 3 ]->setBackgroundColor( Qt::blue );
 }
 
 ImageViewer::~ImageViewer( ) {
@@ -92,12 +92,17 @@ void ImageViewer::setView3( ) {
   views[ 3 ]->show( );
 }
 
-void ImageViewer::set3Views( ) {
+void ImageViewer::setViews012( ) {
   showViews( );
   views[ 3 ]->hide( );
 }
 
-void ImageViewer::set4Views( ) {
+void ImageViewer::setViews123( ) {
+  showViews( );
+  views[ 0 ]->hide( );
+}
+
+void ImageViewer::set0123Views( ) {
   showViews( );
 }
 
@@ -105,12 +110,13 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
   QGraphicsSceneMouseEvent *mouseEvt = dynamic_cast< QGraphicsSceneMouseEvent* >( evt );
   size_t scene = 0;
   for( size_t scn = 1; scn < views.size( ); ++scn ) {
-    if( obj == views[ scn]->scene( ) ) {
+    if( obj == views[ scn ]->scene( ) ) {
       scene = scn;
     }
   }
   if( mouseEvt ) {
-    emit updateStatus( QString( "Scene %3 position: (%1, %2)" ).arg( mouseEvt->scenePos( ).x( ) ).arg( mouseEvt->scenePos( ).y( ) ).arg(scene), 100 );
+    emit updateStatus( QString( "Scene %3 position: (%1, %2)" ).arg( mouseEvt->scenePos( ).x( ) ).arg(
+                         mouseEvt->scenePos( ).y( ) ).arg( scene ), 100 );
   }
   return( QWidget::eventFilter( obj, evt ) );
 }

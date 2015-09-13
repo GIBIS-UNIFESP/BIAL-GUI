@@ -25,8 +25,8 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
   connect( ui->pushButtonSagittal, &QPushButton::clicked, viewer, &ImageViewer::setView2 );
 
   connect( ui->pushButton1View, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
-  connect( ui->pushButton3Views, &QPushButton::clicked, viewer, &ImageViewer::set3Views );
-  connect( ui->pushButton4Views, &QPushButton::clicked, viewer, &ImageViewer::set4Views );
+  connect( ui->pushButton3Views, &QPushButton::clicked, viewer, &ImageViewer::setViews012 );
+  connect( ui->pushButton4Views, &QPushButton::clicked, viewer, &ImageViewer::set0123Views );
 
   connect( ui->pushButton1View, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::show );
   connect( ui->pushButton3Views, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::hide );
@@ -39,8 +39,8 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
   //PPM
 
   connect( ui->pushButton_1RGB, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
-  connect( ui->pushButton_3RGB, &QPushButton::clicked, viewer, &ImageViewer::set3Views );
-  connect( ui->pushButton_4RGB, &QPushButton::clicked, viewer, &ImageViewer::set4Views );
+  connect( ui->pushButton_3RGB, &QPushButton::clicked, viewer, &ImageViewer::setViews123 );
+  connect( ui->pushButton_4RGB, &QPushButton::clicked, viewer, &ImageViewer::set0123Views );
 
   connect( ui->pushButton_1RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::show );
   connect( ui->pushButton_3RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::hide );
