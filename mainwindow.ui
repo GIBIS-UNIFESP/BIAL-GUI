@@ -81,18 +81,20 @@
     <addaction name="actionOpen_image"/>
     <addaction name="actionOpen_DicomDir"/>
     <addaction name="actionOpen_folder"/>
+    <addaction name="separator"/>
     <addaction name="actionAdd_image"/>
     <addaction name="actionRemove_current_image"/>
-    <addaction name="actionLoad_image_on_top"/>
     <addaction name="separator"/>
+    <addaction name="actionLoad_image_on_top"/>
     <addaction name="actionRemove_current_label"/>
+    <addaction name="separator"/>
     <addaction name="menuRecent_files"/>
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuTransparency">
+   <widget class="QMenu" name="menuOverlay">
     <property name="title">
      <string>Overlay</string>
     </property>
@@ -148,9 +150,13 @@
      <property name="title">
       <string>1 view</string>
      </property>
+     <addaction name="actionAxial"/>
      <addaction name="actionCoronal"/>
      <addaction name="actionSagittal"/>
-     <addaction name="actionAxial"/>
+     <addaction name="actionRed_channel"/>
+     <addaction name="actionGreen_channel"/>
+     <addaction name="actionBlue_channel"/>
+     <addaction name="actionAll_channels"/>
     </widget>
     <addaction name="menu1_View"/>
     <addaction name="action3_Views"/>
@@ -178,7 +184,7 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuLayout"/>
-   <addaction name="menuTransparency"/>
+   <addaction name="menuOverlay"/>
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -522,6 +528,26 @@
   <action name="actionShow_defecography_dock">
    <property name="text">
     <string>Show defecography dock</string>
+   </property>
+  </action>
+  <action name="actionRed_channel">
+   <property name="text">
+    <string>Red channel</string>
+   </property>
+  </action>
+  <action name="actionGreen_channel">
+   <property name="text">
+    <string>Green channel</string>
+   </property>
+  </action>
+  <action name="actionBlue_channel">
+   <property name="text">
+    <string>Blue channel</string>
+   </property>
+  </action>
+  <action name="actionAll_channels">
+   <property name="text">
+    <string>All channels</string>
    </property>
   </action>
  </widget>

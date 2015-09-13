@@ -15,7 +15,16 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
     views[ i ]->scene( )->installEventFilter( this );
   }
   layout = new QGridLayout( this );
+  layout->setVerticalSpacing(10);
+  layout->setHorizontalSpacing(10);
   setGridLayout( );
+
+  //FIXME: Temporary code:
+
+  views[ 0 ]->setBackgroundColor( Qt::white );
+  views[ 1 ]->setBackgroundColor( Qt::red );
+  views[ 2 ]->setBackgroundColor( Qt::green );
+  views[ 3 ]->setBackgroundColor( Qt::blue );
 }
 
 ImageViewer::~ImageViewer( ) {

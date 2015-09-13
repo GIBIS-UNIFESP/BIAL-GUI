@@ -49,4 +49,9 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
   connect( ui->pushButton_1RGB, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::hide );
   connect( ui->pushButton_3RGB, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::show);
   connect( ui->pushButton_4RGB, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::show );
+
+  connect( ui->pushButton_RGB, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
+  connect( ui->pushButton_R, &QPushButton::clicked, viewer, &ImageViewer::setView1 );
+  connect( ui->pushButton_G, &QPushButton::clicked, viewer, &ImageViewer::setView2 );
+  connect( ui->pushButton_B, &QPushButton::clicked, viewer, &ImageViewer::setView3 );
 }
