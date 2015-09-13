@@ -37,3 +37,5 @@ RESOURCES += \
     qrs/resources.qrc
 
 CONFIG += c++11
+
+DISTFILES +=
