@@ -28,13 +28,19 @@ void MainWindow::createConnections( ) {
   connect( ui->actionCoronal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
   connect( ui->actionSagittal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
 
+
+  connect( ui->actionAll_channels, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
+  connect( ui->actionRed_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
+  connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
+  connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
+
   connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set3Views );
   connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set4Views );
 
   /* Show/Hide docks */
 
-  connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible);
-  connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible);
+  connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );
+  connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible );
 
 
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
@@ -80,10 +86,14 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 }
 
 void MainWindow::updateMenus( ) {
-  if( controller->CurrentImage( ) == nullptr ) {
-    ui->logoView->show( );
-    ui->imageViewer->hide( );
-    ui->controlsDock->hide( );
-    ui->thumbsDock->hide( );
-  }
+  bool hasImage = ( controller->CurrentImage( ) == nullptr );
+  ui->logoView->setVisible( !hasImage );
+  ui->imageViewer->setVisible( hasImage );
+  ui->controlsDock->setVisible( hasImage );
+  ui->thumbsDock->setVisible( hasImage );
+
+  ui->menuLayout->setEnabled( hasImage );
+  ui->menuOverlay->setEnabled( hasImage );
+
+  //TODO : Verify image type and update layout menu.
 }

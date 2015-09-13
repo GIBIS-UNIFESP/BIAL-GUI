@@ -13,15 +13,11 @@ ImageWidget::~ImageWidget( ) {
 }
 
 void ImageWidget::hideControls( ) {
-  ui->spinBox->hide( );
-  ui->horizontalSlider->hide( );
-  ui->rotateButton->hide( );
+  ui->frameControls->hide();
 }
 
 void ImageWidget::showControls( ) {
-  ui->spinBox->show( );
-  ui->horizontalSlider->show( );
-  ui->rotateButton->show( );
+  ui->frameControls->show();
 }
 
 void ImageWidget::setBackgroundColor( const QColor &color ) {

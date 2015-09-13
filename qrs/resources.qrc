@@ -27,6 +27,7 @@
         <file>icons/stop.svg</file>
         <file>icons/minus.svg</file>
         <file>icons/plus.svg</file>
+        <file>icons/3colors.png</file>
     </qresource>
     <qresource prefix="/translations">
         <file>bial_br.qm</file>

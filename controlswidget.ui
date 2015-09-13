@@ -121,7 +121,7 @@
             </property>
             <property name="icon">
              <iconset resource="qrs/resources.qrc">
-              <normaloff>:/icons/icons/4colors.png</normaloff>:/icons/icons/4colors.png</iconset>
+              <normaloff>:/icons/icons/3colors.png</normaloff>:/icons/icons/3colors.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -179,16 +179,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_G">
+           <widget class="QPushButton" name="pushButton_R">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Green channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
             </property>
             <property name="icon">
              <iconset resource="qrs/resources.qrc">
-              <normaloff>:/icons/icons/colorG.png</normaloff>:/icons/icons/colorG.png</iconset>
+              <normaloff>:/icons/icons/colorR.png</normaloff>:/icons/icons/colorR.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -205,16 +205,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_R">
+           <widget class="QPushButton" name="pushButton_G">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Green channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
             </property>
             <property name="icon">
              <iconset resource="qrs/resources.qrc">
-              <normaloff>:/icons/icons/colorR.png</normaloff>:/icons/icons/colorR.png</iconset>
+              <normaloff>:/icons/icons/colorG.png</normaloff>:/icons/icons/colorG.png</iconset>
             </property>
             <property name="iconSize">
              <size>
