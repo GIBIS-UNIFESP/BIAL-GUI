@@ -17,16 +17,14 @@ SOURCES += main.cpp\
     controlswidget.cpp \
     imageviewer.cpp \
     thumbswidget.cpp \
-    imagewidget.cpp \
-    graphicsscene.cpp
+    imagewidget.cpp
 
 HEADERS  += mainwindow.h \
     controlswidget.h \
     imageviewer.h \
     thumbswidget.h \
     imagewidget.h \
-    viewerinterface.h \
-    graphicsscene.h
+    viewerinterface.h
 
 FORMS    += mainwindow.ui \
     controlswidget.ui \

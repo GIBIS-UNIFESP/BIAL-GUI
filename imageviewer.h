@@ -13,7 +13,6 @@ class QGraphicsScene;
 class ImageViewer : public QWidget, public ViewerInterface {
   Q_OBJECT
   std::array< ImageWidget*, 4 > views;
-  std::array< QGraphicsScene*, 4 > scenes;
   QGridLayout *layout;
 
 public:
@@ -21,6 +20,7 @@ public:
   ~ImageViewer( );
 
   void setBackgroundColor( const QColor &color );
+  bool eventFilter(QObject *obj, QEvent *evt);
 
 public slots:
   void setGridLayout( );

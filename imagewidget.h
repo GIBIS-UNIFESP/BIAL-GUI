@@ -9,7 +9,7 @@ namespace Ui {
   class ImageWidget;
 }
 
-class GraphicsScene;
+class QGraphicsScene;
 
 class ImageWidget : public QWidget, public ViewerInterface {
   Q_OBJECT
@@ -21,11 +21,11 @@ public:
   void showControls();
   virtual void setBackgroundColor(const QColor & color);
 
-  GraphicsScene * scene() const;
+  QGraphicsScene * scene() const;
 
 private:
   Ui::ImageWidget *ui;
-  GraphicsScene * m_scene;
+  QGraphicsScene * m_scene;
 };
 
 #endif /* IMAGEWIDGET_H */

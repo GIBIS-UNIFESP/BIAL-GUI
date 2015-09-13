@@ -1,10 +1,9 @@
-#include "graphicsscene.h"
 #include "imagewidget.h"
 #include "ui_imagewidget.h"
 
 ImageWidget::ImageWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::ImageWidget ) {
   ui->setupUi( this );
-  m_scene = new GraphicsScene( this );
+  m_scene = new QGraphicsScene( this );
   ui->graphicsView->setScene( m_scene );
   setBackgroundColor( Qt::black );
 }
@@ -31,6 +30,6 @@ void ImageWidget::setBackgroundColor( const QColor &color ) {
   }
 }
 
-GraphicsScene* ImageWidget::scene( ) const {
+QGraphicsScene * ImageWidget::scene( ) const {
   return( m_scene );
 }

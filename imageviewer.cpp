@@ -1,13 +1,18 @@
 #include "imageviewer.h"
 #include "imagewidget.h"
 
+#include <QEvent>
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 #include <QGridLayout>
+
+#include <iostream>
 
 ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
   for( size_t i = 0; i < views.size( ); ++i ) {
     views[ i ] = new ImageWidget( this );
     views[ i ]->hideControls( );
+    views[ i ]->scene( )->installEventFilter( this );
   }
   layout = new QGridLayout( this );
   setGridLayout( );
@@ -85,4 +90,20 @@ void ImageViewer::set3Views( ) {
 
 void ImageViewer::set4Views( ) {
   showViews( );
+}
+
+bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
+  QGraphicsSceneMouseEvent *mouseEvt = dynamic_cast< QGraphicsSceneMouseEvent* >( evt );
+  size_t scene = 0;
+  for( size_t scn = 1; scn < views.size( ); ++scn ) {
+    if( obj == views[ scn]->scene( ) ) {
+      scene = scn;
+    }
+  }
+  if( mouseEvt ) {
+    std::cout <<
+    QString( "Scene %3 = (%1, %2)" ).arg( mouseEvt->scenePos( ).x( ) ).arg( mouseEvt->scenePos( ).y( ) ).arg(scene).toStdString( )
+              << std::endl;
+  }
+  return( QWidget::eventFilter( obj, evt ) );
 }
