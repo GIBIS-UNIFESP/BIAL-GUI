@@ -85,7 +85,7 @@
     <addaction name="actionAdd_image"/>
     <addaction name="actionRemove_current_image"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_image_on_top"/>
+    <addaction name="actionAddLabel"/>
     <addaction name="actionRemove_current_label"/>
     <addaction name="separator"/>
     <addaction name="menuRecent_files"/>
@@ -284,7 +284,7 @@
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="actionLoad_image_on_top">
+  <action name="actionAddLabel">
    <property name="text">
     <string>Load label...</string>
    </property>
@@ -400,22 +400,6 @@
     <string>Remove current label</string>
    </property>
   </action>
-  <action name="actionRemove_image">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Remove image...</string>
-   </property>
-  </action>
-  <action name="actionRemove_label">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Remove label...</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
@@ -442,51 +426,6 @@
   <action name="actionGreenPen">
    <property name="text">
     <string>Green</string>
-   </property>
-  </action>
-  <action name="actionMoveMode">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="qrs/resources.qrc">
-     <normaloff>:/icons/pointer.png</normaloff>:/icons/pointer.png</iconset>
-   </property>
-   <property name="text">
-    <string>Move mode</string>
-   </property>
-  </action>
-  <action name="actionLineMode">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="qrs/resources.qrc">
-     <normaloff>:/icons/linepointer.png</normaloff>:/icons/linepointer.png</iconset>
-   </property>
-   <property name="text">
-    <string>Line mode</string>
-   </property>
-   <property name="toolTip">
-    <string>Line mode</string>
-   </property>
-  </action>
-  <action name="actionAngleMode">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="qrs/resources.qrc">
-     <normaloff>:/icons/anglepointer.png</normaloff>:/icons/anglepointer.png</iconset>
-   </property>
-   <property name="text">
-    <string>Angle mode</string>
-   </property>
-   <property name="iconText">
-    <string>Angle mode</string>
-   </property>
-   <property name="toolTip">
-    <string>Angle mode</string>
    </property>
   </action>
   <action name="actionBlackPen">
@@ -523,11 +462,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
-   </property>
-  </action>
-  <action name="actionShow_defecography_dock">
-   <property name="text">
-    <string>Show defecography dock</string>
    </property>
   </action>
   <action name="actionRed_channel">
