@@ -80,20 +80,19 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 }
 
 void MainWindow::updateMenus( ) {
+  //Verifying if an Image is present.
   bool hasImage = ( controller->CurrentImage( ) != nullptr );
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );
   ui->controlsDock->setVisible( hasImage );
   ui->thumbsDock->setVisible( hasImage );
-
   ui->menuLayout->setEnabled( hasImage );
   ui->menuOverlay->setEnabled( hasImage );
-
   ui->actionRemove_current_image->setEnabled( hasImage );
-
   ui->actionAddLabel->setEnabled( hasImage );
   if( !hasImage ) {
     ui->actionRemove_current_label->setEnabled( false );
   }
+
   /* TODO : Verify image type and update layout menu. */
 }
