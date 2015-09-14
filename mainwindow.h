@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#define MaxRecentFiles 10
+
 namespace Ui {
   class MainWindow;
 }
@@ -16,9 +18,17 @@ public:
   explicit MainWindow( QWidget *parent = 0 );
   ~MainWindow( );
 
+  void commandLineOpen( int argc, char *argv[] );
+
 private:
   void createConnections( );
   void setupLogoview( );
+  QString getFileDialog( );
+  bool loadFile( QString filename );
+  bool loadFolder( QString dirname );
+  void setRecentFile( QString fileName );
+  void updateRecentFileActions( );
+  void createActions( );
 
 private slots:
   void on_actionRed_background_triggered( );
@@ -28,10 +38,19 @@ private slots:
   void on_actionWhite_background_triggered( );
 
   void updateMenus( );
+  void setDefaultFolder( );
+  void readSettings( );
+  void openRecentFile( );
+
+  void on_actionOpen_image_triggered( );
+
+  void on_actionQuit_triggered( );
 
 private:
   Ui::MainWindow *ui;
   Controller *controller;
+  QString defaultFolder;
+  QAction *recentFileActs[ MaxRecentFiles ];
 };
 
 #endif /* MAINWINDOW_H */

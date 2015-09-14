@@ -92,7 +92,7 @@
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
-    <addaction name="actionExit"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuOverlay">
     <property name="title">
@@ -405,7 +405,7 @@
     <string>About</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
    </property>

@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = BialGUI
 TEMPLATE = app
 
+include(../bial/bial.pri)
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -18,7 +19,10 @@ SOURCES += main.cpp\
     imageviewer.cpp \
     thumbswidget.cpp \
     imagewidget.cpp \
-    controller.cpp
+    controller.cpp \
+    guiimage.cpp \
+    pixmaplabelitem.cpp \
+    thumbnail.cpp
 
 HEADERS  += mainwindow.h \
     controlswidget.h \
@@ -26,7 +30,10 @@ HEADERS  += mainwindow.h \
     thumbswidget.h \
     imagewidget.h \
     viewerinterface.h \
-    controller.h
+    controller.h \
+    guiimage.h \
+    pixmaplabelitem.h \
+    thumbnail.hpp
 
 FORMS    += mainwindow.ui \
     controlswidget.ui \
@@ -37,5 +44,3 @@ RESOURCES += \
     qrs/resources.qrc
 
 CONFIG += c++11
-
-DISTFILES +=
