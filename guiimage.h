@@ -23,7 +23,6 @@ public:
   size_t width( size_t axis );
   size_t heigth( size_t axis );
   size_t depth( size_t axis );
-
   bool hasLabels( );
 
 signals:

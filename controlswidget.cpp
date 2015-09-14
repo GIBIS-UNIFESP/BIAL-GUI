@@ -68,6 +68,10 @@ void ControlsWidget::imageChanged( ) {
 
   updateRange( );
 
+  if(img == nullptr){
+    return;
+  }
+
   ui->folderHorizontalSlider->setValue( controller->currentImagePos( ) );
   ui->folderSpinBox->setValue( controller->currentImagePos( ) );
   if( img->modality( ) == Modality::NIfTI ) {

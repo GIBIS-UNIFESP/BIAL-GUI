@@ -19,6 +19,8 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->installImageViewer( ui->imageViewer );
 
+  ui->actionPrint->setEnabled( false );
+
   setupLogoview( );
 
   createConnections( );
@@ -29,8 +31,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   createActions( );
 
-  ui->actionPrint->setEnabled( false );
-
+  loadQss( );
 }
 
 void MainWindow::createConnections( ) {
@@ -147,36 +148,34 @@ bool MainWindow::loadFile( QString filename ) {
 }
 
 bool MainWindow::loadFolder( QString dirname ) {
-  QDir folder( dirname);
-  COMMENT("Reding folder: " << folder.absolutePath().toStdString() << ".", 1);
-  QFileInfoList list = folder.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::DirsFirst | QDir::Name);
+  QDir folder( dirname );
+  COMMENT( "Reding folder: " << folder.absolutePath( ).toStdString( ) << ".", 1 );
+  QFileInfoList list = folder.entryInfoList( QDir::NoDotAndDotDot | QDir::Files, QDir::DirsFirst | QDir::Name );
   bool value = false;
-  //  qDebug() << "list size: " << list.size();
+  /*  qDebug() << "list size: " << list.size(); */
 
-  QProgressDialog progress("Reading files...", "Abort", 0, list.size(), this);
-  progress.setWindowModality(Qt::WindowModal);
-
-  for (int i = 0, size = list.size(); i < size; ++i) {
-    progress.setValue(i);
-
-    if (progress.wasCanceled()) {
+  QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
+  progress.setWindowModality( Qt::WindowModal );
+  for( int i = 0, size = list.size( ); i < size; ++i ) {
+    progress.setValue( i );
+    if( progress.wasCanceled( ) ) {
       break;
     }
-
-    QFileInfo fileInfo = list.at(i);
-    if (fileInfo.isFile()) {
-      QString fileName = fileInfo.absoluteFilePath();
-      if (controller->addImage(fileName)) {
+    QFileInfo fileInfo = list.at( i );
+    if( fileInfo.isFile( ) ) {
+      QString fileName = fileInfo.absoluteFilePath( );
+      if( controller->addImage( fileName ) ) {
         value = true;
-      } else {
-        BIAL_WARNING(std::string("Could not open file!"));
-        statusBar()->showMessage(tr("Could not open file!"), 2000);
+      }
+      else {
+        BIAL_WARNING( std::string( "Could not open file!" ) );
+        statusBar( )->showMessage( tr( "Could not open file!" ), 2000 );
         continue;
       }
     }
   }
-  progress.setValue(list.size());
-  return value;
+  progress.setValue( list.size( ) );
+  return( value );
 }
 
 void MainWindow::setDefaultFolder( ) {
@@ -215,7 +214,7 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
     for( int img = 1; img < argc; ++img ) {
       QString fileName( argv[ img ] );
       file.setFile( fileName );
-      COMMENT("\tArgument[" << img << "] = " << fileName.toStdString(), 0);
+      COMMENT( "\tArgument[" << img << "] = " << fileName.toStdString( ), 0 );
       if( file.exists( ) ) {
         if( file.isFile( ) ) {
           if( controller->addImage( file.absoluteFilePath( ) ) ) {
@@ -223,7 +222,7 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
           }
         }
         else if( file.isDir( ) ) {
-          loadFolder( file.absoluteFilePath() );
+          loadFolder( file.absoluteFilePath( ) );
         }
       }
       else {
@@ -279,4 +278,11 @@ void MainWindow::createActions( ) {
   for( int i = 0; i < MaxRecentFiles; ++i ) {
     ui->menuRecent_files->addAction( recentFileActs[ i ] );
   }
+}
+
+void MainWindow::loadQss( ) {
+  QFile file( ":/qss/stylesheet.qss" );
+  file.open( QFile::ReadOnly );
+  QString StyleSheet = QLatin1String( file.readAll( ) );
+  setStyleSheet( StyleSheet );
 }

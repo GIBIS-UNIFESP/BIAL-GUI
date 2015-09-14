@@ -29,6 +29,7 @@ private:
   void setRecentFile( QString fileName );
   void updateRecentFileActions( );
   void createActions( );
+  void loadQss();
 
 private slots:
   void on_actionRed_background_triggered( );

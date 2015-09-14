@@ -1,8 +1,8 @@
 #include "guiimage.h"
 #include <QPixmap>
 
-GuiImage::GuiImage( QString fName, QObject *parent ) : QObject( parent ) {
-  image = Bial::Image< int >::Read( fName.toStdString( ) );
+GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_fileName(fname) {
+  image = Bial::Image< int >::Read( fname.toStdString( ) );
 
   m_max = image.Maximum( );
   if( image.Dims( ) == 3 ) {
