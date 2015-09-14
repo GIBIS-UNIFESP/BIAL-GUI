@@ -1,18 +1,18 @@
 #include "guiimage.h"
 #include <QPixmap>
 
-GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_fileName(fname) {
+GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_fileName( fname ) {
   image = Bial::Image< int >::Read( fname.toStdString( ) );
+  transform.resize( 4 );
+  bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
+  m_currentSlice.resize( 4 );
 
   m_max = image.Maximum( );
   if( image.Dims( ) == 3 ) {
-    transform.resize( 3 );
-    bounding.resize( 3 );
-
-    COMMENT( "NIfTI image detected.", 0 );
+    COMMENT( "NIfTI image detected.", 2 );
     m_modality = Modality::NIfTI;
     {
-      COMMENT( "Generating Axial affine transform.", 0 );
+      COMMENT( "Generating Axial affine transform.", 2 );
       transform[ 0 ].Rotate( 90.0, Bial::Transform3D::X ).Rotate( 90.0, Bial::Transform3D::Y );
       Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
       transform[ 0 ]( start, &start );
@@ -23,7 +23,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
       bounding[ 0 ] = bounding[ 0 ].Normalized( );
     }
     {
-      COMMENT( "Generating Coronal affine transform.", 0 );
+      COMMENT( "Generating Coronal affine transform.", 2 );
       transform[ 1 ].Rotate( 180.0, Bial::Transform3D::Z ).Rotate( 90.0, Bial::Transform3D::Y );
       Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
       transform[ 1 ]( start, &start );
@@ -34,7 +34,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
       bounding[ 1 ] = bounding[ 1 ].Normalized( );
     }
     {
-      COMMENT( "Generating Sagittal affine transform.", 0 );
+      COMMENT( "Generating Sagittal affine transform.", 2 );
       transform[ 2 ].Rotate( 180.0, Bial::Transform3D::Z );
       Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
       transform[ 2 ]( start, &start );
@@ -62,6 +62,7 @@ QString GuiImage::fileName( ) {
 }
 
 QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
+  COMMENT( "GET SLICE: axis = " << axis << ", slice = " << slice, 2 );
   if( slice >= depth( axis ) ) {
     throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
                                           toStdString( ) ) ) );
@@ -69,12 +70,12 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
   try {
     const size_t xsize = width( axis );
     const size_t ysize = heigth( axis );
-    COMMENT( "Xsize = " << xsize << ", Ysize = " << ysize, 0 );
+    COMMENT( "Xsize = " << xsize << ", Ysize = " << ysize, 2 );
     if( modality( ) == Modality::NIfTI ) {
       const Bial::Transform3D &transf = transform[ axis ];
       QImage res( xsize, ysize, QImage::Format_ARGB32 );
       if( m_max == 1 ) {
-        COMMENT( "MAX = 1", 0 )
+        COMMENT( "MAX = 1", 2 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -91,7 +92,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
         }
       }
       else if( m_max < 256 ) {
-        COMMENT( "MAX < 256", 0 )
+        COMMENT( "MAX < 256", 2 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -105,7 +106,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
         }
       }
       else {
-        COMMENT( "MAX >= 256", 0 )
+        COMMENT( "MAX >= 256", 2 );
         double factor = ( double ) m_max / 255.0;
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
@@ -161,4 +162,20 @@ size_t GuiImage::depth( size_t axis = 0 ) {
 
 bool GuiImage::hasLabels( ) {
   return( false );
+}
+
+void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
+  if( m_currentSlice[ axis ] != slice ){
+    if( axis < ( size_t ) m_currentSlice.size( ) ) {
+      m_currentSlice[ axis ] = slice;
+      emit imageUpdated( );
+    }else{
+      throw std::out_of_range(BIAL_ERROR("Axis out of range."));
+    }
+  }
+}
+
+
+size_t GuiImage::currentSlice( size_t axis ) {
+  return( m_currentSlice[ axis ] );
 }

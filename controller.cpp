@@ -96,7 +96,38 @@ int Controller::size( ) {
 }
 
 void Controller::update( ) {
+  COMMENT("UPDATING IMAGE!", 0);
 
+  GuiImage *img = currentImage( );
+  if( img ) {
+    int items = 1;
+    if( img->modality( ) == Modality::NIfTI ) {
+      items = 3;
+    }
+    else if( img->modality( ) == Modality::RGB ) {
+      items = 4;
+    }
+    for( int axis = 0; axis < items; ++axis ) {
+      m_pixmapItems.at( axis )->setImage( img->getSlice( axis, img->currentSlice( axis ) ) );
+/*
+ *      if( img->currentLabel( ) != NULL ) {
+ *        m_pixmapItems[ axis ]->setLabel( img->currentLabel( )->getLabel( axis,
+ *                                                                         img->currentSlice(
+ *                                                                           axis ) ) );
+ *      }
+ *      else {
+ *        m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
+ *      }
+ */
+    }
+  }
+  else {
+    for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
+      m_pixmapItems[ axis ]->setImage( QPixmap( ) );
+//      m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
+    }
+  }
+  emit imageChanged( );
 }
 
 void Controller::setCurrentImagePos( int position ) {
@@ -125,7 +156,15 @@ void Controller::changeOthersSlices( QPointF posF, int axis ) {
 
 }
 
+void Controller::setCurrentSlice( size_t axis, size_t slice ) {
+  currentImage()->setCurrentSlice(axis, slice);
+}
+
 void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
   m_thumbsWidget = thumbsWidget;
   m_thumbsWidget->setController( this );
+}
+
+PixmapLabelItem* Controller::getPixmapItem( size_t axis ) {
+  return( m_pixmapItems.at( axis ) );
 }

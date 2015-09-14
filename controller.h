@@ -123,6 +123,8 @@ public:
    * @param thumbsWidget
    */
   void setThumbsWidget(ThumbsWidget * thumbsWidget);
+
+  PixmapLabelItem * getPixmapItem( size_t axis );
 signals:
   /**
    * @brief This signal is emmited every time the current image changes.
@@ -162,6 +164,13 @@ public slots:
    *
    */
   void changeOthersSlices( QPointF posF, int axis );
+  /**
+   * @brief setCurrentSlice is called by the imageViewer when the slider or
+   *  the spinbox have theis values updated.
+   * @param axis
+   * @param slice
+   */
+  void setCurrentSlice( size_t axis, size_t slice );
 
 };
 

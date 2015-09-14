@@ -19,6 +19,12 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->installImageViewer( ui->imageViewer );
 
+  ui->imageViewer->setController(controller);
+
+  for( size_t axis = 0; axis < 4; ++axis){
+    ui->imageViewer->getScene(axis)->addItem(controller->getPixmapItem(axis));
+  }
+
   ui->actionPrint->setEnabled( false );
 
   setupLogoview( );
@@ -56,8 +62,6 @@ void MainWindow::createConnections( ) {
   connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible );
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
   connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
-
-  /* Opening and saving files. */
 
   /* Dynamic functions. */
   connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );

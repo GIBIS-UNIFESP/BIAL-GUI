@@ -1,6 +1,8 @@
+#include "controller.h"
 #include "imageviewer.h"
 #include "imagewidget.h"
 
+#include <Common.hpp>
 #include <QEvent>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
@@ -13,24 +15,18 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
     views[ i ] = new ImageWidget( this );
     views[ i ]->hideControls( );
     views[ i ]->scene( )->installEventFilter( this );
+    views[ i ]->setViewNumber( i );
   }
   layout = new QGridLayout( this );
   layout->setVerticalSpacing( 10 );
   layout->setHorizontalSpacing( 10 );
   setGridLayout( );
 
-  /* FIXME: Temporary code: */
-
-//  views[ 0 ]->setBackgroundColor( Qt::black );
-//  views[ 1 ]->setBackgroundColor( Qt::red );
-//  views[ 2 ]->setBackgroundColor( Qt::green );
-//  views[ 3 ]->setBackgroundColor( Qt::blue );
 }
 
 ImageViewer::~ImageViewer( ) {
 
 }
-
 
 void ImageViewer::setBackgroundColor( const QColor &color ) {
   for( ImageWidget *view : views ) {
@@ -38,6 +34,26 @@ void ImageViewer::setBackgroundColor( const QColor &color ) {
   }
 }
 
+void ImageViewer::setController( Controller *value ) {
+  controller = value;
+  connect( controller, &Controller::imageChanged, this, &ImageViewer::updateImage );
+  for( ImageWidget *view : views ) {
+    connect(view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice);
+  }
+}
+
+void ImageViewer::updateImage( ) {
+  GuiImage *img = controller->currentImage( );
+  if( !img ) {
+    return;
+  }
+  for( size_t i = 0; i < views.size( ); ++i ) {
+    views[ i ]->setRange( 0, img->depth( i ) );
+    views[ i ]->showControls( );
+    views[ i ]->setSlice(img->currentSlice(i));
+  }
+  /* TODO continue ... */
+}
 
 void ImageViewer::setGridLayout( ) {
   layout->addWidget( views[ 0 ], 0, 0 );
@@ -119,4 +135,11 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
                          mouseEvt->scenePos( ).y( ) ).arg( scene ), 100 );
   }
   return( QWidget::eventFilter( obj, evt ) );
+}
+
+QGraphicsScene* ImageViewer::getScene( size_t axis ) {
+  if( axis > views.size( ) ) {
+    throw std::out_of_range( BIAL_ERROR( QString( "Invalid axis, expected < %1." ).arg( views.size( ) ).toStdString( ) ) );
+  }
+  return( views[ axis ]->scene( ) );
 }

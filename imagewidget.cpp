@@ -1,5 +1,6 @@
 #include "imagewidget.h"
 #include "ui_imagewidget.h"
+#include <Common.hpp>
 
 ImageWidget::ImageWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::ImageWidget ) {
   ui->setupUi( this );
@@ -13,11 +14,11 @@ ImageWidget::~ImageWidget( ) {
 }
 
 void ImageWidget::hideControls( ) {
-  ui->frameControls->hide();
+  ui->frameControls->hide( );
 }
 
 void ImageWidget::showControls( ) {
-  ui->frameControls->show();
+  ui->frameControls->show( );
 }
 
 void ImageWidget::setBackgroundColor( const QColor &color ) {
@@ -26,6 +27,43 @@ void ImageWidget::setBackgroundColor( const QColor &color ) {
   }
 }
 
-QGraphicsScene * ImageWidget::scene( ) const {
+QGraphicsScene* ImageWidget::scene( ) const {
   return( m_scene );
+}
+size_t ImageWidget::viewNumber( ) const {
+  return( m_viewNumber );
+}
+
+void ImageWidget::setViewNumber( const size_t &viewNumber ) {
+  m_viewNumber = viewNumber;
+}
+
+void ImageWidget::setRange( int start, int end ) {
+  if( start > end ) {
+    throw std::invalid_argument( BIAL_ERROR( "start should be smaller than end" ) );
+  }
+  ui->spinBox->setMinimum( start );
+  ui->spinBox->setMaximum( end );
+
+  ui->horizontalSlider->setMinimum( start );
+  ui->horizontalSlider->setMaximum( end );
+
+}
+
+void ImageWidget::setSlice( int slice ) {
+  ui->spinBox->setValue( slice );
+  ui->horizontalSlider->setValue( slice );
+}
+
+void ImageWidget::on_spinBox_valueChanged( int position ) {
+  emit sliceChanged( m_viewNumber, position );
+}
+
+void ImageWidget::on_rotateButton_clicked( ) {
+
+}
+
+void ImageWidget::on_horizontalSlider_valueChanged( int position ) {
+  emit sliceChanged( m_viewNumber, position );
+
 }

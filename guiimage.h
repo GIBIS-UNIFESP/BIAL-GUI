@@ -24,6 +24,8 @@ public:
   size_t heigth( size_t axis );
   size_t depth( size_t axis );
   bool hasLabels( );
+  size_t currentSlice(size_t axis);
+  void setCurrentSlice(size_t axis, size_t slice);
 
 signals:
   void imageUpdated( );
@@ -33,6 +35,7 @@ public slots:
 private:
   QVector< Bial::Transform3D > transform;
   QVector< Bial::BBox > bounding;
+  QVector< size_t > m_currentSlice;
   int m_max;
 };
 
