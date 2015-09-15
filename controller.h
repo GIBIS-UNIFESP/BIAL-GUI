@@ -11,7 +11,7 @@ class ThumbsWidget;
 
 /**
  * @brief The Controller class is one of the most important classes of the User Interface,
- * and is responsible to
+ * and is responsible to manage the images.
  */
 class Controller : public QObject {
   Q_OBJECT

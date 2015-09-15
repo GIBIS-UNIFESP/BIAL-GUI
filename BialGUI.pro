@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     controller.cpp \
     guiimage.cpp \
     pixmaplabelitem.cpp \
-    thumbnail.cpp
+    thumbnail.cpp \
+    displayformat.cpp
 
 HEADERS  += mainwindow.h \
     controlswidget.h \
@@ -33,7 +34,8 @@ HEADERS  += mainwindow.h \
     controller.h \
     guiimage.h \
     pixmaplabelitem.h \
-    thumbnail.hpp
+    thumbnail.hpp \
+    displayformat.h
 
 FORMS    += mainwindow.ui \
     controlswidget.ui \

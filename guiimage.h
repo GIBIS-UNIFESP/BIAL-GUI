@@ -1,13 +1,11 @@
 #ifndef GUIIMAGE_H
 #define GUIIMAGE_H
-
 #include <Geometrics.hpp>
 #include <Image.hpp>
 #include <QObject>
 #include <QVector>
 
-enum class Modality { BW, RGB, NIfTI };
-
+#include "displayformat.h"
 class GuiImage : public QObject {
   Q_OBJECT
 

@@ -44,11 +44,12 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
       transform[ 2 ].Translate( bounding[ 2 ].pMin.x, bounding[ 2 ].pMin.y, bounding[ 2 ].pMin.z );
       bounding[ 2 ] = bounding[ 2 ].Normalized( );
     }
-  }
-  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
+    for(int axis = 0; axis < m_currentSlice.size(); ++axis ) {
+      setCurrentSlice(axis, depth(axis)/2 );
+    }
+  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
     m_modality = Modality::RGB;
-  }
-  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
+  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
     m_modality = Modality::BW;
   }
 }
@@ -90,8 +91,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
             scanLine[ x ] = qRgb( pixel, pixel, pixel );
           }
         }
-      }
-      else if( m_max < 256 ) {
+      } else if( m_max < 256 ) {
         COMMENT( "MAX < 256", 2 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
@@ -104,8 +104,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
             scanLine[ x ] = qRgb( pixel, pixel, pixel );
           }
         }
-      }
-      else {
+      } else {
         COMMENT( "MAX >= 256", 2 );
         double factor = ( double ) m_max / 255.0;
         for( size_t y = 0; y < ysize; ++y ) {
@@ -121,28 +120,22 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
         }
       }
       return( QPixmap::fromImage( res ) );
-    }
-    else if( modality( ) == Modality::RGB ) {
+    } else if( modality( ) == Modality::RGB ) {
 
-    }
-    else if( modality( ) == Modality::BW ) {
+    } else if( modality( ) == Modality::BW ) {
 
     }
     return( QPixmap( ) );
-  }
-  catch( std::bad_alloc &e ) {
+  } catch( std::bad_alloc &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Memory allocation error." ) );
     throw( std::runtime_error( msg ) );
-  }
-  catch( std::runtime_error &e ) {
+  } catch( std::runtime_error &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Runtime error." ) );
     throw( std::runtime_error( msg ) );
-  }
-  catch( const std::out_of_range &e ) {
+  } catch( const std::out_of_range &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Out of range exception." ) );
     throw( std::out_of_range( msg ) );
-  }
-  catch( const std::logic_error &e ) {
+  } catch( const std::logic_error &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Logic Error." ) );
     throw( std::logic_error( msg ) );
   }
@@ -165,11 +158,11 @@ bool GuiImage::hasLabels( ) {
 }
 
 void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
-  if( m_currentSlice[ axis ] != slice ){
+  if( m_currentSlice[ axis ] != slice ) {
     if( axis < ( size_t ) m_currentSlice.size( ) ) {
       m_currentSlice[ axis ] = slice;
       emit imageUpdated( );
-    }else{
+    } else {
       throw std::out_of_range(BIAL_ERROR("Axis out of range."));
     }
   }
