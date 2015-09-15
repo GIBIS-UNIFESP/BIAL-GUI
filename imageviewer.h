@@ -31,6 +31,7 @@ signals:
 
 private slots:
   void updateImage();
+  void changeImage();
 
 public slots:
   void setGridLayout( );

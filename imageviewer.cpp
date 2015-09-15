@@ -36,7 +36,9 @@ void ImageViewer::setBackgroundColor( const QColor &color ) {
 
 void ImageViewer::setController( Controller *value ) {
   controller = value;
-  connect( controller, &Controller::imageChanged, this, &ImageViewer::updateImage );
+  connect( controller, &Controller::imageChanged, this, &ImageViewer::changeImage );
+  connect( controller, &Controller::imageUpdated, this, &ImageViewer::updateImage );
+
   for( ImageWidget *view : views ) {
     connect(view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice);
   }
@@ -48,11 +50,23 @@ void ImageViewer::updateImage( ) {
     return;
   }
   for( size_t i = 0; i < 4; ++i ) {
+    views[ i ]->setSlice(img->currentSlice(i));
+  }
+  /* TODO continue ... */
+}
+
+void ImageViewer::changeImage() {
+  GuiImage *img = controller->currentImage( );
+  if( !img ) {
+    return;
+  }
+  for( size_t i = 0; i < 4; ++i ) {
     views[ i ]->setRange( 0, img->depth( i ) - 1 );
     views[ i ]->showControls( );
     views[ i ]->setSlice(img->currentSlice(i));
   }
   /* TODO continue ... */
+
 }
 
 void ImageViewer::setGridLayout( ) {

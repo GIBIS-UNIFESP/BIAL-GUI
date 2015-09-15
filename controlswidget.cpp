@@ -60,15 +60,13 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
 void ControlsWidget::setController( Controller *value ) {
   controller = value;
   connect( controller, &Controller::imageChanged, this, &ControlsWidget::imageChanged );
+  connect( controller, &Controller::imageUpdated, this, &ControlsWidget::imageUpdated );
   connect( controller, &Controller::containerUpdated, this, &ControlsWidget::updateRange );
 }
 
 void ControlsWidget::imageChanged( ) {
   GuiImage *img = controller->currentImage( );
-
-  updateRange( );
-
-  if(img == nullptr){
+  if(img == nullptr) {
     return;
   }
 
@@ -81,11 +79,9 @@ void ControlsWidget::imageChanged( ) {
     ui->groupBoxPpmViews->hide( );
     ui->groupBoxPpmChannels->hide( );
     ui->pushButton3Views->click( );
-  }
-  else if( img->modality( ) == Modality::RGB ) {
+  } else if( img->modality( ) == Modality::RGB ) {
 
-  }
-  else if( img->modality( ) == Modality::BW ) {
+  } else if( img->modality( ) == Modality::BW ) {
     ui->groupBoxNiftiViews->hide( );
     ui->groupBoxNiftiAxis->hide( );
     ui->groupBoxOrientation->hide( );
@@ -93,6 +89,10 @@ void ControlsWidget::imageChanged( ) {
     ui->groupBoxPpmChannels->hide( );
   }
   ui->groupBoxLabels->setVisible( img->hasLabels( ) );
+}
+
+void ControlsWidget::imageUpdated() {
+
 }
 
 void ControlsWidget::updateRange( ) {
@@ -105,8 +105,7 @@ void ControlsWidget::updateRange( ) {
     ui->folderHorizontalSlider->setEnabled( true );
     ui->folderHorizontalSlider->setMaximum( images );
     ui->folderHorizontalSlider->setMinimum( 0 );
-  }
-  else if( images == 0 ) {
+  } else if( images == 0 ) {
     /*    controller->setCurrentImagePos(images - 1); */
     ui->folderSpinBox->setEnabled( false );
     ui->folderSpinBox->setMaximum( 0 );

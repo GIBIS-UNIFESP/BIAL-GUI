@@ -125,7 +125,7 @@ void Controller::update( ) {
 //      m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
     }
   }
-  emit imageChanged( );
+  emit imageUpdated();
 }
 
 void Controller::setCurrentImagePos( int position ) {

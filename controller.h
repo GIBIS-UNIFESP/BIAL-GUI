@@ -131,6 +131,10 @@ signals:
    */
   void imageChanged( );
   /**
+   * @brief This signal is emmited every time the current image is updated.
+   */
+  void imageUpdated( );
+  /**
    * @brief This signal is emmited avery time the m_images vector is updated.
    */
   void containerUpdated( );

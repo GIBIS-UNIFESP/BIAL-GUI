@@ -23,6 +23,7 @@ public:
 
 protected slots:
   void imageChanged( );
+  void imageUpdated( );
   void updateRange( );
 
 private:
