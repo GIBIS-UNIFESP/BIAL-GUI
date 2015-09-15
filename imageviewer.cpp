@@ -48,7 +48,7 @@ void ImageViewer::updateImage( ) {
     return;
   }
   for( size_t i = 0; i < 4; ++i ) {
-    views[ i ]->setRange( 0, img->depth( i ) );
+    views[ i ]->setRange( 0, img->depth( i ) - 1 );
     views[ i ]->showControls( );
     views[ i ]->setSlice(img->currentSlice(i));
   }
