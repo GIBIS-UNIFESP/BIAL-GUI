@@ -1,15 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include "controller.h"
 
-#define MaxRecentFiles 10
+#include <QMainWindow>
 
 namespace Ui {
   class MainWindow;
 }
-
-class Controller;
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -26,8 +24,6 @@ private:
   QString getFileDialog( );
   bool loadFile( QString filename );
   bool loadFolder( QString dirname );
-  void setRecentFile( QString fileName );
-  void updateRecentFileActions( );
   void createActions( );
   void loadQss();
 
@@ -37,21 +33,21 @@ private slots:
   void on_actionBlue_background_triggered( );
   void on_actionBlack_background_triggered( );
   void on_actionWhite_background_triggered( );
+  void on_actionOpen_image_triggered( );
+  void on_actionQuit_triggered( );
 
   void updateMenus( );
   void setDefaultFolder( );
   void readSettings( );
   void openRecentFile( );
+  void updateRecentFileActions( );
 
-  void on_actionOpen_image_triggered( );
-
-  void on_actionQuit_triggered( );
 
 private:
   Ui::MainWindow *ui;
   Controller *controller;
   QString defaultFolder;
-  QAction *recentFileActs[ MaxRecentFiles ];
+  QAction *recentFileActs[ Controller::MaxRecentFiles ];
 };
 
 #endif /* MAINWINDOW_H */

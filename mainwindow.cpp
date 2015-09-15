@@ -21,7 +21,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->imageViewer->setController(controller);
 
-  for( size_t axis = 0; axis < 4; ++axis){
+  for( size_t axis = 0; axis < 4; ++axis) {
     ui->imageViewer->getScene(axis)->addItem(controller->getPixmapItem(axis));
   }
 
@@ -66,6 +66,7 @@ void MainWindow::createConnections( ) {
   /* Dynamic functions. */
   connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
   connect( controller, &Controller::imageChanged, this, &MainWindow::updateMenus );
+  connect( controller, &Controller::recentFilesUpdated,this,&MainWindow::updateRecentFileActions);
 }
 
 void MainWindow::setupLogoview( ) {
@@ -170,8 +171,7 @@ bool MainWindow::loadFolder( QString dirname ) {
       QString fileName = fileInfo.absoluteFilePath( );
       if( controller->addImage( fileName ) ) {
         value = true;
-      }
-      else {
+      } else {
         BIAL_WARNING( std::string( "Could not open file!" ) );
         statusBar( )->showMessage( tr( "Could not open file!" ), 2000 );
         continue;
@@ -211,9 +211,8 @@ void MainWindow::readSettings( ) {
 void MainWindow::commandLineOpen( int argc, char *argv[] ) {
   COMMENT( "Command Line Open with " << argc << " arguments:", 0 );
   if( ( argc == 3 ) && ( QString( argv[ 1 ] ) == "-d" ) ) {
-/*    LoadDicomdir(QString(argv[2])); */
-  }
-  else {
+    /*    LoadDicomdir(QString(argv[2])); */
+  } else {
     QFileInfo file;
     for( int img = 1; img < argc; ++img ) {
       QString fileName( argv[ img ] );
@@ -221,15 +220,11 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
       COMMENT( "\tArgument[" << img << "] = " << fileName.toStdString( ), 0 );
       if( file.exists( ) ) {
         if( file.isFile( ) ) {
-          if( controller->addImage( file.absoluteFilePath( ) ) ) {
-            setRecentFile( file.absoluteFilePath( ) );
-          }
-        }
-        else if( file.isDir( ) ) {
+          controller->addImage( file.absoluteFilePath( ) );
+        } else if( file.isDir( ) ) {
           loadFolder( file.absoluteFilePath( ) );
         }
-      }
-      else {
+      } else {
         BIAL_WARNING( "FILE DOES NOT EXISTS! : " << file.absolutePath( ).toStdString( ) );
       }
     }
@@ -240,9 +235,6 @@ void MainWindow::on_actionQuit_triggered( ) {
   close( );
 }
 
-void MainWindow::setRecentFile( QString fileName ) {
-
-}
 
 void MainWindow::openRecentFile( ) {
   QAction *action = qobject_cast< QAction* >( sender( ) );
@@ -256,7 +248,7 @@ void MainWindow::updateRecentFileActions( ) {
   QSettings settings;
   QStringList files = settings.value( "recentFileList" ).toStringList( );
 
-  int numRecentFiles = qMin( files.size( ), ( int ) MaxRecentFiles );
+  int numRecentFiles = qMin( files.size( ), ( int ) Controller::MaxRecentFiles );
   if( numRecentFiles > 0 ) {
     ui->menuRecent_files->setEnabled( true );
   }
@@ -266,20 +258,20 @@ void MainWindow::updateRecentFileActions( ) {
     recentFileActs[ i ]->setData( files[ i ] );
     recentFileActs[ i ]->setVisible( true );
   }
-  for( int i = numRecentFiles; i < MaxRecentFiles; ++i ) {
+  for( int i = numRecentFiles; i < Controller::MaxRecentFiles; ++i ) {
     recentFileActs[ i ]->setVisible( false );
   }
 }
 
 void MainWindow::createActions( ) {
-  for( int i = 0; i < MaxRecentFiles; ++i ) {
+  for( int i = 0; i < Controller::MaxRecentFiles; ++i ) {
     recentFileActs[ i ] = new QAction( this );
     recentFileActs[ i ]->setVisible( false );
     connect( recentFileActs[ i ], &QAction::triggered, this, &MainWindow::openRecentFile );
     ui->menuRecent_files->addAction( recentFileActs[ i ] );
   }
   updateRecentFileActions( );
-  for( int i = 0; i < MaxRecentFiles; ++i ) {
+  for( int i = 0; i < Controller::MaxRecentFiles; ++i ) {
     ui->menuRecent_files->addAction( recentFileActs[ i ] );
   }
 }

@@ -15,7 +15,6 @@ class ThumbsWidget;
  */
 class Controller : public QObject {
   Q_OBJECT
-
   /**
    *
    * @brief m_images holds all opened images.
@@ -42,6 +41,7 @@ class Controller : public QObject {
   ThumbsWidget * m_thumbsWidget;
 
 public:
+  enum { MaxRecentFiles = 10 };
   /**
    *
    * @brief Controller's constructor
@@ -134,6 +134,10 @@ signals:
    * @brief This signal is emmited avery time the m_images vector is updated.
    */
   void containerUpdated( );
+  /**
+   * @brief recentFilesUpdated
+   */
+  void recentFilesUpdated();
 public slots:
   /**
    *
@@ -171,7 +175,12 @@ public slots:
    * @param slice
    */
   void setCurrentSlice( size_t axis, size_t slice );
-
+private:
+  /**
+   * @brief setRecentFile
+   * @param file
+   */
+  void setRecentFile(QString fname);
 };
 
 #endif /** CONTROLLER_H */
