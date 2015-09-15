@@ -28,6 +28,19 @@
         <file>icons/minus.svg</file>
         <file>icons/plus.svg</file>
         <file>icons/3colors.png</file>
+        <file>icons/arrows.png</file>
+        <file>icons/sagittal.svg</file>
+        <file>icons/coronal.svg</file>
+        <file>icons/colors.svg</file>
+        <file>icons/colors.png</file>
+        <file>icons/color_R.svg</file>
+        <file>icons/axial.svg</file>
+        <file>icons/arrows.svg</file>
+        <file>icons/4views.svg</file>
+        <file>icons/4colors.svg</file>
+        <file>icons/3views.svg</file>
+        <file>icons/3colors.svg</file>
+        <file>icons/1view.svg</file>
     </qresource>
     <qresource prefix="/translations">
         <file>bial_br.qm</file>
