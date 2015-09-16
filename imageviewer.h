@@ -26,6 +26,8 @@ public:
   QGraphicsScene * getScene(size_t axis);
   void setController(Controller * value);
 
+  void updateViews();
+
 signals:
   void updateStatus(QString text, int timeout = 0 );
 
@@ -48,7 +50,6 @@ public slots:
   void setViews012( );
   void setViews123( );
   void set0123Views( );
-
 
 };
 

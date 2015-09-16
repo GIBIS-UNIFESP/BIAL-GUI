@@ -114,7 +114,7 @@ void Controller::update( ) {
     }
     for( int axis = 0; axis < items; ++axis ) {
 
-      QPixmap pix = img->getSlice( axis, img->currentSlice( axis ) );//.scaledToHeight(img->heigth(axis) * scale);
+      const QPixmap &pix = img->getSlice( axis, img->currentSlice( axis ) ); /* .scaledToHeight(img->heigth(axis) * scale); */
       m_pixmapItems.at( axis )->setImage( pix );
 
       /* TODO Label rendering. */
@@ -134,7 +134,7 @@ void Controller::update( ) {
   else {
     for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
       m_pixmapItems[ axis ]->setImage( QPixmap( ) );
-/*      m_pixmapItems[ axis ]->setLabel( QPixmap( ) ); */
+      m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
     }
   }
   emit imageUpdated( );
@@ -170,9 +170,9 @@ void Controller::setCurrentSlice( size_t axis, size_t slice ) {
 }
 
 void Controller::setZoom( int value ) {
-  //FIXME Zoom doesn't work yet.
-  scale = 1.0 + value/100.0;
-  update();
+  /* FIXME Zoom doesn't work yet. */
+  scale = 1.0 + value / 100.0;
+  update( );
 }
 
 void Controller::setRecentFile( QString fname ) {

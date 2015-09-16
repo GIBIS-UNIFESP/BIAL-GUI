@@ -30,6 +30,10 @@ public:
 
   void setSlice(int slice);
 
+  void fitInView();
+
+  void show();
+
 signals:
   void sliceChanged( size_t viewNbr, size_t slice );
 

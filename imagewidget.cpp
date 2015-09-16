@@ -48,7 +48,10 @@ void ImageWidget::setRange( int start, int end ) {
 
   ui->horizontalSlider->setMinimum( start );
   ui->horizontalSlider->setMaximum( end );
-
+  if( start == end ) {
+    ui->spinBox->setEnabled( false );
+    ui->horizontalSlider->setEnabled( false );
+  }
 }
 
 void ImageWidget::setSlice( int slice ) {
@@ -58,6 +61,18 @@ void ImageWidget::setSlice( int slice ) {
   if( ui->horizontalSlider->value( ) != slice ) {
     ui->horizontalSlider->setValue( slice );
   }
+}
+
+void ImageWidget::fitInView( ) {
+  QGraphicsScene *scn = ui->graphicsView->scene( );
+  if( scn ) {
+    ui->graphicsView->fitInView( scn->itemsBoundingRect( ), Qt::KeepAspectRatio );
+  }
+}
+
+void ImageWidget::show( ) {
+  QWidget::show();
+  fitInView();
 }
 
 void ImageWidget::on_spinBox_valueChanged( int position ) {
@@ -74,8 +89,5 @@ void ImageWidget::on_horizontalSlider_valueChanged( int position ) {
 }
 
 void ImageWidget::resizeEvent( QResizeEvent* ) {
-  QGraphicsScene *scn = ui->graphicsView->scene();
-  if(scn){
-    ui->graphicsView->fitInView(scn->itemsBoundingRect() ,Qt::KeepAspectRatio);
-  }
+  fitInView( );
 }

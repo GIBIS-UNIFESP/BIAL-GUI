@@ -38,26 +38,31 @@ void ImageViewer::setController( Controller *value ) {
   controller = value;
   connect( controller, &Controller::imageChanged, this, &ImageViewer::changeImage );
   connect( controller, &Controller::imageUpdated, this, &ImageViewer::updateImage );
-
   for( ImageWidget *view : views ) {
-    connect(view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice);
+    connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
+  }
+}
+
+void ImageViewer::updateViews( ) {
+  for( size_t i = 0; i < 4; ++i ) {
+    views[i]->fitInView();
   }
 }
 
 void ImageViewer::updateImage( ) {
-  COMMENT("ImageViewer::updateImage", 2);
+  COMMENT( "ImageViewer::updateImage", 2 );
   GuiImage *img = controller->currentImage( );
   if( !img ) {
     return;
   }
   for( size_t i = 0; i < 4; ++i ) {
-    views[ i ]->setSlice(img->currentSlice(i));
+    views[ i ]->setSlice( img->currentSlice( i ) );
   }
   /* TODO continue ... */
 }
 
-void ImageViewer::changeImage() {
-  COMMENT("ImageViewer::changeImage", 0);
+void ImageViewer::changeImage( ) {
+  COMMENT( "ImageViewer::changeImage", 0 );
   GuiImage *img = controller->currentImage( );
   if( !img ) {
     return;
@@ -65,7 +70,7 @@ void ImageViewer::changeImage() {
   for( size_t i = 0; i < 4; ++i ) {
     views[ i ]->setRange( 0, img->depth( i ) - 1 );
     views[ i ]->showControls( );
-    views[ i ]->setSlice(img->currentSlice(i));
+    views[ i ]->setSlice( img->currentSlice( i ) );
   }
   /* TODO continue ... */
 
@@ -76,6 +81,7 @@ void ImageViewer::setGridLayout( ) {
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 1, 0 );
   layout->addWidget( views[ 3 ], 1, 1 );
+  updateViews( );
 }
 
 void ImageViewer::setHorizontalLayout( ) {
@@ -83,6 +89,7 @@ void ImageViewer::setHorizontalLayout( ) {
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 0, 2 );
   layout->addWidget( views[ 3 ], 0, 3 );
+  updateViews( );
 }
 
 void ImageViewer::setVerticalLayout( ) {
@@ -90,6 +97,7 @@ void ImageViewer::setVerticalLayout( ) {
   layout->addWidget( views[ 1 ], 1, 0 );
   layout->addWidget( views[ 2 ], 2, 0 );
   layout->addWidget( views[ 3 ], 3, 0 );
+  updateViews( );
 }
 
 void ImageViewer::hideViews( ) {
