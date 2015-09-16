@@ -39,7 +39,10 @@ class Controller : public QObject {
    * @brief m_thumbsWidget is a pointer to the thumbnails dock.
    */
   ThumbsWidget * m_thumbsWidget;
-
+  /**
+   * @brief scale
+   */
+  double scale;
 public:
   enum { MaxRecentFiles = 10 };
   /**
@@ -179,6 +182,11 @@ public slots:
    * @param slice
    */
   void setCurrentSlice( size_t axis, size_t slice );
+  /**
+   * @brief setZoom
+   * @param value
+   */
+  void setZoom(int value);
 private:
   /**
    * @brief setRecentFile

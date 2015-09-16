@@ -45,6 +45,10 @@ private:
   Ui::ImageWidget *ui;
   QGraphicsScene *m_scene;
   size_t m_viewNumber;
+
+  // QWidget interface
+protected:
+  void resizeEvent(QResizeEvent *);
 };
 
 #endif /* IMAGEWIDGET_H */

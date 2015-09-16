@@ -30,6 +30,7 @@ void ImageWidget::setBackgroundColor( const QColor &color ) {
 QGraphicsScene* ImageWidget::scene( ) const {
   return( m_scene );
 }
+
 size_t ImageWidget::viewNumber( ) const {
   return( m_viewNumber );
 }
@@ -51,8 +52,12 @@ void ImageWidget::setRange( int start, int end ) {
 }
 
 void ImageWidget::setSlice( int slice ) {
-  ui->spinBox->setValue( slice );
-  ui->horizontalSlider->setValue( slice );
+  if( ui->spinBox->value( ) != slice ) {
+    ui->spinBox->setValue( slice );
+  }
+  if( ui->horizontalSlider->value( ) != slice ) {
+    ui->horizontalSlider->setValue( slice );
+  }
 }
 
 void ImageWidget::on_spinBox_valueChanged( int position ) {
@@ -66,4 +71,11 @@ void ImageWidget::on_rotateButton_clicked( ) {
 void ImageWidget::on_horizontalSlider_valueChanged( int position ) {
   emit sliceChanged( m_viewNumber, position );
 
+}
+
+void ImageWidget::resizeEvent( QResizeEvent* ) {
+  QGraphicsScene *scn = ui->graphicsView->scene();
+  if(scn){
+    ui->graphicsView->fitInView(scn->itemsBoundingRect() ,Qt::KeepAspectRatio);
+  }
 }

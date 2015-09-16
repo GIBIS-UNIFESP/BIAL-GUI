@@ -62,6 +62,9 @@ void ControlsWidget::setController( Controller *value ) {
   connect( controller, &Controller::imageChanged, this, &ControlsWidget::imageChanged );
   connect( controller, &Controller::imageUpdated, this, &ControlsWidget::imageUpdated );
   connect( controller, &Controller::containerUpdated, this, &ControlsWidget::updateRange );
+
+  connect( ui->horizontalSliderZoom, &QAbstractSlider::valueChanged, controller, &Controller::setZoom);
+
 }
 
 void ControlsWidget::imageChanged( ) {

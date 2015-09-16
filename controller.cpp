@@ -31,15 +31,20 @@ bool Controller::addImage( QString fname ) {
   GuiImage *img = nullptr;
   try {
     img = new GuiImage( fname, this );
-  } catch( std::bad_alloc e ) {
+  }
+  catch( std::bad_alloc e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( std::runtime_error e ) {
+  }
+  catch( std::runtime_error e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( std::out_of_range e ) {
+  }
+  catch( std::out_of_range e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( std::logic_error e ) {
+  }
+  catch( std::logic_error e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( ... ) {
+  }
+  catch( ... ) {
 
   }
   if( img == nullptr ) {
@@ -53,18 +58,17 @@ bool Controller::addImage( QString fname ) {
   if( currentImagePos( ) == -1 ) {
     setCurrentImagePos( 0 );
   }
-
-  setRecentFile(fname);
+  setRecentFile( fname );
 
   return( true );
 }
 
 bool Controller::addLabel( QString label ) {
-
+  /* TODO Controller::addLabel( QString label ) */
 }
 
 bool Controller::removeCurrentLabel( ) {
-
+  /* TODO Controller::removeCurrentLabel( ) */
 }
 
 void Controller::removeCurrentImage( ) {
@@ -73,7 +77,8 @@ void Controller::removeCurrentImage( ) {
   emit containerUpdated( );
   if( currentImagePos( ) == 0 ) {
     setCurrentImagePos( 0 );
-  } else {
+  }
+  else {
     setCurrentImagePos( currentImagePos( ) - 1 );
   }
 }
@@ -96,18 +101,24 @@ int Controller::size( ) {
 }
 
 void Controller::update( ) {
-  COMMENT("UPDATING IMAGE!", 0);
+  COMMENT( "UPDATING IMAGE!", 1 );
 
   GuiImage *img = currentImage( );
   if( img ) {
     int items = 1;
     if( img->modality( ) == Modality::NIfTI ) {
       items = 3;
-    } else if( img->modality( ) == Modality::RGB ) {
+    }
+    else if( img->modality( ) == Modality::RGB ) {
       items = 4;
     }
     for( int axis = 0; axis < items; ++axis ) {
-      m_pixmapItems.at( axis )->setImage( img->getSlice( axis, img->currentSlice( axis ) ) );
+
+      QPixmap pix = img->getSlice( axis, img->currentSlice( axis ) );//.scaledToHeight(img->heigth(axis) * scale);
+      m_pixmapItems.at( axis )->setImage( pix );
+
+      /* TODO Label rendering. */
+
       /*
        *      if( img->currentLabel( ) != NULL ) {
        *        m_pixmapItems[ axis ]->setLabel( img->currentLabel( )->getLabel( axis,
@@ -119,13 +130,14 @@ void Controller::update( ) {
        *      }
        */
     }
-  } else {
+  }
+  else {
     for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
       m_pixmapItems[ axis ]->setImage( QPixmap( ) );
-//      m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
+/*      m_pixmapItems[ axis ]->setLabel( QPixmap( ) ); */
     }
   }
-  emit imageUpdated();
+  emit imageUpdated( );
 }
 
 void Controller::setCurrentImagePos( int position ) {
@@ -134,16 +146,17 @@ void Controller::setCurrentImagePos( int position ) {
     disconnect( currentImage( ), &GuiImage::imageUpdated, this, &Controller::update );
   }
   if( currentImage( ) != nullptr ) {
+    emit imageChanged( );
     update( );
     connect( currentImage( ), &GuiImage::imageUpdated, this, &Controller::update );
   }
-  emit imageChanged( );
 }
 
 void Controller::loadNextImage( ) {
   if( currentImagePos( ) == ( m_images.count( ) - 1 ) ) {
     setCurrentImagePos( 0 );
-  } else {
+  }
+  else {
     setCurrentImagePos( currentImagePos( ) + 1 );
   }
 }
@@ -153,25 +166,32 @@ void Controller::changeOthersSlices( QPointF posF, int axis ) {
 }
 
 void Controller::setCurrentSlice( size_t axis, size_t slice ) {
-  currentImage()->setCurrentSlice(axis, slice);
+  currentImage( )->setCurrentSlice( axis, slice );
 }
 
-void Controller::setRecentFile(QString fname) {
-  COMMENT("Setting recent file to : \"" << fname.toStdString() << "\"", 1);
-  if (!QFile(fname).exists())
+void Controller::setZoom( int value ) {
+  //FIXME Zoom doesn't work yet.
+  scale = 1.0 + value/100.0;
+  update();
+}
+
+void Controller::setRecentFile( QString fname ) {
+  COMMENT( "Setting recent file to : \"" << fname.toStdString( ) << "\"", 1 );
+  if( !QFile( fname ).exists( ) ) {
     return;
-  QSettings settings;
-  QStringList files = settings.value("recentFileList").toStringList();
-
-  files.removeAll(fname);
-
-  files.prepend(fname);
-  while (files.size() > MaxRecentFiles) {
-    files.removeLast();
   }
-  settings.setValue("recentFileList", files);
+  QSettings settings;
+  QStringList files = settings.value( "recentFileList" ).toStringList( );
 
-  emit recentFilesUpdated();
+  files.removeAll( fname );
+
+  files.prepend( fname );
+  while( files.size( ) > MaxRecentFiles ) {
+    files.removeLast( );
+  }
+  settings.setValue( "recentFileList", files );
+
+  emit recentFilesUpdated( );
 
 }
 

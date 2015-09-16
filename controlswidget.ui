@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>318</width>
-        <height>925</height>
+        <height>942</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_11">
@@ -507,33 +507,37 @@
            </layout>
           </item>
           <item row="1" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QPushButton" name="pushButtonHistogramNormalization">
-              <property name="toolTip">
-               <string>Histogram Normalization</string>
-              </property>
-              <property name="text">
-               <string>Hist. Norm.</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QPushButton" name="pushButtonInterpolation">
               <property name="toolTip">
                <string>Interpolation</string>
               </property>
               <property name="text">
-               <string>Interp.</string>
+               <string>Int.</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonHistogramNormalization">
+              <property name="toolTip">
+               <string>Histogram Normalization</string>
+              </property>
+              <property name="text">
+               <string>Hist. N.</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QPushButton" name="rotateAll">
               <property name="toolTip">
