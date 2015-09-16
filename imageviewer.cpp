@@ -17,11 +17,10 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
     views[ i ]->scene( )->installEventFilter( this );
     views[ i ]->setViewNumber( i );
   }
-  layout = new QGridLayout( this );
+  layout = new QGridLayout(this);
   layout->setVerticalSpacing( 10 );
   layout->setHorizontalSpacing( 10 );
   setGridLayout( );
-
 }
 
 ImageViewer::~ImageViewer( ) {
@@ -41,6 +40,9 @@ void ImageViewer::setController( Controller *value ) {
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
   }
+  for( size_t axis = 0; axis < 4; ++axis) {
+    getScene(axis)->addItem(controller->getPixmapItem(axis));
+  }
 }
 
 void ImageViewer::updateViews( ) {
@@ -58,6 +60,7 @@ void ImageViewer::updateImage( ) {
   for( size_t i = 0; i < 4; ++i ) {
     views[ i ]->setSlice( img->currentSlice( i ) );
   }
+  updateViews();
 }
 
 void ImageViewer::changeImage( ) {
@@ -67,57 +70,90 @@ void ImageViewer::changeImage( ) {
     return;
   }
   DisplayFormat format = controller->currentFormat( );
-  for( size_t i = 0; i < 4; ++i ) {
-    if(format.viewerControls){
-      views[ i ]->setRange( 0, img->depth( i ) - 1 );
-      views[ i ]->setSlice( img->currentSlice( i ) );
-      views[ i ]->showControls( );
-    }else{
-      views[ i ]->hideControls( );
+  for( size_t axis = 0; axis < 4; ++axis ) {
+    if(format.viewerControls) {
+      views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
+      views[ axis ]->setSlice( img->currentSlice( axis ) );
+      views[ axis ]->showControls( );
+    } else {
+      views[ axis ]->hideControls( );
     }
+    getScene(axis)->setSceneRect(controller->getPixmapItem(axis)->boundingRect());
   }
-  setLayout( format.currentLayout );
+  setLayoutType( format.currentLayout );
   setViewMode( format.currentViews );
   /* TODO Continue ... */
 }
 
-void ImageViewer::setLayout( Layout layout ) {
+void ImageViewer::setLayoutType( Layout layout ) {
   switch( layout ) {
-      case Layout::GRID:
-      setGridLayout( );
-      break;
-      case Layout::HORIZONTAL:
-      setHorizontalLayout( );
-      break;
-      case Layout::VERTICAL:
-      setVerticalLayout( );
-      break;
-      case Layout::NONE:
-      break;
+  case Layout::GRID:
+    setGridLayout( );
+    break;
+  case Layout::HORIZONTAL:
+    setHorizontalLayout( );
+    break;
+  case Layout::VERTICAL:
+    setVerticalLayout( );
+    break;
+  case Layout::NONE:
+    break;
+  }
+}
+
+void ImageViewer::getNewLayout() {
+//  delete layout;
+//  layout = new QGridLayout(this);
+//  layout->setVerticalSpacing( 0 );
+//  layout->setHorizontalSpacing( 0 );
+//  layout->setMargin(0);
+//  setLayout(layout);
+  for( ImageWidget *view : views ) {
+    layout->removeWidget(view);
   }
 }
 
 void ImageViewer::setGridLayout( ) {
+  getNewLayout();
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 1, 0 );
   layout->addWidget( views[ 3 ], 1, 1 );
+//  layout->setRowStretch(0,1);
+//  layout->setRowStretch(1,0);
+//  layout->setColumnStretch(0, 0);
+//  layout->setColumnStretch(1, 0);
+
   updateViews( );
 }
 
 void ImageViewer::setHorizontalLayout( ) {
+  getNewLayout();
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 0, 2 );
   layout->addWidget( views[ 3 ], 0, 3 );
+//  layout->setRowStretch(0,1);
+//  layout->setColumnStretch(0, 1);
+//  layout->setColumnStretch(1, 1);
+//  layout->setColumnStretch(2, 1);
+//  layout->setColumnStretch(3, 1);
+
   updateViews( );
 }
 
 void ImageViewer::setVerticalLayout( ) {
+  getNewLayout();
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 1, 0 );
   layout->addWidget( views[ 2 ], 2, 0 );
   layout->addWidget( views[ 3 ], 3, 0 );
+//  layout->setColumnStretch(0, 1);
+//  layout->setRowStretch(0, 1);
+//  layout->setRowStretch(1, 1);
+//  layout->setRowStretch(2, 1);
+//  layout->setRowStretch(3, 1);
+
   updateViews( );
 }
 
@@ -135,30 +171,30 @@ void ImageViewer::showViews( ) {
 
 void ImageViewer::setViewMode( Views views ) {
   switch( views ) {
-      case Views::NONE:
-      hideViews( );
-      break;
-      case Views::SHOW0:
-      setView0( );
-      break;
-      case Views::SHOW1:
-      setView1( );
-      break;
-      case Views::SHOW2:
-      setView2( );
-      break;
-      case Views::SHOW3:
-      setView3( );
-      break;
-      case Views::SHOW012:
-      setViews012( );
-      break;
-      case Views::SHOW123:
-      setViews123( );
-      break;
-      case Views::SHOW0123:
-      setViews0123();
-      break;
+  case Views::NONE:
+    hideViews( );
+    break;
+  case Views::SHOW0:
+    setView0( );
+    break;
+  case Views::SHOW1:
+    setView1( );
+    break;
+  case Views::SHOW2:
+    setView2( );
+    break;
+  case Views::SHOW3:
+    setView3( );
+    break;
+  case Views::SHOW012:
+    setViews012( );
+    break;
+  case Views::SHOW123:
+    setViews123( );
+    break;
+  case Views::SHOW0123:
+    setViews0123();
+    break;
   }
 }
 
@@ -198,15 +234,19 @@ void ImageViewer::setViews0123( ) {
 
 bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
   QGraphicsSceneMouseEvent *mouseEvt = dynamic_cast< QGraphicsSceneMouseEvent* >( evt );
-  size_t scene = 0;
+  size_t axis = 0;
   for( size_t scn = 1; scn < views.size( ); ++scn ) {
     if( obj == views[ scn ]->scene( ) ) {
-      scene = scn;
+      axis = scn;
     }
   }
   if( mouseEvt ) {
-    emit updateStatus( QString( "Scene %3 position: (%1, %2)" ).arg( mouseEvt->scenePos( ).x( ) ).arg(
-                         mouseEvt->scenePos( ).y( ) ).arg( scene ), 100 );
+    GuiImage * img = controller->currentImage();
+    Bial::Point3D pt = img->getPosition(mouseEvt->scenePos( ),axis);
+    if( img != nullptr ) {
+      emit updateStatus( QString( "Axis %3 position: (%1, %2), Bial position = (%4, %5, %6)" ).arg( mouseEvt->scenePos( ).x( ) ).arg(
+                           mouseEvt->scenePos( ).y( ) ).arg( axis ).arg(pt.x).arg(pt.y).arg(pt.z), 10000 );
+    }
   }
   return( QWidget::eventFilter( obj, evt ) );
 }

@@ -17,6 +17,7 @@ class ImageViewer : public QWidget, public ViewerInterface {
   QGridLayout *layout;
   Controller * controller;
 
+  void getNewLayout();
 public:
   explicit ImageViewer( QWidget *parent = 0 );
   ~ImageViewer( );
@@ -36,7 +37,7 @@ private slots:
   void changeImage();
 
 public slots:
-  void setLayout(Layout layout);
+  void setLayoutType(Layout layout);
   void setGridLayout( );
   void setHorizontalLayout( );
   void setVerticalLayout( );

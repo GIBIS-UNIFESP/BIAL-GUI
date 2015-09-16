@@ -12,8 +12,7 @@ Thumbnail::Thumbnail( GuiImage *image, int number, int size,
   QPixmap pix;
   if( image->modality( ) == Modality::NIfTI ) {
     pix = image->getSlice( 0, image->depth( 0 ) / 2 - 1 );
-  }
-  else {
+  } else {
     pix = image->getSlice( 0, 0 );
   }
   pix = pix.scaled( size, size * 2, Qt::KeepAspectRatio, Qt::SmoothTransformation );
@@ -34,7 +33,7 @@ Thumbnail::Thumbnail( GuiImage *image, int number, int size,
   layout->addWidget( textLabel, 0, Qt::AlignCenter );
   layout->addStretch( 1 );
   setLayout( layout );
-/*  setFrameShape(QFrame::Panel); */
+  /*  setFrameShape(QFrame::Panel); */
 }
 
 void Thumbnail::mousePressEvent( QMouseEvent* ) {

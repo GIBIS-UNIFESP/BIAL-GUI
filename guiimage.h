@@ -25,6 +25,8 @@ public:
   size_t currentSlice(size_t axis);
   void setCurrentSlice(size_t axis, size_t slice);
 
+  Bial::Point3D getPosition( QPointF pos, size_t axis );
+
 signals:
   void imageUpdated( );
 

@@ -21,10 +21,6 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->imageViewer->setController(controller);
 
-  for( size_t axis = 0; axis < 4; ++axis) {
-    ui->imageViewer->getScene(axis)->addItem(controller->getPixmapItem(axis));
-  }
-
   ui->actionPrint->setEnabled( false );
 
   setupLogoview( );

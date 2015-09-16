@@ -30,8 +30,8 @@ DisplayFormat::DisplayFormat( Modality modality ) : modality( modality ) {
 
       showNiftiViews = false;
       showNiftiAxis = false;
-      showOrientation = true;
       showPpmViews = true;
+      showOrientation = false;
       showPpmChannels = true;
 
 //      availbleViewOptions = { Views::SHOW0,
@@ -51,7 +51,7 @@ DisplayFormat::DisplayFormat( Modality modality ) : modality( modality ) {
       rotateSingle = false;
 
       showNiftiViews = true;
-      showNiftiAxis = true;
+      showNiftiAxis = false;
       showOrientation = true;
       showPpmViews = false;
       showPpmChannels = false;
