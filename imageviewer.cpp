@@ -45,7 +45,7 @@ void ImageViewer::setController( Controller *value ) {
 
 void ImageViewer::updateViews( ) {
   for( size_t i = 0; i < 4; ++i ) {
-    views[i]->fitInView();
+    views[ i ]->fitInView( );
   }
 }
 
@@ -58,7 +58,6 @@ void ImageViewer::updateImage( ) {
   for( size_t i = 0; i < 4; ++i ) {
     views[ i ]->setSlice( img->currentSlice( i ) );
   }
-  /* TODO continue ... */
 }
 
 void ImageViewer::changeImage( ) {
@@ -67,13 +66,35 @@ void ImageViewer::changeImage( ) {
   if( !img ) {
     return;
   }
+  DisplayFormat format = controller->currentFormat( );
   for( size_t i = 0; i < 4; ++i ) {
-    views[ i ]->setRange( 0, img->depth( i ) - 1 );
-    views[ i ]->showControls( );
-    views[ i ]->setSlice( img->currentSlice( i ) );
+    if(format.viewerControls){
+      views[ i ]->setRange( 0, img->depth( i ) - 1 );
+      views[ i ]->setSlice( img->currentSlice( i ) );
+      views[ i ]->showControls( );
+    }else{
+      views[ i ]->hideControls( );
+    }
   }
-  /* TODO continue ... */
+  setLayout( format.currentLayout );
+  setViewMode( format.currentViews );
+  /* TODO Continue ... */
+}
 
+void ImageViewer::setLayout( Layout layout ) {
+  switch( layout ) {
+      case Layout::GRID:
+      setGridLayout( );
+      break;
+      case Layout::HORIZONTAL:
+      setHorizontalLayout( );
+      break;
+      case Layout::VERTICAL:
+      setVerticalLayout( );
+      break;
+      case Layout::NONE:
+      break;
+  }
 }
 
 void ImageViewer::setGridLayout( ) {
@@ -112,6 +133,35 @@ void ImageViewer::showViews( ) {
   }
 }
 
+void ImageViewer::setViewMode( Views views ) {
+  switch( views ) {
+      case Views::NONE:
+      hideViews( );
+      break;
+      case Views::SHOW0:
+      setView0( );
+      break;
+      case Views::SHOW1:
+      setView1( );
+      break;
+      case Views::SHOW2:
+      setView2( );
+      break;
+      case Views::SHOW3:
+      setView3( );
+      break;
+      case Views::SHOW012:
+      setViews012( );
+      break;
+      case Views::SHOW123:
+      setViews123( );
+      break;
+      case Views::SHOW0123:
+      setViews0123();
+      break;
+  }
+}
+
 void ImageViewer::setView0( ) {
   hideViews( );
   views[ 0 ]->show( );
@@ -142,7 +192,7 @@ void ImageViewer::setViews123( ) {
   views[ 0 ]->hide( );
 }
 
-void ImageViewer::set0123Views( ) {
+void ImageViewer::setViews0123( ) {
   showViews( );
 }
 

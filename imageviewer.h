@@ -2,7 +2,7 @@
 #define IMAGEVIEWER_H
 
 #include "viewerinterface.h"
-
+#include "displayformat.h"
 #include <QWidget>
 #include <array>
 
@@ -36,6 +36,7 @@ private slots:
   void changeImage();
 
 public slots:
+  void setLayout(Layout layout);
   void setGridLayout( );
   void setHorizontalLayout( );
   void setVerticalLayout( );
@@ -43,13 +44,15 @@ public slots:
   void hideViews( );
   void showViews( );
 
+  void setViewMode(Views views);
   void setView0( );
   void setView1( );
   void setView2( );
   void setView3( );
   void setViews012( );
   void setViews123( );
-  void set0123Views( );
+  void setViews0123( );
+
 
 };
 

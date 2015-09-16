@@ -55,7 +55,7 @@ void MainWindow::createConnections( ) {
   connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
   connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
   connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews123 );
-  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set0123Views );
+  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews0123 );
 
   /* Show/Hide docks. */
   connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );

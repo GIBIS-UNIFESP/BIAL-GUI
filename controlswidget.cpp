@@ -27,7 +27,7 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
 
   connect( ui->pushButton1View, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
   connect( ui->pushButton3Views, &QPushButton::clicked, viewer, &ImageViewer::setViews012 );
-  connect( ui->pushButton4Views, &QPushButton::clicked, viewer, &ImageViewer::set0123Views );
+  connect( ui->pushButton4Views, &QPushButton::clicked, viewer, &ImageViewer::setViews0123 );
 
   connect( ui->pushButton1View, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::show );
   connect( ui->pushButton3Views, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::hide );
@@ -41,7 +41,7 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
 
   connect( ui->pushButton_1RGB, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
   connect( ui->pushButton_3RGB, &QPushButton::clicked, viewer, &ImageViewer::setViews123 );
-  connect( ui->pushButton_4RGB, &QPushButton::clicked, viewer, &ImageViewer::set0123Views );
+  connect( ui->pushButton_4RGB, &QPushButton::clicked, viewer, &ImageViewer::setViews0123 );
 
   connect( ui->pushButton_1RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::show );
   connect( ui->pushButton_3RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::hide );
@@ -65,6 +65,9 @@ void ControlsWidget::setController( Controller *value ) {
 
   connect( ui->horizontalSliderZoom, &QAbstractSlider::valueChanged, controller, &Controller::setZoom);
 
+  connect( ui->folderHorizontalSlider, &QAbstractSlider::valueChanged, controller, &Controller::setCurrentImagePos);
+  connect( ui->folderSpinBox, SIGNAL(valueChanged(int)), controller, SLOT(setCurrentImagePos(int)));
+
 }
 
 void ControlsWidget::imageChanged( ) {
@@ -72,26 +75,33 @@ void ControlsWidget::imageChanged( ) {
   if(img == nullptr) {
     return;
   }
-
   ui->folderHorizontalSlider->setValue( controller->currentImagePos( ) );
   ui->folderSpinBox->setValue( controller->currentImagePos( ) );
-  if( img->modality( ) == Modality::NIfTI ) {
-    ui->groupBoxNiftiViews->show( );
-    ui->groupBoxNiftiAxis->hide( );
-    ui->groupBoxOrientation->show( );
-    ui->groupBoxPpmViews->hide( );
-    ui->groupBoxPpmChannels->hide( );
-    ui->pushButton3Views->click( );
-  } else if( img->modality( ) == Modality::RGB ) {
 
-  } else if( img->modality( ) == Modality::BW ) {
-    ui->groupBoxNiftiViews->hide( );
-    ui->groupBoxNiftiAxis->hide( );
-    ui->groupBoxOrientation->hide( );
-    ui->groupBoxPpmViews->hide( );
-    ui->groupBoxPpmChannels->hide( );
+  DisplayFormat format = controller->currentFormat();
+  switch (format.currentLayout) {
+  case Layout::GRID:
+    ui->pushButtonGrid->setChecked(true);
+    break;
+  case Layout::HORIZONTAL:
+    ui->pushButtonHorizontal->setChecked(true);
+    break;
+  case Layout::VERTICAL:
+    ui->pushButtonVertical->setChecked(true);
+    break;
+  case Layout::NONE:
+    break;
   }
+  ui->groupBoxNiftiViews->setVisible( format.showNiftiViews );
+  ui->groupBoxNiftiAxis->setVisible( format.showNiftiAxis);
+  ui->groupBoxOrientation->setVisible( format.showOrientation );
+  ui->groupBoxPpmViews->setVisible( format.showPpmViews);
+  ui->groupBoxPpmChannels->setVisible( format.showPpmChannels);
+  ui->rotate->setVisible(format.rotateSingle);
+  ui->rotateAll->setVisible(format.rotateAll);
   ui->groupBoxLabels->setVisible( img->hasLabels( ) );
+
+  //TODO Continue ...
 }
 
 void ControlsWidget::imageUpdated() {

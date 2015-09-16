@@ -15,6 +15,8 @@ class ThumbsWidget;
  */
 class Controller : public QObject {
   Q_OBJECT
+
+  DisplayFormat noneFormat, bwFormat, rgbFormat, niftiFormat;
   /**
    *
    * @brief m_images holds all opened images.
@@ -126,6 +128,10 @@ public:
    * @param thumbsWidget
    */
   void setThumbsWidget(ThumbsWidget * thumbsWidget);
+  /**
+   * @brief currentFormat
+   */
+  DisplayFormat &currentFormat();
 
   PixmapLabelItem * getPixmapItem( size_t axis );
 signals:

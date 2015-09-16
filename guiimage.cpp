@@ -107,7 +107,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
             Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int r, g, b;
+            int r(0), g(0), b(0);
             if( image.ValidPixel( pos.x, pos.y ) ) {
               r = static_cast< int >( image( pos.x, pos.y, 0 ) * factor );
               g = static_cast< int >( image( pos.x, pos.y, 1 ) * factor );
@@ -122,7 +122,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
             Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int pixel;
+            int pixel = 0;
             if( image.ValidPixel( pos.x, pos.y ) ) {
               pixel = static_cast< int >( image( pos.x, pos.y, axis - 1 ) * factor );
             }

@@ -4,7 +4,7 @@
 #include <QVector>
 
 enum class Modality {
-  BW, RGB, NIfTI
+  NONE, BW, RGB, NIfTI
 };
 enum class Layout {
   NONE, GRID, HORIZONTAL, VERTICAL
@@ -26,7 +26,13 @@ public:
   bool rotateAll;
   bool rotateSingle;
 
-  QVector<Views> availbleViewOptions;
+  bool showNiftiViews;
+  bool showNiftiAxis;
+  bool showOrientation;
+  bool showPpmViews;
+  bool showPpmChannels;
+
+//  QVector<Views> availbleViewOptions;
 };
 
 #endif // DISPLAYFORMAT_H

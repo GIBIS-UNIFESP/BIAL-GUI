@@ -4,7 +4,8 @@
 #include <QFile>
 #include <qsettings.h>
 
-Controller::Controller( int views, QObject *parent ) : QObject( parent ) {
+Controller::Controller( int views, QObject *parent ) : QObject( parent ), noneFormat( Modality::NONE ), bwFormat(
+    Modality::BW ), rgbFormat( Modality::RGB ), niftiFormat( Modality::NIfTI ) {
   for( int item = 0; item < views; ++item ) {
     m_pixmapItems.append( new PixmapLabelItem( ) );
   }
@@ -114,7 +115,8 @@ void Controller::update( ) {
     }
     for( int axis = 0; axis < items; ++axis ) {
 
-      const QPixmap &pix = img->getSlice( axis, img->currentSlice( axis ) ); /* .scaledToHeight(img->heigth(axis) * scale); */
+      const QPixmap &pix = img->getSlice( axis, img->currentSlice( axis ) ); /* .scaledToHeight(img->heigth(axis) *
+                                                                              * scale); */
       m_pixmapItems.at( axis )->setImage( pix );
 
       /* TODO Label rendering. */
@@ -198,6 +200,32 @@ void Controller::setRecentFile( QString fname ) {
 void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
   m_thumbsWidget = thumbsWidget;
   m_thumbsWidget->setController( this );
+}
+
+DisplayFormat & Controller::currentFormat( ) {
+  if( !currentImage( ) ) {
+    return( noneFormat );
+  }
+  Modality mod = currentImage( )->modality( );
+  switch( mod ) {
+  case Modality::NONE: {
+      return( noneFormat );
+      break;
+    }
+      case Modality::BW: {
+      return( bwFormat );
+      break;
+    }
+      case Modality::RGB: {
+      return( rgbFormat );
+      break;
+    }
+      case Modality::NIfTI: {
+      return( niftiFormat );
+      break;
+    }
+  }
+  return( noneFormat );
 }
 
 PixmapLabelItem* Controller::getPixmapItem( size_t axis ) {
