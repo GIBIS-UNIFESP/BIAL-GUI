@@ -4,13 +4,13 @@
 #include <QVector>
 
 enum class Modality {
-  BW, RGB, NIfTI, NONE
+  BW, RGB, NIfTI
 };
 enum class Layout {
-  GRID, HORIZONTAL, VERTICAL
+  NONE, GRID, HORIZONTAL, VERTICAL
 };
 enum class Views {
-  SHOW1, SHOW2, SHOW3, SHOW4, SHOW012, SHOW123, SHOW0123
+  NONE, SHOW0, SHOW1, SHOW2, SHOW3, SHOW012, SHOW123, SHOW0123
 };
 
 class DisplayFormat {
@@ -23,9 +23,10 @@ public:
 
   bool viewerControls;
   bool enableTools;
+  bool rotateAll;
+  bool rotateSingle;
 
   QVector<Views> availbleViewOptions;
-  QVector<Views> availbleLayoutOptions;
 };
 
 #endif // DISPLAYFORMAT_H
