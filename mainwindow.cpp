@@ -78,23 +78,23 @@ MainWindow::~MainWindow( ) {
 }
 
 void MainWindow::on_actionRed_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::red );
+  ui->imageViewer->setViewBgColor( Qt::red );
 }
 
 void MainWindow::on_actionGreen_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::green );
+  ui->imageViewer->setViewBgColor( Qt::green );
 }
 
 void MainWindow::on_actionBlue_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::blue );
+  ui->imageViewer->setViewBgColor( Qt::blue );
 }
 
 void MainWindow::on_actionBlack_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::black );
+  ui->imageViewer->setViewBgColor( Qt::black );
 }
 
 void MainWindow::on_actionWhite_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::white );
+  ui->imageViewer->setViewBgColor( Qt::white );
 }
 
 void MainWindow::updateMenus( ) {
@@ -103,10 +103,16 @@ void MainWindow::updateMenus( ) {
   /* Verifying if an Image is present. */
   bool hasImage = ( controller->currentImage( ) != nullptr );
 
+  if(controller->size() <= 1 ) {
+    ui->thumbsDock->hide();
+    ui->controlsDock->hide();
+    std::cout << "WTF!!!" << std::endl;
+  }
+
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );
-  ui->controlsDock->setVisible( hasImage );
-  ui->thumbsDock->setVisible( hasImage );
+//  ui->controlsDock->setVisible( hasImage );
+//  ui->thumbsDock->setVisible( hasImage );
   ui->menuLayout->setEnabled( hasImage );
   ui->menuOverlay->setEnabled( hasImage );
   ui->actionRemove_current_image->setEnabled( hasImage );

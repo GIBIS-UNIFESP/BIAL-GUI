@@ -63,7 +63,7 @@ void ControlsWidget::setController( Controller *value ) {
   connect( controller, &Controller::imageUpdated, this, &ControlsWidget::imageUpdated );
   connect( controller, &Controller::containerUpdated, this, &ControlsWidget::updateRange );
 
-  connect( ui->horizontalSliderZoom, &QAbstractSlider::valueChanged, controller, &Controller::setZoom);
+//  connect( ui->horizontalSliderZoom, &QAbstractSlider::valueChanged, controller, &Controller::setZoom);
 
   connect( ui->folderHorizontalSlider, &QAbstractSlider::valueChanged, controller, &Controller::setCurrentImagePos);
   connect( ui->folderSpinBox, SIGNAL(valueChanged(int)), controller, SLOT(setCurrentImagePos(int)));

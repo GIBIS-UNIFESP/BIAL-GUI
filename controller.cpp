@@ -56,6 +56,7 @@ bool Controller::addImage( QString fname ) {
   emit containerUpdated( );
 
   m_thumbsWidget->addThumbnail( img );
+
   if( currentImagePos( ) == -1 ) {
     setCurrentImagePos( 0 );
   }

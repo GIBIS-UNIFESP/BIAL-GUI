@@ -22,7 +22,7 @@ public:
   explicit ImageViewer( QWidget *parent = 0 );
   ~ImageViewer( );
 
-  void setBackgroundColor( const QColor &color );
+  void setViewBgColor( const QColor &color );
   bool eventFilter(QObject *obj, QEvent *evt);
   QGraphicsScene * getScene(size_t axis);
   void setController(Controller * value);

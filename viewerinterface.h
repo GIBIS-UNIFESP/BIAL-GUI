@@ -5,7 +5,7 @@ class QColor;
 
 class ViewerInterface {
 public:
-  virtual void setBackgroundColor(const QColor & color) = 0;
+  virtual void setViewBgColor(const QColor & color) = 0;
 };
 
 #endif // VIEWERINTERFACE_H

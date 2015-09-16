@@ -19,7 +19,7 @@ public:
   ~ImageWidget( );
   void hideControls( );
   void showControls( );
-  virtual void setBackgroundColor( const QColor &color );
+  virtual void setViewBgColor( const QColor &color );
 
   QGraphicsScene* scene( ) const;
 

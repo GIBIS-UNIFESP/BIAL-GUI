@@ -6,7 +6,11 @@ ImageWidget::ImageWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::Ima
   ui->setupUi( this );
   m_scene = new QGraphicsScene( this );
   ui->graphicsView->setScene( m_scene );
-  setBackgroundColor( Qt::black );
+  setViewBgColor( Qt::black );
+  QPalette p(palette());
+  p.setColor(QPalette::Background, Qt::lightGray);
+  setAutoFillBackground(true);
+  setPalette(p);
 }
 
 ImageWidget::~ImageWidget( ) {
@@ -21,7 +25,7 @@ void ImageWidget::showControls( ) {
   ui->frameControls->show( );
 }
 
-void ImageWidget::setBackgroundColor( const QColor &color ) {
+void ImageWidget::setViewBgColor( const QColor &color ) {
   if( ui->graphicsView->scene( ) ) {
     ui->graphicsView->scene( )->setBackgroundBrush( color );
   }

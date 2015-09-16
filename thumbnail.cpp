@@ -15,23 +15,25 @@ Thumbnail::Thumbnail( GuiImage *image, int number, int size,
   } else {
     pix = image->getSlice( 0, 0 );
   }
-  pix = pix.scaled( size, size * 2, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+  pix = pix.scaled( size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
   QLabel *imageLabel = new QLabel;
   imageLabel->setPixmap( pix );
 
   QFileInfo info( image->fileName( ) );
-  QLabel *textLabel = new QLabel;
-  textLabel->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
-  textLabel->setWordWrap( true );
+//  QLabel *textLabel = new QLabel;
+//  textLabel->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+//  textLabel->setWordWrap( true );
   QString fname = info.fileName( );
   setToolTip( fname );
-  fname.truncate( 15 );
-  textLabel->setText( fname );
+  setAttribute(Qt::WA_AlwaysShowToolTips);
+//  fname.truncate( 15 );
+//  textLabel->setText( fname );
   QVBoxLayout *layout = new QVBoxLayout;
-  layout->addWidget( imageLabel, 0, Qt::AlignCenter );
-  layout->addWidget( textLabel, 0, Qt::AlignCenter );
+  layout->addWidget( imageLabel, 0, Qt::AlignHCenter );
+//  layout->addWidget( textLabel, 0, Qt::AlignCenter );
   layout->addStretch( 1 );
+  layout->setMargin(2);
   setLayout( layout );
   /*  setFrameShape(QFrame::Panel); */
 }

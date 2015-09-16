@@ -19,10 +19,12 @@ void ThumbsWidget::clear( ) {
 void ThumbsWidget::addThumbnail( GuiImage *image ) {
   COMMENT( "Loading new thumbnail", 1 );
   int num = thumbs.size( );
-  int size = width( ) - 80;
+  int size = width( ) - 40;
   Thumbnail *thumbnail = new Thumbnail( image, num, size );
   thumbs.append( thumbnail );
-  ui->thumbsLayout->addWidget( thumbnail, num, 0 );
+  ui->thumbsLayout->addWidget( thumbnail, num, 0,  Qt::AlignHCenter  );
+  ui->thumbsLayout->setMargin(0);
+  ui->thumbsLayout->setVerticalSpacing(1);
 /*  thumbnail->show(); */
   connect( thumbnail, &Thumbnail::changeImage, controller, &Controller::setCurrentImagePos );
 }

@@ -18,18 +18,25 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
     views[ i ]->setViewNumber( i );
   }
   layout = new QGridLayout(this);
-  layout->setVerticalSpacing( 10 );
-  layout->setHorizontalSpacing( 10 );
+  layout->setVerticalSpacing( 0 );
+  layout->setHorizontalSpacing( 0 );
+  layout->setMargin(0);
   setGridLayout( );
+//  setStyleSheet("background-color:black;");
+  QPalette p(palette());
+  p.setColor(QPalette::Background, Qt::black);
+  setAutoFillBackground(true);
+  setPalette(p);
+
 }
 
 ImageViewer::~ImageViewer( ) {
 
 }
 
-void ImageViewer::setBackgroundColor( const QColor &color ) {
+void ImageViewer::setViewBgColor( const QColor &color ) {
   for( ImageWidget *view : views ) {
-    view->setBackgroundColor( color );
+    view->setViewBgColor( color );
   }
 }
 
