@@ -19,6 +19,8 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->installImageViewer( ui->imageViewer );
 
+  ui->controlsDock->hide();
+
   ui->imageViewer->setController(controller);
 
   ui->actionPrint->setEnabled( false );
@@ -34,6 +36,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
   createActions( );
 
   loadQss( );
+
 }
 
 void MainWindow::createConnections( ) {
@@ -61,7 +64,8 @@ void MainWindow::createConnections( ) {
 
   /* Dynamic functions. */
   connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
-  connect( controller, &Controller::imageChanged, this, &MainWindow::updateMenus );
+  connect( controller, &Controller::currentImageChanged, this, &MainWindow::updateMenus );
+  connect( controller, &Controller::containerUpdated, this, &MainWindow::updateMenus );
   connect( controller, &Controller::recentFilesUpdated,this,&MainWindow::updateRecentFileActions);
 }
 
@@ -105,7 +109,10 @@ void MainWindow::updateMenus( ) {
 
   if(controller->size() <= 1 ) {
     ui->thumbsDock->hide();
-    ui->controlsDock->hide();
+//    ui->controlsDock->hide();
+  } else {
+    ui->thumbsDock->show();
+//    ui->controlsDock->show();
   }
 
   ui->logoView->setVisible( !hasImage );
@@ -162,7 +169,9 @@ bool MainWindow::loadFolder( QString dirname ) {
 
   QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
   progress.setWindowModality( Qt::WindowModal );
-  for( int i = 0, size = list.size( ); i < size; ++i ) {
+  int size = size = list.size( );
+
+  for( int i = 0; i < size; ++i ) {
     progress.setValue( i );
     if( progress.wasCanceled( ) ) {
       break;
@@ -215,6 +224,7 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
     /*    LoadDicomdir(QString(argv[2])); */
   } else {
     QFileInfo file;
+
     for( int img = 1; img < argc; ++img ) {
       QString fileName( argv[ img ] );
       file.setFile( fileName );

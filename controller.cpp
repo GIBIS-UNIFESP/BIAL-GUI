@@ -149,7 +149,7 @@ void Controller::setCurrentImagePos( int position ) {
     disconnect( currentImage( ), &GuiImage::imageUpdated, this, &Controller::update );
   }
   if( currentImage( ) != nullptr ) {
-    emit imageChanged( );
+    emit currentImageChanged( );
     update( );
     connect( currentImage( ), &GuiImage::imageUpdated, this, &Controller::update );
   }

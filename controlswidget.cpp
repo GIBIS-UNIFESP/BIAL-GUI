@@ -59,7 +59,7 @@ void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
 
 void ControlsWidget::setController( Controller *value ) {
   controller = value;
-  connect( controller, &Controller::imageChanged, this, &ControlsWidget::imageChanged );
+  connect( controller, &Controller::currentImageChanged, this, &ControlsWidget::imageChanged );
   connect( controller, &Controller::imageUpdated, this, &ControlsWidget::imageUpdated );
   connect( controller, &Controller::containerUpdated, this, &ControlsWidget::updateRange );
 

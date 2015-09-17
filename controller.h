@@ -138,7 +138,7 @@ signals:
   /**
    * @brief This signal is emmited every time the current image changes.
    */
-  void imageChanged( );
+  void currentImageChanged( );
   /**
    * @brief This signal is emmited every time the current image is updated.
    */

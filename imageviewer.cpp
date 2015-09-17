@@ -42,7 +42,7 @@ void ImageViewer::setViewBgColor( const QColor &color ) {
 
 void ImageViewer::setController( Controller *value ) {
   controller = value;
-  connect( controller, &Controller::imageChanged, this, &ImageViewer::changeImage );
+  connect( controller, &Controller::currentImageChanged, this, &ImageViewer::changeImage );
   connect( controller, &Controller::imageUpdated, this, &ImageViewer::updateImage );
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
