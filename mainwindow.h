@@ -36,7 +36,8 @@ private slots:
   void on_actionOpen_image_triggered( );
   void on_actionQuit_triggered( );
 
-  void updateMenus( );
+  void currentImageChanged( );
+  void containerUpdated( );
   void setDefaultFolder( );
   void readSettings( );
   void openRecentFile( );

@@ -29,7 +29,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   createConnections( );
 
-  updateMenus( );
+  currentImageChanged( );
 
   readSettings( );
 
@@ -64,8 +64,8 @@ void MainWindow::createConnections( ) {
 
   /* Dynamic functions. */
   connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
-  connect( controller, &Controller::currentImageChanged, this, &MainWindow::updateMenus );
-  connect( controller, &Controller::containerUpdated, this, &MainWindow::updateMenus );
+  connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
+  connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
   connect( controller, &Controller::recentFilesUpdated,this,&MainWindow::updateRecentFileActions);
 }
 
@@ -101,24 +101,22 @@ void MainWindow::on_actionWhite_background_triggered( ) {
   ui->imageViewer->setViewBgColor( Qt::white );
 }
 
-void MainWindow::updateMenus( ) {
-  COMMENT( "Updating menus, current image = " << controller->currentImagePos( ), 0 );
+void MainWindow::currentImageChanged( ) {
 
-  /* Verifying if an Image is present. */
-  bool hasImage = ( controller->currentImage( ) != nullptr );
+
+}
+
+void MainWindow::containerUpdated() {
 
   if(controller->size() <= 1 ) {
     ui->thumbsDock->hide();
-//    ui->controlsDock->hide();
   } else {
     ui->thumbsDock->show();
-//    ui->controlsDock->show();
   }
+  bool hasImage = ( controller->currentImage( ) != nullptr );
 
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );
-//  ui->controlsDock->setVisible( hasImage );
-//  ui->thumbsDock->setVisible( hasImage );
   ui->menuLayout->setEnabled( hasImage );
   ui->menuOverlay->setEnabled( hasImage );
   ui->actionRemove_current_image->setEnabled( hasImage );
@@ -126,7 +124,6 @@ void MainWindow::updateMenus( ) {
   if( !hasImage ) {
     ui->actionRemove_current_label->setEnabled( false );
   }
-  /* TODO : Verify image type and update layout menu. */
 }
 
 void MainWindow::on_actionOpen_image_triggered( ) {

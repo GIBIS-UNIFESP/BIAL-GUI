@@ -671,40 +671,6 @@
           <item row="0" column="0">
            <layout class="QGridLayout" name="gridLayout_14">
             <item row="0" column="2">
-             <widget class="QPushButton" name="buttonStop">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/stop.svg</normaloff>:/icons/icons/stop.svg</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>12</width>
-                <height>12</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="buttonPlay">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>12</width>
-                <height>12</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
              <widget class="QSpinBox" name="spinBoxSpeed">
               <property name="enabled">
                <bool>true</bool>
@@ -723,6 +689,28 @@
               </property>
               <property name="value">
                <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="buttonPlay">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="qrs/resources.qrc">
+                <normaloff>:/icons/icons/play.svg</normaloff>
+                <normalon>:/icons/icons/stop.svg</normalon>
+                <activeon>:/icons/icons/stop.svg</activeon>:/icons/icons/play.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>12</width>
+                <height>12</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>

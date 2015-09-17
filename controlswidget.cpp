@@ -135,16 +135,14 @@ void ControlsWidget::updateRange( ) {
   }
 }
 
-void ControlsWidget::on_buttonPlay_clicked() {
-  COMMENT("Play button clicked.", 1);
-  timer->start();
-}
-
-void ControlsWidget::on_buttonStop_clicked() {
-  COMMENT("Stop button clicked.", 1);
-  timer->stop();
-}
-
 void ControlsWidget::on_spinBoxSpeed_valueChanged(int value) {
-  timer->setInterval( 1000/ui->spinBoxSpeed->value() );
+  timer->setInterval( 1000/value );
+}
+
+void ControlsWidget::on_buttonPlay_clicked(bool checked) {
+  if(checked){
+    timer->start();
+  }else{
+    timer->stop();
+  }
 }
