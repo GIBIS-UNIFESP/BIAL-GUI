@@ -106,7 +106,6 @@ void MainWindow::updateMenus( ) {
   if(controller->size() <= 1 ) {
     ui->thumbsDock->hide();
     ui->controlsDock->hide();
-    std::cout << "WTF!!!" << std::endl;
   }
 
   ui->logoView->setVisible( !hasImage );

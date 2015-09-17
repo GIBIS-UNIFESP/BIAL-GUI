@@ -47,11 +47,13 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     for( int axis = 0; axis < m_currentSlice.size( ); ++axis ) {
       setCurrentSlice( axis, depth( axis ) / 2 );
     }
-  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
+  }
+  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
     m_modality = Modality::RGB;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
-  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
+  }
+  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
     m_modality = Modality::BW;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
@@ -93,13 +95,14 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
-    } else if( modality( ) == Modality::RGB ) {
+    }
+    else if( modality( ) == Modality::RGB ) {
       if( axis == 0 ) {
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
             Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int r(0), g(0), b(0);
+            int r( 0 ), g( 0 ), b( 0 );
             if( image.ValidPixel( pos.x, pos.y ) ) {
               r = static_cast< int >( image( pos.x, pos.y, 0 ) * factor );
               g = static_cast< int >( image( pos.x, pos.y, 1 ) * factor );
@@ -108,7 +111,8 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
             scanLine[ x ] = qRgb( r, g, b );
           }
         }
-      } else {
+      }
+      else {
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -123,16 +127,20 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
       }
     }
     return( QPixmap::fromImage( res ) );
-  } catch( std::bad_alloc &e ) {
+  }
+  catch( std::bad_alloc &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Memory allocation error." ) );
     throw( std::runtime_error( msg ) );
-  } catch( std::runtime_error &e ) {
+  }
+  catch( std::runtime_error &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Runtime error." ) );
     throw( std::runtime_error( msg ) );
-  } catch( const std::out_of_range &e ) {
+  }
+  catch( const std::out_of_range &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Out of range exception." ) );
     throw( std::out_of_range( msg ) );
-  } catch( const std::logic_error &e ) {
+  }
+  catch( const std::logic_error &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Logic Error." ) );
     throw( std::logic_error( msg ) );
   }
@@ -159,16 +167,25 @@ void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
     if( axis < ( size_t ) m_currentSlice.size( ) ) {
       m_currentSlice[ axis ] = slice;
       emit imageUpdated( );
-    } else {
+    }
+    else {
       throw std::out_of_range( BIAL_ERROR( "Axis out of range." ) );
     }
   }
 }
 
-Bial::Point3D GuiImage::getPosition(QPointF pos, size_t axis) {
-  Bial::Point3D point( pos.x(), pos.y(), (double) m_currentSlice[axis] );
-  transform[axis](point, &point);
-  return point;
+Bial::Point3D GuiImage::getPosition( QPointF pos, size_t axis ) {
+  Bial::Point3D point( pos.x( ), pos.y( ), ( double ) m_currentSlice[ axis ] );
+  transform[ axis ]( point, &point );
+  return( point );
+}
+
+const Bial::Image< int > &GuiImage::getImage( ) const {
+  return( image );
+}
+
+int GuiImage::max( ) {
+  return( m_max );
 }
 
 
