@@ -3,8 +3,14 @@
 #include "imageviewer.h"
 #include "ui_controlswidget.h"
 
+#include <QTimer>
+
 ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::ControlsWidget ) {
   ui->setupUi( this );
+
+  timer = new QTimer(this);
+  timer->setInterval( 1000/ui->spinBoxSpeed->value()  );
+
 }
 
 ControlsWidget::~ControlsWidget( ) {
@@ -67,6 +73,7 @@ void ControlsWidget::setController( Controller *value ) {
 
   connect( ui->folderHorizontalSlider, &QAbstractSlider::valueChanged, controller, &Controller::setCurrentImagePos);
   connect( ui->folderSpinBox, SIGNAL(valueChanged(int)), controller, SLOT(setCurrentImagePos(int)));
+  connect(timer, &QTimer::timeout, controller, &Controller::loadNextImage);
 
 }
 
@@ -126,4 +133,18 @@ void ControlsWidget::updateRange( ) {
     ui->folderHorizontalSlider->setMaximum( 0 );
     ui->folderHorizontalSlider->setMinimum( 0 );
   }
+}
+
+void ControlsWidget::on_buttonPlay_clicked() {
+  COMMENT("Play button clicked.", 1);
+  timer->start();
+}
+
+void ControlsWidget::on_buttonStop_clicked() {
+  COMMENT("Stop button clicked.", 1);
+  timer->stop();
+}
+
+void ControlsWidget::on_spinBoxSpeed_valueChanged(int value) {
+  timer->setInterval( 1000/ui->spinBoxSpeed->value() );
 }

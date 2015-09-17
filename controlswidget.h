@@ -26,9 +26,17 @@ protected slots:
   void imageUpdated( );
   void updateRange( );
 
+  void on_buttonPlay_clicked();
+
+  void on_buttonStop_clicked();
+
+private slots:
+  void on_spinBoxSpeed_valueChanged(int arg1);
+
 private:
   Ui::ControlsWidget *ui;
   Controller *controller;
+  QTimer * timer;
 };
 
 #endif /* CONTROLSWIDGET_H */
