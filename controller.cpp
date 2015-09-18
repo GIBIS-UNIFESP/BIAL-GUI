@@ -53,7 +53,6 @@ bool Controller::addImage( QString fname ) {
   }
   m_images.append( img );
 
-  emit containerUpdated( );
 
   m_thumbsWidget->addThumbnail( img );
 
@@ -61,6 +60,8 @@ bool Controller::addImage( QString fname ) {
     setCurrentImagePos( 0 );
   }
   setRecentFile( fname );
+
+  emit containerUpdated( );
 
   return( true );
 }
@@ -76,13 +77,13 @@ bool Controller::removeCurrentLabel( ) {
 void Controller::removeCurrentImage( ) {
   m_images.removeAt( currentImagePos( ) );
   m_thumbsWidget->removeAt( currentImagePos( ) );
-  emit containerUpdated( );
   if( currentImagePos( ) == 0 ) {
     setCurrentImagePos( 0 );
   }
   else {
     setCurrentImagePos( currentImagePos( ) - 1 );
   }
+  emit containerUpdated( );
 }
 
 bool Controller::isEmpty( ) {
