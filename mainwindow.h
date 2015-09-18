@@ -25,7 +25,7 @@ private:
   bool loadFile( QString filename );
   bool loadFolder( QString dirname );
   void createActions( );
-  void loadQss();
+  void loadQss( );
 
 private slots:
   void on_actionRed_background_triggered( );
@@ -38,11 +38,17 @@ private slots:
 
   void currentImageChanged( );
   void containerUpdated( );
-  void setDefaultFolder( );
   void readSettings( );
   void openRecentFile( );
   void updateRecentFileActions( );
 
+
+  void on_actionAddLabel_triggered( );
+  void on_actionOpen_folder_triggered( );
+  void on_actionAdd_image_triggered( );
+  void on_actionRemove_current_image_triggered( );
+  void on_actionSelect_default_folder_triggered( );
+  void on_actionRemove_current_label_triggered( );
 
 private:
   Ui::MainWindow *ui;

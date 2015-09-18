@@ -20,9 +20,9 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->installImageViewer( ui->imageViewer );
 
-  ui->controlsDock->hide();
+  ui->controlsDock->hide( );
 
-  ui->imageViewer->setController(controller);
+  ui->imageViewer->setController( controller );
 
   ui->actionPrint->setEnabled( false );
 
@@ -67,7 +67,7 @@ void MainWindow::createConnections( ) {
   connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
   connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
-  connect( controller, &Controller::recentFilesUpdated,this,&MainWindow::updateRecentFileActions);
+  connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
 }
 
 void MainWindow::setupLogoview( ) {
@@ -107,12 +107,12 @@ void MainWindow::currentImageChanged( ) {
 
 }
 
-void MainWindow::containerUpdated() {
-
-  if(controller->size() <= 1 ) {
-    ui->thumbsDock->hide();
-  } else {
-    ui->thumbsDock->show();
+void MainWindow::containerUpdated( ) {
+  if( controller->size( ) <= 1 ) {
+    ui->thumbsDock->hide( );
+  }
+  else {
+    ui->thumbsDock->show( );
   }
   bool hasImage = ( controller->currentImage( ) != nullptr );
 
@@ -168,7 +168,6 @@ bool MainWindow::loadFolder( QString dirname ) {
   QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
   progress.setWindowModality( Qt::WindowModal );
   int size = list.size( );
-
   for( int i = 0; i < size; ++i ) {
     progress.setValue( i );
     if( progress.wasCanceled( ) ) {
@@ -179,7 +178,8 @@ bool MainWindow::loadFolder( QString dirname ) {
       QString fileName = fileInfo.absoluteFilePath( );
       if( controller->addImage( fileName ) ) {
         value = true;
-      } else {
+      }
+      else {
         BIAL_WARNING( std::string( "Could not open file!" ) );
         statusBar( )->showMessage( tr( "Could not open file!" ), 2000 );
         continue;
@@ -188,21 +188,6 @@ bool MainWindow::loadFolder( QString dirname ) {
   }
   progress.setValue( list.size( ) );
   return( value );
-}
-
-void MainWindow::setDefaultFolder( ) {
-  QDir dir;
-  if( !dir.exists( QDir::homePath( ) + "/.bial/" ) ) {
-    dir.mkdir( QDir::homePath( ) + "/.bial/" );
-  }
-  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ) );
-  if( !temp.isEmpty( ) ) {
-    defaultFolder = temp;
-    QSettings settings;
-    settings.beginGroup( "MainWindow" );
-    settings.setValue( "defaultFolder", defaultFolder );
-    settings.endGroup( );
-  }
 }
 
 void MainWindow::readSettings( ) {
@@ -220,9 +205,9 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
   COMMENT( "Command Line Open with " << argc << " arguments:", 0 );
   if( ( argc == 3 ) && ( QString( argv[ 1 ] ) == "-d" ) ) {
     /*    LoadDicomdir(QString(argv[2])); */
-  } else {
+  }
+  else {
     QFileInfo file;
-
     for( int img = 1; img < argc; ++img ) {
       QString fileName( argv[ img ] );
       file.setFile( fileName );
@@ -230,10 +215,12 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
       if( file.exists( ) ) {
         if( file.isFile( ) ) {
           controller->addImage( file.absoluteFilePath( ) );
-        } else if( file.isDir( ) ) {
+        }
+        else if( file.isDir( ) ) {
           loadFolder( file.absoluteFilePath( ) );
         }
-      } else {
+      }
+      else {
         BIAL_WARNING( "FILE DOES NOT EXISTS! : " << file.absolutePath( ).toStdString( ) );
       }
     }
@@ -290,4 +277,48 @@ void MainWindow::loadQss( ) {
   file.open( QFile::ReadOnly );
   QString StyleSheet = QLatin1String( file.readAll( ) );
   setStyleSheet( StyleSheet );
+}
+
+void MainWindow::on_actionAddLabel_triggered( ) {
+  controller->addLabel(getFileDialog( ));
+}
+
+void MainWindow::on_actionOpen_folder_triggered( ) {
+  QString folderString = QFileDialog::getExistingDirectory(this, tr("Open folder"), defaultFolder);
+  COMMENT("Opening folder: \"" << folderString.toStdString() << "\"", 1)
+
+  if (!folderString.isEmpty()) {
+    controller->clear();
+    if (!loadFolder(folderString)) {
+      BIAL_WARNING("Could not read folder!")
+      QMessageBox::warning(this, "Warning", tr("Could not read folder!"));
+    }
+  }
+}
+
+void MainWindow::on_actionAdd_image_triggered( ) {
+  controller->addImage( getFileDialog( ) );
+}
+
+void MainWindow::on_actionRemove_current_image_triggered( ) {
+  controller->removeCurrentImage();
+}
+
+void MainWindow::on_actionSelect_default_folder_triggered( ) {
+  QDir dir;
+  if( !dir.exists( QDir::homePath( ) + "/.bial/" ) ) {
+    dir.mkdir( QDir::homePath( ) + "/.bial/" );
+  }
+  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ) );
+  if( !temp.isEmpty( ) ) {
+    defaultFolder = temp;
+    QSettings settings;
+    settings.beginGroup( "MainWindow" );
+    settings.setValue( "defaultFolder", defaultFolder );
+    settings.endGroup( );
+  }
+}
+
+void MainWindow::on_actionRemove_current_label_triggered( ) {
+  controller->removeCurrentLabel();
 }
