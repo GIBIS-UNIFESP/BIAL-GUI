@@ -180,7 +180,7 @@ public slots:
    * @param axis is the number of the view's axis.
    *
    */
-  void changeOthersSlices( QPointF posF, int axis );
+  void changeOthersSlices(QPointF posF, Qt::MouseButtons buttons, size_t axis );
   /**
    * @brief setCurrentSlice is called by the imageViewer when the slider or
    *  the spinbox have theis values updated.

@@ -180,6 +180,10 @@ Bial::Point3D GuiImage::getPosition( QPointF pos, size_t axis ) {
   return( point );
 }
 
+Bial::Transform3D GuiImage::getTransform( size_t axis ) {
+  return( transform.at( axis ) );
+}
+
 const Bial::Image< int > &GuiImage::getImage( ) const {
   return( image );
 }

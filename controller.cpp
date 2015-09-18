@@ -55,7 +55,6 @@ bool Controller::addImage( QString fname ) {
 
 
   m_thumbsWidget->addThumbnail( img );
-
   if( currentImagePos( ) == -1 ) {
     setCurrentImagePos( 0 );
   }
@@ -165,8 +164,25 @@ void Controller::loadNextImage( ) {
   }
 }
 
-void Controller::changeOthersSlices( QPointF posF, int axis ) {
-
+void Controller::changeOthersSlices( QPointF posF, Qt::MouseButtons buttons, size_t axis ) {
+  COMMENT( "Changing slice position of other frames based on image position.", 2 );
+  if( currentImage( ) ) {
+    if( ( currentImage( )->modality( ) == Modality::NIfTI ) && ( buttons & Qt::LeftButton ) ) {
+      Bial::Transform3D transform = currentImage( )->getTransform( axis );
+      Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
+                                    ( double ) currentImage( )->currentSlice( axis ) );
+      for( int other = 0; other < 3; ++other ) {
+        if( other != axis ) {
+          Bial::Transform3D otherTransf = currentImage( )->getTransform( other ).Inverse( );
+          Bial::Point3D otherPt = otherTransf( pt );
+          currentImage( )->setCurrentSlice( other, otherPt.z );
+        }
+      }
+    }
+  }
+  else {
+    BIAL_WARNING( "CURRENT IMAGE NOT FOUND!" );
+  }
 }
 
 void Controller::setCurrentSlice( size_t axis, size_t slice ) {
@@ -204,13 +220,13 @@ void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
   m_thumbsWidget->setController( this );
 }
 
-DisplayFormat & Controller::currentFormat( ) {
+DisplayFormat &Controller::currentFormat( ) {
   if( !currentImage( ) ) {
     return( noneFormat );
   }
   Modality mod = currentImage( )->modality( );
   switch( mod ) {
-  case Modality::NONE: {
+      case Modality::NONE: {
       return( noneFormat );
       break;
     }

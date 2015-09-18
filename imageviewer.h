@@ -31,6 +31,8 @@ public:
 
 signals:
   void updateStatus(QString text, int timeout = 0 );
+  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseMoved(QPointF pt, size_t axis );
 
 private slots:
   void updateImage();
