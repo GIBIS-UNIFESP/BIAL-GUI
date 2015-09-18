@@ -171,7 +171,7 @@ void Controller::changeOthersSlices( QPointF posF, Qt::MouseButtons buttons, siz
       Bial::Transform3D transform = currentImage( )->getTransform( axis );
       Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
                                     ( double ) currentImage( )->currentSlice( axis ) );
-      for( int other = 0; other < 3; ++other ) {
+      for( size_t other = 0; other < 3; ++other ) {
         if( other != axis ) {
           Bial::Transform3D otherTransf = currentImage( )->getTransform( other ).Inverse( );
           Bial::Point3D otherPt = otherTransf( pt );
