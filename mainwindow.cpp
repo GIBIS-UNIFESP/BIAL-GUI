@@ -3,6 +3,7 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
+#include <QFileInfoList>
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
 #include <QProgressDialog>
@@ -166,7 +167,7 @@ bool MainWindow::loadFolder( QString dirname ) {
 
   QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
   progress.setWindowModality( Qt::WindowModal );
-  int size = size = list.size( );
+  int size = list.size( );
 
   for( int i = 0; i < size; ++i ) {
     progress.setValue( i );
