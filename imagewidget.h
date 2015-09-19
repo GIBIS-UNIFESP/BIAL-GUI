@@ -10,6 +10,7 @@ namespace Ui {
 }
 
 class QGraphicsScene;
+class QGraphicsView;
 
 class ImageWidget : public QWidget, public ViewerInterface {
   Q_OBJECT
@@ -23,6 +24,8 @@ public:
 
   QGraphicsScene* scene( ) const;
 
+  QGraphicsView * graphicsView();
+
   size_t viewNumber( ) const;
   void setViewNumber( const size_t &viewNumber );
 
@@ -30,7 +33,7 @@ public:
 
   void setSlice(int slice);
 
-  void fitInView(QRectF rect);
+//  void fitInView(QRectF rect);
 
   void show();
 

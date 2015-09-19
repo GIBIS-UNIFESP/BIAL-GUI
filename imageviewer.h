@@ -34,6 +34,7 @@ signals:
 private slots:
   void updateViews();
   void changeImage();
+  void updateOverlay(QPointF pt, size_t axis );
 
 public slots:
   void setLayoutType(Layout layout);

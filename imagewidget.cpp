@@ -7,10 +7,10 @@ ImageWidget::ImageWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::Ima
   m_scene = new QGraphicsScene( this );
   ui->graphicsView->setScene( m_scene );
   setViewBgColor( Qt::black );
-  QPalette p(palette());
-  p.setColor(QPalette::Background, Qt::lightGray);
-  setAutoFillBackground(true);
-  setPalette(p);
+  QPalette p( palette( ) );
+  p.setColor( QPalette::Background, Qt::lightGray );
+  setAutoFillBackground( true );
+  setPalette( p );
 }
 
 ImageWidget::~ImageWidget( ) {
@@ -33,6 +33,10 @@ void ImageWidget::setViewBgColor( const QColor &color ) {
 
 QGraphicsScene* ImageWidget::scene( ) const {
   return( m_scene );
+}
+
+QGraphicsView* ImageWidget::graphicsView( ) {
+  return( ui->graphicsView );
 }
 
 size_t ImageWidget::viewNumber( ) const {
@@ -67,15 +71,15 @@ void ImageWidget::setSlice( int slice ) {
   }
 }
 
-void ImageWidget::fitInView( QRectF rect ) {
-  QGraphicsScene *scn = ui->graphicsView->scene( );
-  if( scn ) {
-    ui->graphicsView->fitInView( rect, Qt::KeepAspectRatio );
-  }
-}
+//void ImageWidget::fitInView( QRectF rect ) {
+//  QGraphicsScene *scn = ui->graphicsView->scene( );
+//  if( scn ) {
+//    ui->graphicsView->fitInView( rect, Qt::KeepAspectRatio );
+//  }
+//}
 
 void ImageWidget::show( ) {
-  QWidget::show();
+  QWidget::show( );
 }
 
 void ImageWidget::on_spinBox_valueChanged( int position ) {
