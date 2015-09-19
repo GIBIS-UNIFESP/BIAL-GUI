@@ -1,10 +1,11 @@
+#include "graphicsscene.h"
 #include "imagewidget.h"
 #include "ui_imagewidget.h"
 #include <Common.hpp>
 
 ImageWidget::ImageWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::ImageWidget ) {
   ui->setupUi( this );
-  m_scene = new QGraphicsScene( this );
+  m_scene = new GraphicsScene( this );
   ui->graphicsView->setScene( m_scene );
   setViewBgColor( Qt::black );
   QPalette p( palette( ) );
@@ -31,7 +32,7 @@ void ImageWidget::setViewBgColor( const QColor &color ) {
   }
 }
 
-QGraphicsScene* ImageWidget::scene( ) const {
+GraphicsScene* ImageWidget::scene( ) const {
   return( m_scene );
 }
 
@@ -70,13 +71,6 @@ void ImageWidget::setSlice( int slice ) {
     ui->horizontalSlider->setValue( slice );
   }
 }
-
-//void ImageWidget::fitInView( QRectF rect ) {
-//  QGraphicsScene *scn = ui->graphicsView->scene( );
-//  if( scn ) {
-//    ui->graphicsView->fitInView( rect, Qt::KeepAspectRatio );
-//  }
-//}
 
 void ImageWidget::show( ) {
   QWidget::show( );

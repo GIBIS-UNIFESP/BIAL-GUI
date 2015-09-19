@@ -40,7 +40,7 @@ class Controller : public QObject {
   /**
    * @brief m_thumbsWidget is a pointer to the thumbnails dock.
    */
-  ThumbsWidget * m_thumbsWidget;
+  ThumbsWidget *m_thumbsWidget;
   /**
    * @brief scale
    */
@@ -127,13 +127,13 @@ public:
    * @brief setThumbsWidget setThumbsWidget sets the pointer to the thumbnails dock.
    * @param thumbsWidget
    */
-  void setThumbsWidget(ThumbsWidget * thumbsWidget);
+  void setThumbsWidget( ThumbsWidget *thumbsWidget );
   /**
    * @brief currentFormat
    */
-  DisplayFormat &currentFormat();
+  DisplayFormat &currentFormat( );
 
-  PixmapLabelItem * getPixmapItem( size_t axis );
+  PixmapLabelItem* getPixmapItem( size_t axis );
 signals:
   /**
    * @brief This signal is emmited every time the current image changes.
@@ -150,7 +150,7 @@ signals:
   /**
    * @brief recentFilesUpdated
    */
-  void recentFilesUpdated();
+  void recentFilesUpdated( );
 public slots:
   /**
    *
@@ -180,7 +180,7 @@ public slots:
    * @param axis is the number of the view's axis.
    *
    */
-  void changeOthersSlices(QPointF posF, Qt::MouseButtons buttons, size_t axis );
+  void changeOthersSlices( QPointF posF, Qt::MouseButtons buttons, size_t axis );
   /**
    * @brief setCurrentSlice is called by the imageViewer when the slider or
    *  the spinbox have theis values updated.
@@ -192,13 +192,13 @@ public slots:
    * @brief setZoom
    * @param value
    */
-  void setZoom(int value);
+  void setZoom( int value );
 private:
   /**
    * @brief setRecentFile
    * @param file
    */
-  void setRecentFile(QString fname);
+  void setRecentFile( QString fname );
 };
 
 #endif /** CONTROLLER_H */

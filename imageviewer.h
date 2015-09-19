@@ -54,8 +54,6 @@ public slots:
   void setViews123( );
   void setViews0123( );
 
-
-
   // QWidget interface
 protected:
   void resizeEvent(QResizeEvent *);
