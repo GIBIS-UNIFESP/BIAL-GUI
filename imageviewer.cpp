@@ -85,9 +85,6 @@ void ImageViewer::changeImage( ) {
       views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
       views[ axis ]->setSlice( img->currentSlice( axis ) );
       views[ axis ]->showControls( );
-      if( img->modality( ) == Modality::NIfTI ) {
-        views[ axis ]->scene( )->setOverlay( true );
-      }
     }
     else {
       views[ axis ]->hideControls( );
@@ -99,17 +96,18 @@ void ImageViewer::changeImage( ) {
 }
 
 void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
+  //FIXME Use "currentSlice" to determine overlay positions.
   COMMENT( "ImageViewer::updateOverlay", 0 );
   views[ axis ]->scene( )->updateOverlay( pt );
-  GuiImage * img = controller->currentImage( );
+  GuiImage *img = controller->currentImage( );
   Bial::Transform3D transform = img->getTransform( axis );
   Bial::Point3D pt3d = transform( ( double ) pt.x( ), ( double ) pt.y( ),
-                                ( double ) img->currentSlice( axis ) );
+                                  ( double ) img->currentSlice( axis ) );
   for( size_t other = 0; other < 3; ++other ) {
     if( other != axis ) {
       Bial::Transform3D otherTransf = img->getTransform( other ).Inverse( );
       Bial::Point3D otherPt = otherTransf( pt3d );
-      views[ other ]->scene( )->updateOverlay( QPointF(otherPt.x, otherPt.y) );
+      views[ other ]->scene( )->updateOverlay( QPointF( otherPt.x, otherPt.y ) );
     }
   }
 }
@@ -257,6 +255,14 @@ void ImageViewer::setViews123( ) {
 void ImageViewer::setViews0123( ) {
   showViews( );
   /* updateViews( ); */
+}
+
+void ImageViewer::toggleOverlay( ) {
+  for( size_t axis = 0; axis < 4; ++axis ) {
+    if( controller->currentImage()->modality( ) == Modality::NIfTI ) {
+      views[ axis ]->scene( )->setOverlay( !views[ axis ]->scene( )->overlay() );
+    }
+  }
 }
 
 void ImageViewer::resizeEvent( QResizeEvent* ) {

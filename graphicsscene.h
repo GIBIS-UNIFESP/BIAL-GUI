@@ -12,6 +12,7 @@ public:
   void setOverlay( bool overlay );
   void setOverlayPen( const QPen &overlayPen );
   void updateOverlay( QPointF pos );
+  bool overlay( ) const;
 
 protected:
   void drawForeground( QPainter *painter, const QRectF &rect );

@@ -68,6 +68,9 @@ void MainWindow::createConnections( ) {
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
   connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
   connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
+
+  /* Overlay */
+  connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay);
 }
 
 void MainWindow::setupLogoview( ) {
