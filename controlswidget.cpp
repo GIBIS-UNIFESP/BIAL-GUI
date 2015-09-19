@@ -96,9 +96,31 @@ void ControlsWidget::imageChanged( ) {
   case Layout::VERTICAL:
     ui->pushButtonVertical->setChecked(true);
     break;
-  case Layout::NONE:
+  }
+  switch (format.currentViews) {
+  case Views::SHOW0:
+    ui->pushButton1View->setChecked(true);
+    break;
+  case Views::SHOW1:
+    ui->pushButton1View->setChecked(true);
+    break;
+  case Views::SHOW2:
+    ui->pushButton1View->setChecked(true);
+    break;
+  case Views::SHOW3:
+    ui->pushButton1View->setChecked(true);
+    break;
+  case Views::SHOW012:
+    ui->pushButton3Views->setChecked(true);
+    break;
+  case Views::SHOW123:
+    ui->pushButton3Views->setChecked(true);
+    break;
+  case Views::SHOW0123:
+    ui->pushButton4Views->setChecked(true);
     break;
   }
+
   ui->groupBoxNiftiViews->setVisible( format.showNiftiViews );
   ui->groupBoxNiftiAxis->setVisible( format.showNiftiAxis);
   ui->groupBoxOrientation->setVisible( format.showOrientation );

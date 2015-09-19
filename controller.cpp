@@ -5,7 +5,7 @@
 #include <QFile>
 #include <qsettings.h>
 
-Controller::Controller( int views, QObject *parent ) : QObject( parent ), noneFormat( Modality::NONE ), bwFormat(
+Controller::Controller( int views, QObject *parent ) : QObject( parent ), bwFormat(
     Modality::BW ), rgbFormat( Modality::RGB ), niftiFormat( Modality::NIfTI ) {
   for( int item = 0; item < views; ++item ) {
     m_pixmapItems.append( new PixmapLabelItem( ) );
@@ -225,15 +225,8 @@ void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
 }
 
 DisplayFormat &Controller::currentFormat( ) {
-  if( !currentImage( ) ) {
-    return( noneFormat );
-  }
   Modality mod = currentImage( )->modality( );
   switch( mod ) {
-      case Modality::NONE: {
-      return( noneFormat );
-      break;
-    }
       case Modality::BW: {
       return( bwFormat );
       break;
@@ -247,7 +240,6 @@ DisplayFormat &Controller::currentFormat( ) {
       break;
     }
   }
-  return( noneFormat );
 }
 
 PixmapLabelItem* Controller::getPixmapItem( size_t axis ) {

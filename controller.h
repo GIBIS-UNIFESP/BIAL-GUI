@@ -16,7 +16,7 @@ class ThumbsWidget;
 class Controller : public QObject {
   Q_OBJECT
 
-  DisplayFormat noneFormat, bwFormat, rgbFormat, niftiFormat;
+  DisplayFormat bwFormat, rgbFormat, niftiFormat;
   /**
    *
    * @brief m_images holds all opened images.

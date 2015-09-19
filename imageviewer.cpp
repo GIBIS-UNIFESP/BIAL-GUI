@@ -113,71 +113,45 @@ void ImageViewer::setLayoutType( Layout layout ) {
       case Layout::VERTICAL:
       setVerticalLayout( );
       break;
-      case Layout::NONE:
-      break;
   }
 }
 
 void ImageViewer::getNewLayout( ) {
-  /*
-   *  delete layout;
-   *  layout = new QGridLayout(this);
-   *  layout->setVerticalSpacing( 0 );
-   *  layout->setHorizontalSpacing( 0 );
-   *  layout->setMargin(0);
-   *  setLayout(layout);
-   */
   for( ImageWidget *view : views ) {
     layout->removeWidget( view );
   }
 }
 
 void ImageViewer::setGridLayout( ) {
+  COMMENT("Set grid layout.", 0)
   getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 1, 0 );
   layout->addWidget( views[ 3 ], 1, 1 );
-  /*
-   *  layout->setRowStretch(0,1);
-   *  layout->setRowStretch(1,0);
-   *  layout->setColumnStretch(0, 0);
-   *  layout->setColumnStretch(1, 0);
-   */
 
   updateViews( );
 }
 
 void ImageViewer::setHorizontalLayout( ) {
+  COMMENT("Set horizontal layout.", 0)
   getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 0, 2 );
   layout->addWidget( views[ 3 ], 0, 3 );
-  /*
-   *  layout->setRowStretch(0,1);
-   *  layout->setColumnStretch(0, 1);
-   *  layout->setColumnStretch(1, 1);
-   *  layout->setColumnStretch(2, 1);
-   *  layout->setColumnStretch(3, 1);
-   */
 
   updateViews( );
 }
 
+
 void ImageViewer::setVerticalLayout( ) {
+  COMMENT("Set vertical layout.", 0)
   getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 1, 0 );
   layout->addWidget( views[ 2 ], 2, 0 );
   layout->addWidget( views[ 3 ], 3, 0 );
-  /*
-   *  layout->setColumnStretch(0, 1);
-   *  layout->setRowStretch(0, 1);
-   *  layout->setRowStretch(1, 1);
-   *  layout->setRowStretch(2, 1);
-   *  layout->setRowStretch(3, 1);
-   */
 
   updateViews( );
 }
@@ -186,21 +160,18 @@ void ImageViewer::hideViews( ) {
   for( ImageWidget *view : views ) {
     view->hide( );
   }
-  updateViews( );
+  //updateViews( );
 }
 
 void ImageViewer::showViews( ) {
   for( ImageWidget *view : views ) {
     view->show( );
   }
-  updateViews( );
+  //updateViews( );
 }
 
 void ImageViewer::setViewMode( Views views ) {
   switch( views ) {
-      case Views::NONE:
-      hideViews( );
-      break;
       case Views::SHOW0:
       setView0( );
       break;
@@ -228,42 +199,42 @@ void ImageViewer::setViewMode( Views views ) {
 void ImageViewer::setView0( ) {
   hideViews( );
   views[ 0 ]->show( );
-
+  //updateViews( );
 }
 
 void ImageViewer::setView1( ) {
   hideViews( );
   views[ 1 ]->show( );
-
+  //updateViews( );
 }
 
 void ImageViewer::setView2( ) {
   hideViews( );
   views[ 2 ]->show( );
-
+  //updateViews( );
 }
 
 void ImageViewer::setView3( ) {
   hideViews( );
   views[ 3 ]->show( );
-
+  //updateViews( );
 }
 
 void ImageViewer::setViews012( ) {
   showViews( );
   views[ 3 ]->hide( );
-
+  //updateViews( );
 }
 
 void ImageViewer::setViews123( ) {
   showViews( );
   views[ 0 ]->hide( );
-
+  //updateViews( );
 }
 
 void ImageViewer::setViews0123( ) {
   showViews( );
-
+  //updateViews( );
 }
 
 void ImageViewer::resizeEvent( QResizeEvent* ) {
