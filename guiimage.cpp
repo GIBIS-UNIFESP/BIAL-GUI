@@ -163,14 +163,15 @@ bool GuiImage::hasLabels( ) {
 }
 
 void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
-  if( m_currentSlice[ axis ] != slice ) {
-    if( axis < ( size_t ) m_currentSlice.size( ) ) {
+  size_t sz = m_currentSlice.size( );
+  if( axis < sz ) {
+    if( m_currentSlice[ axis ] != slice ) {
       m_currentSlice[ axis ] = slice;
       emit imageUpdated( );
     }
-    else {
-      throw std::out_of_range( BIAL_ERROR( "Axis out of range." ) );
-    }
+  }
+  else {
+    throw std::out_of_range( BIAL_ERROR( "Axis out of range." ) );
   }
 }
 

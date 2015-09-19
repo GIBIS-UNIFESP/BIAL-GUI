@@ -133,6 +133,7 @@ void ImageViewer::getNewLayout( ) {
   for( ImageWidget *view : views ) {
     layout->removeWidget( view );
   }
+  updateViews( );
 }
 
 void ImageViewer::setGridLayout( ) {
@@ -173,14 +174,14 @@ void ImageViewer::hideViews( ) {
   for( ImageWidget *view : views ) {
     view->hide( );
   }
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::showViews( ) {
   for( ImageWidget *view : views ) {
     view->show( );
   }
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setViewMode( Views views ) {
@@ -219,42 +220,42 @@ void ImageViewer::setViewMode( Views views ) {
 void ImageViewer::setView0( ) {
   hideViews( );
   views[ 0 ]->show( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setView1( ) {
   hideViews( );
   views[ 1 ]->show( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setView2( ) {
   hideViews( );
   views[ 2 ]->show( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setView3( ) {
   hideViews( );
   views[ 3 ]->show( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setViews012( ) {
   showViews( );
   views[ 3 ]->hide( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setViews123( ) {
   showViews( );
   views[ 0 ]->hide( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::setViews0123( ) {
   showViews( );
-  /* updateViews( ); */
+  updateViews( );
 }
 
 void ImageViewer::toggleOverlay( ) {
