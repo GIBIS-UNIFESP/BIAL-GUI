@@ -10,7 +10,7 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
 
   timer = new QTimer(this);
   timer->setInterval( 1000/ui->spinBoxSpeed->value()  );
-
+  controller = nullptr;
 }
 
 ControlsWidget::~ControlsWidget( ) {

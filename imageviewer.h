@@ -26,16 +26,13 @@ public:
   bool eventFilter(QObject *obj, QEvent *evt);
   QGraphicsScene * getScene(size_t axis);
   void setController(Controller * value);
-
-  void updateViews();
-
 signals:
   void updateStatus(QString text, int timeout = 0 );
   void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseMoved(QPointF pt, size_t axis );
 
 private slots:
-  void updateImage();
+  void updateViews();
   void changeImage();
 
 public slots:
@@ -57,6 +54,10 @@ public slots:
   void setViews0123( );
 
 
+
+  // QWidget interface
+protected:
+  void resizeEvent(QResizeEvent *);
 };
 
 #endif /* IMAGEVIEWER_H */

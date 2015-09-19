@@ -1,6 +1,7 @@
 #include "controller.h"
 #include "thumbswidget.h"
 
+#include <QDebug>
 #include <QFile>
 #include <qsettings.h>
 
@@ -175,7 +176,10 @@ void Controller::changeOthersSlices( QPointF posF, Qt::MouseButtons buttons, siz
         if( other != axis ) {
           Bial::Transform3D otherTransf = currentImage( )->getTransform( other ).Inverse( );
           Bial::Point3D otherPt = otherTransf( pt );
-          currentImage( )->setCurrentSlice( other, otherPt.z );
+          size_t pos = static_cast<size_t>(round(otherPt.z));
+          if(pos < currentImage()->depth(axis)){
+            currentImage( )->setCurrentSlice( other, pos );
+          }
         }
       }
     }

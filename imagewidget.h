@@ -30,7 +30,7 @@ public:
 
   void setSlice(int slice);
 
-  void fitInView();
+  void fitInView(QRectF rect);
 
   void show();
 
@@ -50,9 +50,6 @@ private:
   QGraphicsScene *m_scene;
   size_t m_viewNumber;
 
-  // QWidget interface
-protected:
-  void resizeEvent(QResizeEvent *);
 };
 
 #endif /* IMAGEWIDGET_H */

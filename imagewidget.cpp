@@ -67,16 +67,15 @@ void ImageWidget::setSlice( int slice ) {
   }
 }
 
-void ImageWidget::fitInView( ) {
+void ImageWidget::fitInView( QRectF rect ) {
   QGraphicsScene *scn = ui->graphicsView->scene( );
   if( scn ) {
-    ui->graphicsView->fitInView( scn->itemsBoundingRect( ), Qt::KeepAspectRatio );
+    ui->graphicsView->fitInView( rect, Qt::KeepAspectRatio );
   }
 }
 
 void ImageWidget::show( ) {
   QWidget::show();
-  fitInView();
 }
 
 void ImageWidget::on_spinBox_valueChanged( int position ) {
@@ -90,8 +89,4 @@ void ImageWidget::on_rotateButton_clicked( ) {
 void ImageWidget::on_horizontalSlider_valueChanged( int position ) {
   emit sliceChanged( m_viewNumber, position );
 
-}
-
-void ImageWidget::resizeEvent( QResizeEvent* ) {
-  fitInView( );
 }
