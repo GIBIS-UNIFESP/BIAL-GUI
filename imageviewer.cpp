@@ -45,7 +45,7 @@ void ImageViewer::setController( Controller *value ) {
   controller = value;
   connect( controller, &Controller::currentImageChanged, this, &ImageViewer::changeImage );
   connect( controller, &Controller::imageUpdated, this, &ImageViewer::updateViews );
-//  connect( this, &ImageViewer::mouseClicked, controller, &Controller::changeOthersSlices );
+  /*  connect( this, &ImageViewer::mouseClicked, controller, &Controller::changeOthersSlices ); */
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
   }
@@ -97,7 +97,7 @@ void ImageViewer::changeImage( ) {
 }
 
 void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
-  //FIXME Use "currentSlice" to determine overlay positions.
+  /* FIXME Use "currentSlice" to determine overlay positions. */
   COMMENT( "ImageViewer::updateOverlay", 0 );
   views[ axis ]->scene( )->updateOverlay( pt );
   GuiImage *img = controller->currentImage( );
@@ -115,15 +115,15 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
 
 void ImageViewer::setLayoutType( Layout layout ) {
   switch( layout ) {
-      case Layout::GRID: {
+  case Layout::GRID: {
       setGridLayout( );
       break;
     }
-      case Layout::HORIZONTAL: {
+  case Layout::HORIZONTAL: {
       setHorizontalLayout( );
       break;
     }
-      case Layout::VERTICAL: {
+  case Layout::VERTICAL: {
       setVerticalLayout( );
       break;
     }
@@ -139,7 +139,7 @@ void ImageViewer::getNewLayout( ) {
 
 void ImageViewer::setGridLayout( ) {
   COMMENT( "Set grid layout.", 0 )
-  getNewLayout( );
+      getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 1, 0 );
@@ -150,7 +150,7 @@ void ImageViewer::setGridLayout( ) {
 
 void ImageViewer::setHorizontalLayout( ) {
   COMMENT( "Set horizontal layout.", 0 )
-  getNewLayout( );
+      getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 0, 2 );
@@ -162,7 +162,7 @@ void ImageViewer::setHorizontalLayout( ) {
 
 void ImageViewer::setVerticalLayout( ) {
   COMMENT( "Set vertical layout.", 0 )
-  getNewLayout( );
+      getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 1, 0 );
   layout->addWidget( views[ 2 ], 2, 0 );
@@ -187,31 +187,31 @@ void ImageViewer::showViews( ) {
 
 void ImageViewer::setViewMode( Views views ) {
   switch( views ) {
-      case Views::SHOW0: {
+  case Views::SHOW0: {
       setView0( );
       break;
     }
-      case Views::SHOW1: {
+  case Views::SHOW1: {
       setView1( );
       break;
     }
-      case Views::SHOW2: {
+  case Views::SHOW2: {
       setView2( );
       break;
     }
-      case Views::SHOW3: {
+  case Views::SHOW3: {
       setView3( );
       break;
     }
-      case Views::SHOW012: {
+  case Views::SHOW012: {
       setViews012( );
       break;
     }
-      case Views::SHOW123: {
+  case Views::SHOW123: {
       setViews123( );
       break;
     }
-      case Views::SHOW0123: {
+  case Views::SHOW0123: {
       setViews0123( );
       break;
     }
@@ -261,8 +261,8 @@ void ImageViewer::setViews0123( ) {
 
 void ImageViewer::toggleOverlay( ) {
   for( size_t axis = 0; axis < 4; ++axis ) {
-    if( controller->currentImage()->modality( ) == Modality::NIfTI ) {
-      views[ axis ]->scene( )->setOverlay( !views[ axis ]->scene( )->overlay() );
+    if( controller->currentImage( )->modality( ) == Modality::NIfTI ) {
+      views[ axis ]->scene( )->setOverlay( !views[ axis ]->scene( )->overlay( ) );
     }
   }
 }
@@ -282,18 +282,18 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
   if( mouseEvt ) {
     QPointF scnPos = mouseEvt->scenePos( );
     if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseMove ) {
-      if(dragging && timer.elapsed() > 100){
-        timer.restart();
-        controller->changeOthersSlices(scnPos, axis);
+      if( dragging && ( timer.elapsed( ) > 100 ) ) {
+        timer.restart( );
+        controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
       }
       emit mouseMoved( scnPos, axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMousePress ) {
       dragging = true;
-      timer.restart();
-//      emit mouseClicked( scnPos, mouseEvt->buttons( ), axis );
-      controller->changeOthersSlices(scnPos, axis);
+      timer.restart( );
+      /*emit mouseClicked( scnPos, mouseEvt->buttons( ), axis ); */
+      controller->changeOthersSlices( scnPos, axis );
       updateOverlay( scnPos, axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
