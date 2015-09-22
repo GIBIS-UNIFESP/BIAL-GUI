@@ -38,6 +38,8 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   loadQss( );
 
+  containerUpdated();
+
 }
 
 void MainWindow::createConnections( ) {
@@ -68,10 +70,8 @@ void MainWindow::createConnections( ) {
   connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
   connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
 
-
   /* ImageViewer */
   connect( ui->imageViewer, &ImageViewer::mouseMoved, this, &MainWindow::mouseMoved );
-
 
   /* Overlay */
   connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay );
@@ -115,6 +115,7 @@ void MainWindow::currentImageChanged( ) {
 }
 
 void MainWindow::containerUpdated( ) {
+  COMMENT("MainWindow::containerUpdated( )", 0);
   if( controller->size( ) <= 1 ) {
     ui->thumbsDock->hide( );
   }
@@ -122,6 +123,7 @@ void MainWindow::containerUpdated( ) {
     ui->thumbsDock->show( );
   }
   bool hasImage = ( controller->currentImage( ) != nullptr );
+  COMMENT("Has Image = " << hasImage, 0);
 
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );

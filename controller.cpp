@@ -50,6 +50,7 @@ bool Controller::addImage( QString fname ) {
 
   }
   if( img == nullptr ) {
+    emit containerUpdated( );
     return( false );
   }
   m_images.append( img );
