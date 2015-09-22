@@ -58,6 +58,8 @@ public slots:
   void setViews0123( );
 
   void toggleOverlay();
+  void setOverlay(bool hasOverlay);
+
 
   // QWidget interface
 protected:

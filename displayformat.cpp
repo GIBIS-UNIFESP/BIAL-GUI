@@ -14,6 +14,7 @@ DisplayFormat::DisplayFormat( Modality modality ) : modality( modality ) {
       showOrientation = false;
       showPpmViews = false;
       showPpmChannels = false;
+      hasOverlay = false;
       break;
     }
       case Modality::RGB: {
@@ -28,6 +29,7 @@ DisplayFormat::DisplayFormat( Modality modality ) : modality( modality ) {
       showPpmViews = true;
       showOrientation = false;
       showPpmChannels = true;
+      hasOverlay = false;
       break;
     }
       case Modality::NIfTI: {
@@ -42,6 +44,7 @@ DisplayFormat::DisplayFormat( Modality modality ) : modality( modality ) {
       showOrientation = true;
       showPpmViews = false;
       showPpmChannels = false;
+      hasOverlay = true;
       break;
     }
   }

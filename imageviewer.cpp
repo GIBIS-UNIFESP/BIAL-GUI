@@ -91,6 +91,9 @@ void ImageViewer::changeImage( ) {
       views[ axis ]->hideControls( );
     }
   }
+  if( !format.hasOverlay ) {
+    format.hasOverlay = false;
+  }
   setLayoutType( format.currentLayout );
   setViewMode( format.currentViews );
   updateViews( );
@@ -115,15 +118,15 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
 
 void ImageViewer::setLayoutType( Layout layout ) {
   switch( layout ) {
-  case Layout::GRID: {
+      case Layout::GRID: {
       setGridLayout( );
       break;
     }
-  case Layout::HORIZONTAL: {
+      case Layout::HORIZONTAL: {
       setHorizontalLayout( );
       break;
     }
-  case Layout::VERTICAL: {
+      case Layout::VERTICAL: {
       setVerticalLayout( );
       break;
     }
@@ -139,7 +142,7 @@ void ImageViewer::getNewLayout( ) {
 
 void ImageViewer::setGridLayout( ) {
   COMMENT( "Set grid layout.", 0 )
-      getNewLayout( );
+  getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 1, 0 );
@@ -150,7 +153,7 @@ void ImageViewer::setGridLayout( ) {
 
 void ImageViewer::setHorizontalLayout( ) {
   COMMENT( "Set horizontal layout.", 0 )
-      getNewLayout( );
+  getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 0, 1 );
   layout->addWidget( views[ 2 ], 0, 2 );
@@ -162,7 +165,7 @@ void ImageViewer::setHorizontalLayout( ) {
 
 void ImageViewer::setVerticalLayout( ) {
   COMMENT( "Set vertical layout.", 0 )
-      getNewLayout( );
+  getNewLayout( );
   layout->addWidget( views[ 0 ], 0, 0 );
   layout->addWidget( views[ 1 ], 1, 0 );
   layout->addWidget( views[ 2 ], 2, 0 );
@@ -187,31 +190,31 @@ void ImageViewer::showViews( ) {
 
 void ImageViewer::setViewMode( Views views ) {
   switch( views ) {
-  case Views::SHOW0: {
+      case Views::SHOW0: {
       setView0( );
       break;
     }
-  case Views::SHOW1: {
+      case Views::SHOW1: {
       setView1( );
       break;
     }
-  case Views::SHOW2: {
+      case Views::SHOW2: {
       setView2( );
       break;
     }
-  case Views::SHOW3: {
+      case Views::SHOW3: {
       setView3( );
       break;
     }
-  case Views::SHOW012: {
+      case Views::SHOW012: {
       setViews012( );
       break;
     }
-  case Views::SHOW123: {
+      case Views::SHOW123: {
       setViews123( );
       break;
     }
-  case Views::SHOW0123: {
+      case Views::SHOW0123: {
       setViews0123( );
       break;
     }
@@ -261,9 +264,15 @@ void ImageViewer::setViews0123( ) {
 
 void ImageViewer::toggleOverlay( ) {
   for( size_t axis = 0; axis < 4; ++axis ) {
-    if( controller->currentImage( )->modality( ) == Modality::NIfTI ) {
+    if( controller->currentFormat().hasOverlay ) {
       views[ axis ]->scene( )->setOverlay( !views[ axis ]->scene( )->overlay( ) );
     }
+  }
+}
+
+void ImageViewer::setOverlay( bool hasOverlay ) {
+  for( size_t axis = 0; axis < 4; ++axis ) {
+    views[ axis ]->scene( )->setOverlay( hasOverlay );
   }
 }
 
@@ -290,14 +299,20 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
       emit mouseMoved( scnPos, axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMousePress ) {
-      dragging = true;
-      timer.restart( );
-      /*emit mouseClicked( scnPos, mouseEvt->buttons( ), axis ); */
-      controller->changeOthersSlices( scnPos, axis );
-      updateOverlay( scnPos, axis );
+      if(mouseEvt->button() == Qt::LeftButton){
+        dragging = true;
+        timer.restart( );
+        controller->changeOthersSlices( scnPos, axis );
+        updateOverlay( scnPos, axis );
+      }
+      /* emit mouseClicked( scnPos, mouseEvt->buttons( ), axis ); */
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
-      dragging = false;
+      if(mouseEvt->button() == Qt::LeftButton){
+        dragging = false;
+        controller->changeOthersSlices( scnPos, axis );
+        updateOverlay( scnPos, axis );
+      }
     }
   }
   return( QWidget::eventFilter( obj, evt ) );

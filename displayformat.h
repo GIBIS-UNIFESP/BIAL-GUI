@@ -25,6 +25,7 @@ public:
   bool enableTools;
   bool rotateAll;
   bool rotateSingle;
+  bool hasOverlay;
 
   bool showNiftiViews;
   bool showNiftiAxis;
