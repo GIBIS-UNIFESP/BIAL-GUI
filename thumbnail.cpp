@@ -6,6 +6,10 @@
 
 Thumbnail::Thumbnail( GuiImage *image, int number, int size,
                       QWidget *parent ) : QFrame( parent ), m_imageNumber( number ) {
+  if(!image){
+    throw std::invalid_argument("Image does not exists.");
+  }
+  COMMENT("Creating thumbnail for image " << image->fileName().toStdString(), 0);
   setFrameStyle( QFrame::Raised );
   setFrameShape( QFrame::StyledPanel );
   setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );

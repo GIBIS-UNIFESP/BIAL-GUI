@@ -49,11 +49,13 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     }
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
+    COMMENT( "PPM image detected.", 2 );
     m_modality = Modality::RGB;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
+    COMMENT( "Gray image detected.", 2 );
     m_modality = Modality::BW;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
@@ -69,7 +71,7 @@ QString GuiImage::fileName( ) {
 }
 
 QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
-  COMMENT( "GET SLICE: axis = " << axis << ", slice = " << slice, 0 );
+  COMMENT( "GET SLICE: image = " << m_fileName.toStdString() << ", axis = " << axis << ", slice = " << slice, 0 );
   if( slice >= depth( axis ) ) {
     throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
                                           toStdString( ) ) ) );
@@ -165,7 +167,7 @@ bool GuiImage::hasLabels( ) {
 void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
   size_t sz = m_currentSlice.size( );
   if( axis < sz ) {
-    if( m_currentSlice[ axis ] != slice ) {
+    if( m_currentSlice[ axis ] != slice && slice < depth(axis)) {
       m_currentSlice[ axis ] = slice;
       emit imageUpdated( );
     }
