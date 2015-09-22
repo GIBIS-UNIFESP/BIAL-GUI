@@ -3,6 +3,7 @@
 
 #include "viewerinterface.h"
 #include "displayformat.h"
+#include <QTime>
 #include <QWidget>
 #include <array>
 
@@ -16,6 +17,8 @@ class ImageViewer : public QWidget, public ViewerInterface {
   std::array< ImageWidget*, 4 > views;
   QGridLayout *layout;
   Controller * controller;
+  bool dragging;
+  QTime timer;
 
   void getNewLayout();
 public:
@@ -26,9 +29,9 @@ public:
   bool eventFilter(QObject *obj, QEvent *evt);
   QGraphicsScene * getScene(size_t axis);
   void setController(Controller * value);
+
 signals:
-  void updateStatus(QString text, int timeout = 0 );
-  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+//  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseMoved(QPointF pt, size_t axis );
 
 private slots:

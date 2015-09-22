@@ -50,6 +50,8 @@ private slots:
   void on_actionSelect_default_folder_triggered( );
   void on_actionRemove_current_label_triggered( );
 
+  void mouseMoved(QPointF scnPos, size_t axis);
+
 private:
   Ui::MainWindow *ui;
   Controller *controller;

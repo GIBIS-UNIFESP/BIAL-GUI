@@ -165,10 +165,10 @@ void Controller::loadNextImage( ) {
   }
 }
 
-void Controller::changeOthersSlices( QPointF posF, Qt::MouseButtons buttons, size_t axis ) {
+void Controller::changeOthersSlices( QPointF posF, size_t axis ) {
   COMMENT( "Changing slice position of other frames based on image position.", 2 );
   if( currentImage( ) ) {
-    if( ( currentImage( )->modality( ) == Modality::NIfTI ) && ( buttons & Qt::LeftButton ) ) {
+    if( ( currentImage( )->modality( ) == Modality::NIfTI ) ) {
       Bial::Transform3D transform = currentImage( )->getTransform( axis );
       Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
                                     ( double ) currentImage( )->currentSlice( axis ) );

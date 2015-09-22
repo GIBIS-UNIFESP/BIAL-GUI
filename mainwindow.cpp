@@ -63,14 +63,18 @@ void MainWindow::createConnections( ) {
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
   connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
 
-  /* Dynamic functions. */
-  connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
+  /* Controller. */
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
   connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
   connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
 
+
+  /* ImageViewer */
+  connect( ui->imageViewer, &ImageViewer::mouseMoved, this, &MainWindow::mouseMoved );
+
+
   /* Overlay */
-  connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay);
+  connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay );
 }
 
 void MainWindow::setupLogoview( ) {
@@ -283,18 +287,17 @@ void MainWindow::loadQss( ) {
 }
 
 void MainWindow::on_actionAddLabel_triggered( ) {
-  controller->addLabel(getFileDialog( ));
+  controller->addLabel( getFileDialog( ) );
 }
 
 void MainWindow::on_actionOpen_folder_triggered( ) {
-  QString folderString = QFileDialog::getExistingDirectory(this, tr("Open folder"), defaultFolder);
-  COMMENT("Opening folder: \"" << folderString.toStdString() << "\"", 1)
-
-  if (!folderString.isEmpty()) {
-    controller->clear();
-    if (!loadFolder(folderString)) {
-      BIAL_WARNING("Could not read folder!")
-      QMessageBox::warning(this, "Warning", tr("Could not read folder!"));
+  QString folderString = QFileDialog::getExistingDirectory( this, tr( "Open folder" ), defaultFolder );
+  COMMENT( "Opening folder: \"" << folderString.toStdString( ) << "\"", 1 )
+  if( !folderString.isEmpty( ) ) {
+    controller->clear( );
+    if( !loadFolder( folderString ) ) {
+      BIAL_WARNING( "Could not read folder!" )
+      QMessageBox::warning( this, "Warning", tr( "Could not read folder!" ) );
     }
   }
 }
@@ -304,7 +307,7 @@ void MainWindow::on_actionAdd_image_triggered( ) {
 }
 
 void MainWindow::on_actionRemove_current_image_triggered( ) {
-  controller->removeCurrentImage();
+  controller->removeCurrentImage( );
 }
 
 void MainWindow::on_actionSelect_default_folder_triggered( ) {
@@ -323,5 +326,38 @@ void MainWindow::on_actionSelect_default_folder_triggered( ) {
 }
 
 void MainWindow::on_actionRemove_current_label_triggered( ) {
-  controller->removeCurrentLabel();
+  controller->removeCurrentLabel( );
+}
+
+void MainWindow::mouseMoved( QPointF scnPos, size_t axis ) {
+  GuiImage *img = controller->currentImage( );
+  if( img != nullptr ) {
+    Bial::Point3D pt = img->getPosition( scnPos, axis );
+    QString msg;
+    int max = img->max( );
+    if( img->modality( ) == Modality::NIfTI ) {
+      if( img->getImage( ).ValidPixel( pt.x, pt.y, pt.z ) ) {
+        int color = img->getImage( ).at( pt.x, pt.y, pt.z );
+        msg = QString( "Axis %1 : (%2, %3, %4) = %5/%6" ).arg( axis ).arg( ( int ) pt.x ).arg(
+          ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max );
+      }
+    }
+    else if( img->modality( ) == Modality::BW ) {
+      if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
+        int color = img->getImage( ).at( pt.x, pt.y );
+        msg = QString( "(%1, %2) = %3/%4" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( color ).arg( max );
+      }
+    }
+    else if( img->modality( ) == Modality::RGB ) {
+      if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
+        int r = img->getImage( ).at( pt.x, pt.y, 0 );
+        int g = img->getImage( ).at( pt.x, pt.y, 1 );
+        int b = img->getImage( ).at( pt.x, pt.y, 2 );
+        msg =
+          QString( "(%1, %2) = (%3, %4, %5)/%6" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( r ).arg( g ).arg( b ).arg(
+            max );
+      }
+    }
+    ui->statusBar->showMessage( msg, 10000 );
+  }
 }

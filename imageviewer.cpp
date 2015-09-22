@@ -28,6 +28,7 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
   p.setColor( QPalette::Background, Qt::black );
   setAutoFillBackground( true );
   setPalette( p );
+  dragging = false;
 }
 
 ImageViewer::~ImageViewer( ) {
@@ -44,7 +45,7 @@ void ImageViewer::setController( Controller *value ) {
   controller = value;
   connect( controller, &Controller::currentImageChanged, this, &ImageViewer::changeImage );
   connect( controller, &Controller::imageUpdated, this, &ImageViewer::updateViews );
-  connect( this, &ImageViewer::mouseClicked, controller, &Controller::changeOthersSlices );
+//  connect( this, &ImageViewer::mouseClicked, controller, &Controller::changeOthersSlices );
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
   }
@@ -281,39 +282,22 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
   if( mouseEvt ) {
     QPointF scnPos = mouseEvt->scenePos( );
     if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseMove ) {
-      GuiImage *img = controller->currentImage( );
-      if( img != nullptr ) {
-        Bial::Point3D pt = img->getPosition( scnPos, axis );
-        int max = img->max( );
-        if( img->modality( ) == Modality::NIfTI ) {
-          if( img->getImage( ).ValidPixel( pt.x, pt.y, pt.z ) ) {
-            int color = img->getImage( ).at( pt.x, pt.y, pt.z );
-            emit updateStatus( QString( "Axis %1 : (%2, %3, %4) = %5/%6" ).arg( axis ).arg( ( int ) pt.x ).arg(
-                                 ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max ), 10000 );
-          }
-        }
-        else if( img->modality( ) == Modality::BW ) {
-          if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
-            int color = img->getImage( ).at( pt.x, pt.y );
-            emit updateStatus( QString( "(%1, %2) = %3/%4" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( color ).arg(
-                                 max ), 10000 );
-          }
-        }
-        else if( img->modality( ) == Modality::RGB ) {
-          if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
-            int r = img->getImage( ).at( pt.x, pt.y, 0 );
-            int g = img->getImage( ).at( pt.x, pt.y, 1 );
-            int b = img->getImage( ).at( pt.x, pt.y, 2 );
-            emit updateStatus( QString( "(%1, %2) = (%3, %4, %5)/%6" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg(
-                                 r ).arg( g ).arg( b ).arg( max ), 10000 );
-          }
-        }
+      if(dragging && timer.elapsed() > 100){
+        timer.restart();
+        controller->changeOthersSlices(scnPos, axis);
+        updateOverlay( scnPos, axis );
       }
       emit mouseMoved( scnPos, axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMousePress ) {
-      emit mouseClicked( scnPos, mouseEvt->buttons( ), axis );
+      dragging = true;
+      timer.restart();
+//      emit mouseClicked( scnPos, mouseEvt->buttons( ), axis );
+      controller->changeOthersSlices(scnPos, axis);
       updateOverlay( scnPos, axis );
+    }
+    else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
+      dragging = false;
     }
   }
   return( QWidget::eventFilter( obj, evt ) );
