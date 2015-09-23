@@ -114,7 +114,6 @@ void Controller::update( ) {
   if( img ) {
     std::array< bool, 4 > showItens = currentFormat( )->getViews( );
     for( int axis = 0; axis < 4; ++axis ) {
-      std::cout << "Axis[" << axis << "] = " << showItens[ axis ] << std::endl;
       if( showItens[ axis ] ) {
         const QPixmap &pix = img->getSlice( axis, img->currentSlice( axis ) );
         m_pixmapItems.at( axis )->setImage( pix );
