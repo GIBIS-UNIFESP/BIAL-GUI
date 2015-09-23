@@ -18,7 +18,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->setController( controller );
 
-  ui->controlsWidget->installImageViewer( ui->imageViewer );
+//  ui->controlsWidget->installImageViewer( ui->imageViewer );
 
   ui->controlsDock->hide( );
 
@@ -42,20 +42,24 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
 void MainWindow::createConnections( ) {
   /* Layout */
-  connect( ui->actionGrid, &QAction::triggered, ui->imageViewer, &ImageViewer::setGridLayout );
-  connect( ui->actionHorizontal, &QAction::triggered, ui->imageViewer, &ImageViewer::setHorizontalLayout );
-  connect( ui->actionVertical, &QAction::triggered, ui->imageViewer, &ImageViewer::setVerticalLayout );
-  connect( ui->actionAxial, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
-  connect( ui->actionCoronal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
-  connect( ui->actionSagittal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
+/*
+ *  connect( ui->actionGrid, &QAction::triggered, ui->imageViewer, &ImageViewer::setGridLayout );
+ *  connect( ui->actionHorizontal, &QAction::triggered, ui->imageViewer, &ImageViewer::setHorizontalLayout );
+ *  connect( ui->actionVertical, &QAction::triggered, ui->imageViewer, &ImageViewer::setVerticalLayout );
+ *  connect( ui->actionAxial, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
+ *  connect( ui->actionCoronal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
+ *  connect( ui->actionSagittal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
+ */
 
   /* PPM */
-  connect( ui->actionAll_channels, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
-  connect( ui->actionRed_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
-  connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
-  connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
-  connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews123 );
-  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews0123 );
+/*
+ *  connect( ui->actionAll_channels, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
+ *  connect( ui->actionRed_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
+ *  connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
+ *  connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
+ *  connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews123 );
+ *  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews0123 );
+ */
 
   /* Show/Hide docks. */
   connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );
@@ -110,8 +114,26 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 }
 
 void MainWindow::currentImageChanged( ) {
+  if( controller->currentImage( ) ) {
+    DisplayFormat *format = controller->currentFormat( );
+    ui->menuLayout->setEnabled( format->modality( ) != Modality::BW );
+    ui->menuOverlay->setEnabled( format->hasOverlay( ) );
 
+    ui->actionGrid->setVisible( format->showOrientation( ) );
+    ui->actionHorizontal->setVisible( format->showOrientation( ) );
+    ui->actionVertical->setVisible( format->showOrientation( ) );
 
+    ui->actionAxial->setVisible( format->modality( ) == Modality::NIfTI );
+    ui->actionCoronal->setVisible( format->modality( ) == Modality::NIfTI );
+    ui->actionSagittal->setVisible( format->modality( ) == Modality::NIfTI );
+
+    ui->actionRed_channel->setVisible( format->modality( ) == Modality::RGB );
+    ui->actionGreen_channel->setVisible( format->modality( ) == Modality::RGB );
+    ui->actionBlue_channel->setVisible( format->modality( ) == Modality::RGB );
+    ui->actionAll_channels->setVisible( format->modality( ) == Modality::RGB );
+    ui->action3_Views->setVisible( format->has3Views( ) );
+    ui->action4_Views->setVisible( format->has4Views( ) );
+  }
 }
 
 void MainWindow::containerUpdated( ) {
@@ -132,6 +154,7 @@ void MainWindow::containerUpdated( ) {
   if( !hasImage ) {
     ui->actionRemove_current_label->setEnabled( false );
   }
+  currentImageChanged( );
 }
 
 void MainWindow::on_actionOpen_image_triggered( ) {

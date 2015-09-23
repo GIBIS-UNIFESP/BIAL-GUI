@@ -6,11 +6,14 @@
 #include <qsettings.h>
 
 Controller::Controller( int views, QObject *parent ) : QObject( parent ), bwFormat(
-    Modality::BW ), rgbFormat( Modality::RGB ), niftiFormat( Modality::NIfTI ) {
+    new BWFormat( this ) ), rgbFormat( new RGBFormat( this ) ), niftiFormat( new NIfTIFormat( this ) ) {
   for( int item = 0; item < views; ++item ) {
     m_pixmapItems.append( new PixmapLabelItem( ) );
   }
   m_currentImagePos = -1;
+  connect( rgbFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( niftiFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( bwFormat, &DisplayFormat::updated, this, &Controller::update );
 }
 
 GuiImage* Controller::currentImage( ) {
@@ -108,31 +111,13 @@ void Controller::update( ) {
 
   GuiImage *img = currentImage( );
   if( img ) {
-    int items = 1;
-    if( img->modality( ) == Modality::NIfTI ) {
-      items = 3;
-    }
-    else if( img->modality( ) == Modality::RGB ) {
-      items = 4;
-    }
-    for( int axis = 0; axis < items; ++axis ) {
-
-      const QPixmap &pix = img->getSlice( axis, img->currentSlice( axis ) ); /* .scaledToHeight(img->heigth(axis) *
-                                                                              * scale); */
-      m_pixmapItems.at( axis )->setImage( pix );
-
-      /* TODO Label rendering. */
-
-      /*
-       *      if( img->currentLabel( ) != NULL ) {
-       *        m_pixmapItems[ axis ]->setLabel( img->currentLabel( )->getLabel( axis,
-       *                                                                         img->currentSlice(
-       *                                                                           axis ) ) );
-       *      }
-       *      else {
-       *        m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
-       *      }
-       */
+    std::array< bool, 4 > showItens = currentFormat( )->getViews( );
+    for( int axis = 0; axis < 4; ++axis ) {
+      std::cout << "Axis[" << axis << "] = " << showItens[ axis ] << std::endl;
+      if( showItens[ axis ] ) {
+        const QPixmap &pix = img->getSlice( axis, img->currentSlice( axis ) );
+        m_pixmapItems.at( axis )->setImage( pix );
+      }
     }
   }
   else {
@@ -177,7 +162,7 @@ void Controller::changeOthersSlices( QPointF posF, size_t axis ) {
           Bial::Transform3D otherTransf = currentImage( )->getTransform( other ).Inverse( );
           Bial::Point3D otherPt = otherTransf( pt );
           size_t pos = static_cast< size_t >( round( otherPt.z ) );
-          if( pos < currentImage( )->depth( axis ) ) {
+          if( pos < currentImage( )->depth( other ) ) {
             currentImage( )->setCurrentSlice( other, pos );
           }
         }
@@ -216,7 +201,6 @@ void Controller::setRecentFile( QString fname ) {
   settings.setValue( "recentFileList", files );
 
   emit recentFilesUpdated( );
-
 }
 
 void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
@@ -224,21 +208,16 @@ void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
   m_thumbsWidget->setController( this );
 }
 
-DisplayFormat &Controller::currentFormat( ) {
+DisplayFormat* Controller::currentFormat( ) {
   Modality mod = currentImage( )->modality( );
-  switch( mod ) {
-      case Modality::BW: {
-      return( bwFormat );
-      break;
-    }
-      case Modality::RGB: {
-      return( rgbFormat );
-      break;
-    }
-      case Modality::NIfTI: {
-      return( niftiFormat );
-      break;
-    }
+  if( mod == Modality::RGB ) {
+    return( rgbFormat );
+  }
+  else if( mod == Modality::NIfTI ) {
+    return( niftiFormat );
+  }
+  else {
+    return( bwFormat );
   }
 }
 

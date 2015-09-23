@@ -3,6 +3,7 @@
 
 #include "viewerinterface.h"
 #include "displayformat.h"
+#include "graphicsscene.h"
 #include <QTime>
 #include <QWidget>
 #include <array>
@@ -27,7 +28,7 @@ public:
 
   void setViewBgColor( const QColor &color );
   bool eventFilter(QObject *obj, QEvent *evt);
-  QGraphicsScene * getScene(size_t axis);
+  GraphicsScene * getScene(size_t axis);
   void setController(Controller * value);
 
 signals:
@@ -37,10 +38,11 @@ signals:
 private slots:
   void updateViews();
   void changeImage();
-  void updateOverlay(QPointF pt, size_t axis );
 
-public slots:
   void setLayoutType(Layout layout);
+  void updateOverlay(QPointF pt, size_t axis );
+  void setViewMode(Views views);
+
   void setGridLayout( );
   void setHorizontalLayout( );
   void setVerticalLayout( );
@@ -48,7 +50,6 @@ public slots:
   void hideViews( );
   void showViews( );
 
-  void setViewMode(Views views);
   void setView0( );
   void setView1( );
   void setView2( );
@@ -57,8 +58,9 @@ public slots:
   void setViews123( );
   void setViews0123( );
 
+public slots:
+
   void toggleOverlay();
-  void setOverlay(bool hasOverlay);
 
 
   // QWidget interface

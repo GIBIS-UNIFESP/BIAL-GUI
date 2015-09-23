@@ -63,14 +63,9 @@ void ImageViewer::updateViews( ) {
   if( !img ) {
     return;
   }
-  for( size_t i = 0; i < 4; ++i ) {
-    views[ i ]->setSlice( img->currentSlice( i ) );
-    if( controller ) {
-      QGraphicsView *view = views[ i ]->graphicsView( );
-      view->fitInView( controller->getPixmapItem( i ), Qt::KeepAspectRatio );
-      QRectF r = controller->getPixmapItem( i )->boundingRect( );
-      views[ i ]->scene( )->setSceneRect( r );
-    }
+  for( size_t axis = 0; axis < 4; ++axis ) {
+    views[ axis ]->setSlice( img->currentSlice( axis ) );
+    getScene( axis )->setOverlay( controller->currentFormat()->overlay());
   }
 }
 
@@ -80,9 +75,10 @@ void ImageViewer::changeImage( ) {
   if( !img ) {
     return;
   }
-  DisplayFormat format = controller->currentFormat( );
+  DisplayFormat * format = controller->currentFormat( );
   for( size_t axis = 0; axis < 4; ++axis ) {
-    if( format.viewerControls ) {
+    views[ axis ]->scene( )->setOverlay(false);
+    if( format->hasViewerControls() ) {
       views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
       views[ axis ]->setSlice( img->currentSlice( axis ) );
       views[ axis ]->showControls( );
@@ -91,11 +87,16 @@ void ImageViewer::changeImage( ) {
       views[ axis ]->hideControls( );
     }
   }
-  if( !format.hasOverlay ) {
-    format.hasOverlay = false;
+  setLayoutType( format->currentLayout() );
+  setViewMode( format->currentViews() );
+  for( size_t axis = 0; axis < 4; ++axis ) {
+    if( controller) {
+      QRectF r = controller->getPixmapItem( axis )->boundingRect( );
+      views[ axis ]->scene( )->setSceneRect( r );
+      QGraphicsView *view = views[ axis ]->graphicsView( );
+      view->fitInView( controller->getPixmapItem( axis ), Qt::KeepAspectRatio );
+    }
   }
-  setLayoutType( format.currentLayout );
-  setViewMode( format.currentViews );
   updateViews( );
 }
 
@@ -108,10 +109,13 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   Bial::Point3D pt3d = transform( ( double ) pt.x( ), ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
   for( size_t other = 0; other < 3; ++other ) {
-    if( other != axis ) {
-      Bial::Transform3D otherTransf = img->getTransform( other ).Inverse( );
-      Bial::Point3D otherPt = otherTransf( pt3d );
-      views[ other ]->scene( )->updateOverlay( QPointF( otherPt.x, otherPt.y ) );
+    if(controller->currentFormat()->overlay()){
+      views[ other ]->scene( )->setOverlay(true);
+      if( other != axis ) {
+        Bial::Transform3D otherTransf = img->getTransform( other ).Inverse( );
+        Bial::Point3D otherPt = otherTransf( pt3d );
+        views[ other ]->scene( )->updateOverlay( QPointF( otherPt.x, otherPt.y ) );
+      }
     }
   }
 }
@@ -263,21 +267,13 @@ void ImageViewer::setViews0123( ) {
 }
 
 void ImageViewer::toggleOverlay( ) {
-  for( size_t axis = 0; axis < 4; ++axis ) {
-    if( controller->currentFormat().hasOverlay ) {
-      views[ axis ]->scene( )->setOverlay( !views[ axis ]->scene( )->overlay( ) );
-    }
-  }
-}
-
-void ImageViewer::setOverlay( bool hasOverlay ) {
-  for( size_t axis = 0; axis < 4; ++axis ) {
-    views[ axis ]->scene( )->setOverlay( hasOverlay );
+  if(controller->currentImage()){
+    controller->currentFormat()->toggleOverlay();
   }
 }
 
 void ImageViewer::resizeEvent( QResizeEvent* ) {
-  updateViews( );
+  changeImage();
 }
 
 bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
@@ -318,7 +314,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
   return( QWidget::eventFilter( obj, evt ) );
 }
 
-QGraphicsScene* ImageViewer::getScene( size_t axis ) {
+GraphicsScene* ImageViewer::getScene( size_t axis ) {
   if( axis > views.size( ) ) {
     throw std::out_of_range( BIAL_ERROR( QString( "Invalid axis, expected < %1." ).arg( views.size( ) ).toStdString( ) ) );
   }

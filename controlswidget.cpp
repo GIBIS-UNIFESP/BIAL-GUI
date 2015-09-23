@@ -8,59 +8,15 @@
 ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::ControlsWidget ) {
   ui->setupUi( this );
 
-  timer = new QTimer(this);
-  timer->setInterval( 1000/ui->spinBoxSpeed->value()  );
+  timer = new QTimer( this );
+  timer->setInterval( 1000 / ui->spinBoxSpeed->value( ) );
   controller = nullptr;
+  ui->pushButton4Views->hide( );
+  ui->pushButton_3RGB->hide( );
 }
 
 ControlsWidget::~ControlsWidget( ) {
   delete ui;
-}
-
-void ControlsWidget::installImageViewer( ImageViewer *viewer ) {
-
-  /* Layout */
-
-  connect( ui->pushButtonGrid, &QPushButton::clicked, viewer, &ImageViewer::setGridLayout );
-  connect( ui->pushButtonHorizontal, &QPushButton::clicked, viewer, &ImageViewer::setHorizontalLayout );
-  connect( ui->pushButtonVertical, &QPushButton::clicked, viewer, &ImageViewer::setVerticalLayout );
-
-  /* NIfTI */
-
-  connect( ui->pushButtonAxial, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
-  connect( ui->pushButtonCoronal, &QPushButton::clicked, viewer, &ImageViewer::setView1 );
-  connect( ui->pushButtonSagittal, &QPushButton::clicked, viewer, &ImageViewer::setView2 );
-
-  connect( ui->pushButton1View, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
-  connect( ui->pushButton3Views, &QPushButton::clicked, viewer, &ImageViewer::setViews012 );
-  connect( ui->pushButton4Views, &QPushButton::clicked, viewer, &ImageViewer::setViews0123 );
-
-  connect( ui->pushButton1View, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::show );
-  connect( ui->pushButton3Views, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::hide );
-  connect( ui->pushButton4Views, &QPushButton::clicked, ui->groupBoxNiftiAxis, &QGroupBox::hide );
-
-  connect( ui->pushButton1View, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::hide );
-  connect( ui->pushButton3Views, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::show );
-  connect( ui->pushButton4Views, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::show );
-
-  /* PPM */
-
-  connect( ui->pushButton_1RGB, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
-  connect( ui->pushButton_3RGB, &QPushButton::clicked, viewer, &ImageViewer::setViews123 );
-  connect( ui->pushButton_4RGB, &QPushButton::clicked, viewer, &ImageViewer::setViews0123 );
-
-  connect( ui->pushButton_1RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::show );
-  connect( ui->pushButton_3RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::hide );
-  connect( ui->pushButton_4RGB, &QPushButton::clicked, ui->groupBoxPpmChannels, &QGroupBox::hide );
-
-  connect( ui->pushButton_1RGB, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::hide );
-  connect( ui->pushButton_3RGB, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::show );
-  connect( ui->pushButton_4RGB, &QPushButton::clicked, ui->groupBoxOrientation, &QGroupBox::show );
-
-  connect( ui->pushButton_RGB, &QPushButton::clicked, viewer, &ImageViewer::setView0 );
-  connect( ui->pushButton_R, &QPushButton::clicked, viewer, &ImageViewer::setView1 );
-  connect( ui->pushButton_G, &QPushButton::clicked, viewer, &ImageViewer::setView2 );
-  connect( ui->pushButton_B, &QPushButton::clicked, viewer, &ImageViewer::setView3 );
 }
 
 void ControlsWidget::setController( Controller *value ) {
@@ -68,72 +24,67 @@ void ControlsWidget::setController( Controller *value ) {
   connect( controller, &Controller::currentImageChanged, this, &ControlsWidget::imageChanged );
   connect( controller, &Controller::imageUpdated, this, &ControlsWidget::imageUpdated );
   connect( controller, &Controller::containerUpdated, this, &ControlsWidget::updateRange );
-
-//  connect( ui->horizontalSliderZoom, &QAbstractSlider::valueChanged, controller, &Controller::setZoom);
-
-  connect( ui->folderHorizontalSlider, &QAbstractSlider::valueChanged, controller, &Controller::setCurrentImagePos);
-  connect( ui->folderSpinBox, SIGNAL(valueChanged(int)), controller, SLOT(setCurrentImagePos(int)));
-  connect(timer, &QTimer::timeout, controller, &Controller::loadNextImage);
-
+  connect( ui->folderHorizontalSlider, &QAbstractSlider::valueChanged, controller, &Controller::setCurrentImagePos );
+  connect( ui->folderSpinBox, SIGNAL( valueChanged( int ) ), controller, SLOT( setCurrentImagePos( int ) ) );
+  connect( timer, &QTimer::timeout, controller, &Controller::loadNextImage );
 }
 
 void ControlsWidget::imageChanged( ) {
   GuiImage *img = controller->currentImage( );
-  if(img == nullptr) {
+  if( img == nullptr ) {
     return;
   }
   ui->folderHorizontalSlider->setValue( controller->currentImagePos( ) );
   ui->folderSpinBox->setValue( controller->currentImagePos( ) );
 
-  DisplayFormat format = controller->currentFormat();
-  switch (format.currentLayout) {
-  case Layout::GRID:
-    ui->pushButtonGrid->setChecked(true);
-    break;
-  case Layout::HORIZONTAL:
-    ui->pushButtonHorizontal->setChecked(true);
-    break;
-  case Layout::VERTICAL:
-    ui->pushButtonVertical->setChecked(true);
-    break;
+  DisplayFormat *format = controller->currentFormat( );
+  switch( format->currentLayout( ) ) {
+      case Layout::GRID:
+      ui->pushButtonGrid->setChecked( true );
+      break;
+      case Layout::HORIZONTAL:
+      ui->pushButtonHorizontal->setChecked( true );
+      break;
+      case Layout::VERTICAL:
+      ui->pushButtonVertical->setChecked( true );
+      break;
   }
-  switch (format.currentViews) {
-  case Views::SHOW0:
-    ui->pushButton1View->setChecked(true);
-    break;
-  case Views::SHOW1:
-    ui->pushButton1View->setChecked(true);
-    break;
-  case Views::SHOW2:
-    ui->pushButton1View->setChecked(true);
-    break;
-  case Views::SHOW3:
-    ui->pushButton1View->setChecked(true);
-    break;
-  case Views::SHOW012:
-    ui->pushButton3Views->setChecked(true);
-    break;
-  case Views::SHOW123:
-    ui->pushButton3Views->setChecked(true);
-    break;
-  case Views::SHOW0123:
-    ui->pushButton4Views->setChecked(true);
-    break;
+  switch( format->currentViews( ) ) {
+      case Views::SHOW0:
+      ui->pushButton1View->setChecked( true );
+      break;
+      case Views::SHOW1:
+      ui->pushButton1View->setChecked( true );
+      break;
+      case Views::SHOW2:
+      ui->pushButton1View->setChecked( true );
+      break;
+      case Views::SHOW3:
+      ui->pushButton1View->setChecked( true );
+      break;
+      case Views::SHOW012:
+      ui->pushButton3Views->setChecked( true );
+      break;
+      case Views::SHOW123:
+      ui->pushButton3Views->setChecked( true );
+      break;
+      case Views::SHOW0123:
+      ui->pushButton4Views->setChecked( true );
+      break;
   }
-
-  ui->groupBoxNiftiViews->setVisible( format.showNiftiViews );
-  ui->groupBoxNiftiAxis->setVisible( format.showNiftiAxis);
-  ui->groupBoxOrientation->setVisible( format.showOrientation );
-  ui->groupBoxPpmViews->setVisible( format.showPpmViews);
-  ui->groupBoxPpmChannels->setVisible( format.showPpmChannels);
-  ui->rotate->setVisible(format.rotateSingle);
-  ui->rotateAll->setVisible(format.rotateAll);
+  ui->groupBoxNiftiViews->setVisible( format->showNiftiViews( ) );
+  ui->groupBoxNiftiAxis->setVisible( format->showNiftiAxis( ) );
+  ui->groupBoxOrientation->setVisible( format->showOrientation( ) );
+  ui->groupBoxPpmViews->setVisible( format->showPpmViews( ) );
+  ui->groupBoxPpmChannels->setVisible( format->showPpmChannels( ) );
+  ui->rotate->setVisible( format->rotateSingle( ) );
+  ui->rotateAll->setVisible( format->rotateAll( ) );
   ui->groupBoxLabels->setVisible( img->hasLabels( ) );
 
-  //TODO Continue ...
+  /* TODO Continue ... */
 }
 
-void ControlsWidget::imageUpdated() {
+void ControlsWidget::imageUpdated( ) {
 
 }
 
@@ -145,9 +96,10 @@ void ControlsWidget::updateRange( ) {
     ui->folderSpinBox->setEnabled( true );
     ui->folderSpinBox->setMaximum( images );
     ui->folderHorizontalSlider->setEnabled( true );
-    ui->folderHorizontalSlider->setMaximum( images );
+    ui->folderHorizontalSlider->setMaximum( images - 1 );
     ui->folderHorizontalSlider->setMinimum( 0 );
-  } else if( images == 0 ) {
+  }
+  else if( images == 0 ) {
     /*    controller->setCurrentImagePos(images - 1); */
     ui->folderSpinBox->setEnabled( false );
     ui->folderSpinBox->setMaximum( 0 );
@@ -157,14 +109,79 @@ void ControlsWidget::updateRange( ) {
   }
 }
 
-void ControlsWidget::on_spinBoxSpeed_valueChanged(int value) {
-  timer->setInterval( 1000/value );
+void ControlsWidget::on_spinBoxSpeed_valueChanged( int value ) {
+  timer->setInterval( 1000 / value );
 }
 
-void ControlsWidget::on_buttonPlay_clicked(bool checked) {
-  if(checked){
-    timer->start();
-  }else{
-    timer->stop();
+void ControlsWidget::on_buttonPlay_clicked( bool checked ) {
+  if( checked ) {
+    timer->start( );
   }
+  else {
+    timer->stop( );
+  }
+}
+
+void ControlsWidget::on_pushButton1View_clicked( ) {
+
+}
+
+void ControlsWidget::on_pushButton3Views_clicked( ) {
+
+}
+
+void ControlsWidget::on_pushButton4Views_clicked( ) {
+
+}
+
+void ControlsWidget::on_pushButton_1RGB_clicked( ) {
+
+}
+
+void ControlsWidget::on_pushButton_3RGB_clicked( ) {
+
+}
+
+void ControlsWidget::on_pushButton_4RGB_clicked( ) {
+
+}
+
+void ControlsWidget::on_pushButtonGrid_clicked( ) {
+  controller->currentFormat()->setCurrentLayout(Layout::GRID);
+}
+
+void ControlsWidget::on_pushButtonHorizontal_clicked( ) {
+  controller->currentFormat()->setCurrentLayout(Layout::HORIZONTAL);
+}
+
+void ControlsWidget::on_pushButtonVertical_clicked( ) {
+  controller->currentFormat()->setCurrentLayout(Layout::VERTICAL);
+}
+
+void ControlsWidget::on_pushButtonAxial_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW0);
+}
+
+void ControlsWidget::on_pushButtonCoronal_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW1);
+}
+
+void ControlsWidget::on_pushButtonSagittal_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW2);
+}
+
+void ControlsWidget::on_pushButton_RGB_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW0);
+}
+
+void ControlsWidget::on_pushButton_R_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW1);
+}
+
+void ControlsWidget::on_pushButton_G_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW2);
+}
+
+void ControlsWidget::on_pushButton_B_clicked( ) {
+  controller->currentFormat()->setCurrentViews(Views::SHOW3);
 }

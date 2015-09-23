@@ -84,7 +84,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
 
     double factor = 255.0 / ( double ) m_max;
 
-    COMMENT( "Xsize = " << xsize << ", Ysize = " << ysize, 2 );
+//    COMMENT( "Xsize = " << xsize << ", Ysize = " << ysize, 0 );
     if( ( modality( ) == Modality::NIfTI ) || ( modality( ) == Modality::BW ) ) {
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );

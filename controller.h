@@ -16,7 +16,9 @@ class ThumbsWidget;
 class Controller : public QObject {
   Q_OBJECT
 
-  DisplayFormat bwFormat, rgbFormat, niftiFormat;
+  DisplayFormat * bwFormat;
+  DisplayFormat * rgbFormat;
+  DisplayFormat * niftiFormat;
   /**
    *
    * @brief m_images holds all opened images.
@@ -131,9 +133,12 @@ public:
   /**
    * @brief currentFormat
    */
-  DisplayFormat &currentFormat( );
+  DisplayFormat * currentFormat( );
 
   PixmapLabelItem* getPixmapItem( size_t axis );
+  DisplayFormat * getNiftiFormat() const;
+  void setNiftiFormat(DisplayFormat * value);
+
 signals:
   /**
    * @brief This signal is emmited every time the current image changes.
