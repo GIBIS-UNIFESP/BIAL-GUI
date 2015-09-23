@@ -52,15 +52,22 @@ void ControlsWidget::imageChanged( ) {
   switch( format->currentViews( ) ) {
       case Views::SHOW0:
       ui->pushButton1View->setChecked( true );
+      ui->pushButtonAxial->setChecked( true );
+      ui->pushButton_RGB->setChecked( true );
       break;
       case Views::SHOW1:
       ui->pushButton1View->setChecked( true );
+      ui->pushButtonCoronal->setChecked( true );
+      ui->pushButton_R->setChecked( true );
       break;
       case Views::SHOW2:
       ui->pushButton1View->setChecked( true );
+      ui->pushButtonSagittal->setChecked( true );
+      ui->pushButton_G->setChecked( true );
       break;
       case Views::SHOW3:
       ui->pushButton1View->setChecked( true );
+      ui->pushButton_B->setChecked( true );
       break;
       case Views::SHOW012:
       ui->pushButton3Views->setChecked( true );
@@ -123,27 +130,27 @@ void ControlsWidget::on_buttonPlay_clicked( bool checked ) {
 }
 
 void ControlsWidget::on_pushButton1View_clicked( ) {
-
+  controller->currentFormat()->setNumberOfViews(1);
 }
 
 void ControlsWidget::on_pushButton3Views_clicked( ) {
-
+  controller->currentFormat()->setNumberOfViews(3);
 }
 
 void ControlsWidget::on_pushButton4Views_clicked( ) {
-
+  controller->currentFormat()->setNumberOfViews(4);
 }
 
 void ControlsWidget::on_pushButton_1RGB_clicked( ) {
-
+  controller->currentFormat()->setNumberOfViews(1);
 }
 
 void ControlsWidget::on_pushButton_3RGB_clicked( ) {
-
+  controller->currentFormat()->setNumberOfViews(3);
 }
 
 void ControlsWidget::on_pushButton_4RGB_clicked( ) {
-
+  controller->currentFormat()->setNumberOfViews(4);
 }
 
 void ControlsWidget::on_pushButtonGrid_clicked( ) {

@@ -50,7 +50,22 @@ private slots:
   void on_actionSelect_default_folder_triggered( );
   void on_actionRemove_current_label_triggered( );
 
-  void mouseMoved(QPointF scnPos, size_t axis);
+  void mouseMoved( QPointF scnPos, size_t axis );
+
+  void on_actionAxial_triggered( );
+  void on_actionCoronal_triggered( );
+  void on_actionSagittal_triggered( );
+  void on_action3_Views_triggered( );
+  void on_action4_Views_triggered( );
+  void on_actionVertical_triggered( );
+  void on_actionHorizontal_triggered( );
+  void on_actionGrid_triggered( );
+
+  void on_actionWhitePen_triggered( );
+  void on_actionRedPen_triggered( );
+  void on_actionBluePen_triggered( );
+  void on_actionGreenPen_triggered( );
+  void on_actionBlackPen_triggered( );
 
 private:
   Ui::MainWindow *ui;

@@ -18,7 +18,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->setController( controller );
 
-//  ui->controlsWidget->installImageViewer( ui->imageViewer );
+/*  ui->controlsWidget->installImageViewer( ui->imageViewer ); */
 
   ui->controlsDock->hide( );
 
@@ -38,31 +38,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   loadQss( );
 
-  containerUpdated();
+  containerUpdated( );
 
 }
 
 void MainWindow::createConnections( ) {
-  /* Layout */
-/*
- *  connect( ui->actionGrid, &QAction::triggered, ui->imageViewer, &ImageViewer::setGridLayout );
- *  connect( ui->actionHorizontal, &QAction::triggered, ui->imageViewer, &ImageViewer::setHorizontalLayout );
- *  connect( ui->actionVertical, &QAction::triggered, ui->imageViewer, &ImageViewer::setVerticalLayout );
- *  connect( ui->actionAxial, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
- *  connect( ui->actionCoronal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
- *  connect( ui->actionSagittal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
- */
-
-  /* PPM */
-/*
- *  connect( ui->actionAll_channels, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
- *  connect( ui->actionRed_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
- *  connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
- *  connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
- *  connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews123 );
- *  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews0123 );
- */
-
   /* Show/Hide docks. */
   connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );
   connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible );
@@ -131,13 +111,14 @@ void MainWindow::currentImageChanged( ) {
     ui->actionGreen_channel->setVisible( format->modality( ) == Modality::RGB );
     ui->actionBlue_channel->setVisible( format->modality( ) == Modality::RGB );
     ui->actionAll_channels->setVisible( format->modality( ) == Modality::RGB );
+
     ui->action3_Views->setVisible( format->has3Views( ) );
     ui->action4_Views->setVisible( format->has4Views( ) );
   }
 }
 
 void MainWindow::containerUpdated( ) {
-  COMMENT("MainWindow::containerUpdated( )", 0);
+  COMMENT( "MainWindow::containerUpdated( )", 0 );
   if( controller->size( ) <= 1 ) {
     ui->thumbsDock->hide( );
   }
@@ -145,7 +126,7 @@ void MainWindow::containerUpdated( ) {
     ui->thumbsDock->show( );
   }
   bool hasImage = ( controller->currentImage( ) != nullptr );
-  COMMENT("Has Image = " << hasImage, 0);
+  COMMENT( "Has Image = " << hasImage, 0 );
 
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );
@@ -385,4 +366,56 @@ void MainWindow::mouseMoved( QPointF scnPos, size_t axis ) {
     }
     ui->statusBar->showMessage( msg, 10000 );
   }
+}
+
+void MainWindow::on_actionAxial_triggered( ) {
+  controller->currentFormat( )->setCurrentViews( Views::SHOW0 );
+}
+
+void MainWindow::on_actionCoronal_triggered( ) {
+  controller->currentFormat( )->setCurrentViews( Views::SHOW1 );
+}
+
+void MainWindow::on_actionSagittal_triggered( ) {
+  controller->currentFormat( )->setCurrentViews( Views::SHOW2 );
+}
+
+void MainWindow::on_action3_Views_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 3 );
+}
+
+void MainWindow::on_action4_Views_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 4 );
+}
+
+void MainWindow::on_actionVertical_triggered( ) {
+  controller->currentFormat( )->setCurrentLayout( Layout::VERTICAL );
+}
+
+void MainWindow::on_actionHorizontal_triggered( ) {
+  controller->currentFormat( )->setCurrentLayout( Layout::HORIZONTAL );
+}
+
+void MainWindow::on_actionGrid_triggered( ) {
+  controller->currentFormat( )->setCurrentLayout( Layout::GRID );
+}
+
+void MainWindow::on_actionWhitePen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::white );
+}
+
+void MainWindow::on_actionRedPen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::red );
+}
+
+void MainWindow::on_actionBluePen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::blue );
+}
+
+void MainWindow::on_actionGreenPen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::green );
+}
+
+void MainWindow::on_actionBlackPen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::black );
 }

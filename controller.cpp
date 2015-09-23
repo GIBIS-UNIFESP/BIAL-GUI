@@ -11,6 +11,9 @@ Controller::Controller( int views, QObject *parent ) : QObject( parent ), bwForm
     m_pixmapItems.append( new PixmapLabelItem( ) );
   }
   m_currentImagePos = -1;
+  connect( rgbFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( niftiFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( bwFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
   connect( rgbFormat, &DisplayFormat::updated, this, &Controller::update );
   connect( niftiFormat, &DisplayFormat::updated, this, &Controller::update );
   connect( bwFormat, &DisplayFormat::updated, this, &Controller::update );

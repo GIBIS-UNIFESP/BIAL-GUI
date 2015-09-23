@@ -78,6 +78,7 @@ void ImageViewer::changeImage( ) {
   DisplayFormat * format = controller->currentFormat( );
   for( size_t axis = 0; axis < 4; ++axis ) {
     views[ axis ]->scene( )->setOverlay(false);
+    views[ axis ]->scene( )->setOverlayPen(format->overlayColor());
     if( format->hasViewerControls() ) {
       views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
       views[ axis ]->setSlice( img->currentSlice( axis ) );

@@ -1,6 +1,7 @@
 #ifndef DISPLAYFORMAT_H
 #define DISPLAYFORMAT_H
 
+#include <QColor>
 #include <QObject>
 #include <QVector>
 #include <array>
@@ -12,23 +13,21 @@ enum class Layout {
   GRID, HORIZONTAL, VERTICAL
 };
 enum class Views {
-  SHOW0, SHOW1, SHOW2, SHOW3, SHOW012, SHOW123, SHOW0123
+  SHOW0 = 1, SHOW1 = 2, SHOW2 = 4, SHOW3 = 8, SHOW012 = 7, SHOW123 = 14, SHOW0123 = 15
 };
 
-class DisplayFormat : public QObject{
+class DisplayFormat : public QObject {
   Q_OBJECT
 public:
-  explicit DisplayFormat(QObject *parent);
+  explicit DisplayFormat( QObject *parent );
 
   Modality modality( ) const;
-  void setModality( const Modality &modality );
 
   Layout currentLayout( ) const;
-  void setCurrentLayout( const Layout &currentLayout );
+  virtual void setCurrentLayout( const Layout &currentLayout );
 
   Views currentViews( ) const;
-  void setCurrentViews( const Views &currentViews );
-
+  virtual void setCurrentViews( const Views &currentViews );
 
   bool hasViewerControls( ) const;
 
@@ -50,11 +49,11 @@ public:
 
   bool showPpmChannels( ) const;
 
-  bool overlay() const;
+  bool overlay( ) const;
 
   void setOverlay( bool overlay );
 
-  void toggleOverlay();
+  void toggleOverlay( );
 
   bool hasLayout( ) const;
 
@@ -62,10 +61,16 @@ public:
 
   bool has4Views( ) const;
 
-  std::array<bool, 4> getViews();
+  std::array< bool, 4 > getViews( );
+
+  int getNumberOfViews( ) const;
+  virtual void setNumberOfViews( int numberOfViews ) = 0;
+
+  QColor overlayColor() const;
+  void setOverlayColor(const QColor & overlayColor);
 
 signals:
-  void updated();
+  void updated( );
 
 protected:
   Modality m_modality;
@@ -89,21 +94,28 @@ protected:
   bool m_showOrientation;
   bool m_showPpmViews;
   bool m_showPpmChannels;
+
+  int m_numberOfViews;
+  QColor m_overlayColor;
 };
 
 class BWFormat : public DisplayFormat {
 public:
-  BWFormat(QObject *parent = 0);
+  BWFormat( QObject *parent = 0 );
+  void setNumberOfViews( int numberOfViews );
 };
 
 class NIfTIFormat : public DisplayFormat {
 public:
-  NIfTIFormat(QObject *parent = 0);
+  NIfTIFormat( QObject *parent = 0 );
+  virtual void setCurrentViews( const Views &currentViews );
+  void setNumberOfViews( int numberOfViews );
 };
 
 class RGBFormat : public DisplayFormat {
 public:
-  RGBFormat(QObject *parent = 0);
+  RGBFormat( QObject *parent = 0 );
+  void setNumberOfViews( int numberOfViews );
 };
 
 
