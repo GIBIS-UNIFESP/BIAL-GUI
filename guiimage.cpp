@@ -44,6 +44,8 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
       transform[ 2 ].Translate( bounding[ 2 ].pMin.x, bounding[ 2 ].pMin.y, bounding[ 2 ].pMin.z );
       bounding[ 2 ] = bounding[ 2 ].Normalized( );
     }
+    cachedPixmaps.resize( 3 );
+    needUpdate.insert( 0, 3, true );
     for( int axis = 0; axis < m_currentSlice.size( ); ++axis ) {
       setCurrentSlice( axis, depth( axis ) / 2 );
     }
@@ -53,13 +55,18 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     m_modality = Modality::RGB;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
+    cachedPixmaps.resize( 4 );
+    needUpdate.insert( 0, 4, true );
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
     COMMENT( "Gray image detected.", 2 );
     m_modality = Modality::BW;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
+    cachedPixmaps.resize( 1 );
+    needUpdate.push_back( true );
   }
+  COMMENT("Image " << fileName().toStdString() << " size = (" << width(0) << ", " << heigth(0) << ", " << depth(0) << ")", 0);
 }
 
 Modality GuiImage::modality( ) {
@@ -70,8 +77,12 @@ QString GuiImage::fileName( ) {
   return( m_fileName );
 }
 
-QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
-  COMMENT( "GET SLICE: image = " << m_fileName.toStdString() << ", axis = " << axis << ", slice = " << slice, 0 );
+QPixmap GuiImage::getSlice( size_t axis ) {
+  size_t slice = currentSlice( axis );
+  COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << axis << ", slice = " << slice, 0 );
+  if( !needUpdate[ axis ] ) {
+    return( cachedPixmaps[ axis ] );
+  }
   if( slice >= depth( axis ) ) {
     throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
                                           toStdString( ) ) ) );
@@ -83,8 +94,6 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
     const Bial::Transform3D &transf = transform[ axis ];
 
     double factor = 255.0 / ( double ) m_max;
-
-//    COMMENT( "Xsize = " << xsize << ", Ysize = " << ysize, 0 );
     if( ( modality( ) == Modality::NIfTI ) || ( modality( ) == Modality::BW ) ) {
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
@@ -115,6 +124,7 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
         }
       }
       else {
+        int r( axis == 1 ), g( axis == 2 ), b( axis == 3 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -123,12 +133,14 @@ QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
             if( image.ValidPixel( pos.x, pos.y ) ) {
               pixel = static_cast< int >( image( pos.x, pos.y, axis - 1 ) * factor );
             }
-            scanLine[ x ] = qRgb( pixel, pixel, pixel );
+            scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
           }
         }
       }
     }
-    return( QPixmap::fromImage( res ) );
+    cachedPixmaps[ axis ] = QPixmap::fromImage( res );
+    needUpdate[ axis ] = false;
+    return( cachedPixmaps[ axis ] );
   }
   catch( std::bad_alloc &e ) {
     std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Memory allocation error." ) );
@@ -167,8 +179,9 @@ bool GuiImage::hasLabels( ) {
 void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
   size_t sz = m_currentSlice.size( );
   if( axis < sz ) {
-    if( m_currentSlice[ axis ] != slice && slice < depth(axis)) {
+    if( ( m_currentSlice[ axis ] != slice ) && ( slice < depth( axis ) ) ) {
       m_currentSlice[ axis ] = slice;
+      needUpdate[ axis ] = true;
       emit imageUpdated( );
     }
   }

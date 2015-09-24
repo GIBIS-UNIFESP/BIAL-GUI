@@ -14,11 +14,7 @@ Thumbnail::Thumbnail( GuiImage *image, int number, int size,
   setFrameShape( QFrame::StyledPanel );
   setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
   QPixmap pix;
-  if( image->modality( ) == Modality::NIfTI ) {
-    pix = image->getSlice( 0, image->depth( 0 ) / 2 - 1 );
-  } else {
-    pix = image->getSlice( 0, 0 );
-  }
+  pix = image->getSlice( 0 );
   pix = pix.scaled( size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
   QLabel *imageLabel = new QLabel;

@@ -55,7 +55,7 @@ void ImageViewer::setController( Controller *value ) {
 }
 
 void ImageViewer::updateViews( ) {
-  COMMENT( "ImageViewer::updateViews", 0 );
+  COMMENT( "ImageViewer::updateViews", 2 );
   if( !controller ) {
     return;
   }
@@ -70,7 +70,7 @@ void ImageViewer::updateViews( ) {
 }
 
 void ImageViewer::changeImage( ) {
-  COMMENT( "ImageViewer::changeImage", 0 );
+  COMMENT( "ImageViewer::changeImage", 2 );
   GuiImage *img = controller->currentImage( );
   if( !img ) {
     return;

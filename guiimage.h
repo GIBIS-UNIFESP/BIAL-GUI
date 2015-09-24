@@ -3,6 +3,7 @@
 #include <Geometrics.hpp>
 #include <Image.hpp>
 #include <QObject>
+#include <QPixmap>
 #include <QVector>
 
 #include "displayformat.h"
@@ -12,12 +13,14 @@ class GuiImage : public QObject {
   Modality m_modality;
   Bial::Image< int > image;
   QString m_fileName;
+  QVector<QPixmap>cachedPixmaps;
+  QVector<bool>needUpdate;
 
 public:
   explicit GuiImage( QString fName, QObject *parent = 0 );
   Modality modality( );
   QString fileName( );
-  QPixmap getSlice( size_t axis, size_t slice );
+  QPixmap getSlice( size_t axis );
   size_t width( size_t axis );
   size_t heigth( size_t axis );
   size_t depth( size_t axis );
@@ -31,7 +34,6 @@ public:
   const Bial::Image< int > &getImage( ) const;
 
   int max( );
-
 signals:
   void imageUpdated( );
 

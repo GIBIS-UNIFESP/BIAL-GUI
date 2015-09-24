@@ -152,6 +152,7 @@ void DisplayFormat::setCurrentLayout( const Layout &currentLayout ) {
   m_currentLayout = currentLayout;
   emit updated( );
 }
+
 void DisplayFormat::setCurrentViews( const Views &currentViews ) {
   COMMENT( "View set to " << ( int ) currentViews, 0 );
   switch( currentViews ) {
