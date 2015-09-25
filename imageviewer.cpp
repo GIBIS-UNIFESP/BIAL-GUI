@@ -104,7 +104,7 @@ void ImageViewer::changeImage( ) {
 void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   /* FIXME Use "currentSlice" to determine overlay positions. */
   COMMENT( "ImageViewer::updateOverlay", 0 );
-  views[ axis ]->scene( )->updateOverlay( pt );
+  views[ axis ]->scene( )->setOverlayPos( pt );
   GuiImage *img = controller->currentImage( );
   Bial::FastTransform transform = img->getTransform( axis );
   Bial::Point3D pt3d = transform( ( double ) pt.x( ), ( double ) pt.y( ),
@@ -115,7 +115,7 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
       if( other != axis ) {
         Bial::FastTransform otherTransf = img->getTransform( other ).Inverse( );
         Bial::Point3D otherPt = otherTransf( pt3d );
-        views[ other ]->scene( )->updateOverlay( QPointF( otherPt.x, otherPt.y ) );
+        views[ other ]->scene( )->setOverlayPos( QPointF( otherPt.x, otherPt.y ) );
       }
     }
   }

@@ -1,10 +1,15 @@
 #include "graphicsscene.h"
 #include <QPainter>
 
+
+QPointF GraphicsScene::overlayPos( ) const {
+  return( m_overlayPos );
+}
+
 GraphicsScene::GraphicsScene( QObject *parent ) : QGraphicsScene( parent ) {
   m_overlay = false;
   m_overlayPen = QPen( Qt::green );
-  m_pos = QPointF(-1,-1);
+  m_overlayPos = QPointF( -1, -1 );
 }
 
 void GraphicsScene::setOverlayPen( const QPen &overlayPen ) {
@@ -12,8 +17,8 @@ void GraphicsScene::setOverlayPen( const QPen &overlayPen ) {
   update( );
 }
 
-void GraphicsScene::updateOverlay( QPointF pos ) {
-  m_pos = pos;
+void GraphicsScene::setOverlayPos( QPointF pos ) {
+  m_overlayPos = pos;
   update( );
 }
 
@@ -30,9 +35,9 @@ void GraphicsScene::drawForeground( QPainter *painter, const QRectF &rect ) {
   if( m_overlay ) {
     painter->setRenderHint( QPainter::Antialiasing );
     painter->setPen( m_overlayPen );
-    painter->setOpacity(0.5);
-    painter->drawLine( m_pos.x( ), 0, m_pos.x( ), height( ) ); /* vertical */
-    painter->drawLine( 0, m_pos.y( ), width( ), m_pos.y( ) ); /* horizontal */
+    painter->setOpacity( 0.5 );
+    painter->drawLine( m_overlayPos.x( ), 0, m_overlayPos.x( ), height( ) ); /* vertical */
+    painter->drawLine( 0, m_overlayPos.y( ), width( ), m_overlayPos.y( ) ); /* horizontal */
   }
   QGraphicsScene::drawForeground( painter, rect );
 }
