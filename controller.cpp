@@ -157,12 +157,12 @@ void Controller::changeOthersSlices( QPointF posF, size_t axis ) {
   COMMENT( "Changing slice position of other frames based on image position.", 2 );
   if( currentImage( ) ) {
     if( ( currentImage( )->modality( ) == Modality::NIfTI ) ) {
-      Bial::Transform3D transform = currentImage( )->getTransform( axis );
+      Bial::FastTransform transform = currentImage( )->getTransform( axis );
       Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
                                     ( double ) currentImage( )->currentSlice( axis ) );
       for( size_t other = 0; other < 3; ++other ) {
         if( other != axis ) {
-          Bial::Transform3D otherTransf = currentImage( )->getTransform( other ).Inverse( );
+          Bial::FastTransform otherTransf = currentImage( )->getTransform( other ).Inverse( );
           Bial::Point3D otherPt = otherTransf( pt );
           size_t pos = static_cast< size_t >( round( otherPt.z ) );
           if( pos < currentImage( )->depth( other ) ) {

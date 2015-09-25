@@ -29,7 +29,7 @@ public:
   void setCurrentSlice( size_t axis, size_t slice );
 
   Bial::Point3D getPosition( QPointF pos, size_t axis );
-  Bial::Transform3D getTransform( size_t axis );
+  Bial::FastTransform getTransform( size_t axis );
 
   const Bial::Image< int > &getImage( ) const;
 
@@ -40,7 +40,7 @@ signals:
 public slots:
 
 private:
-  QVector< Bial::Transform3D > transform;
+  QVector< Bial::FastTransform > transform;
   QVector< Bial::BBox > bounding;
   QVector< size_t > m_currentSlice;
   int m_max;

@@ -13,7 +13,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     m_modality = Modality::NIfTI;
     {
       COMMENT( "Generating Axial affine transform.", 2 );
-      transform[ 0 ].Rotate( 90.0, Bial::Transform3D::X ).Rotate( 90.0, Bial::Transform3D::Y );
+      transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
       Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
       transform[ 0 ]( start, &start );
       transform[ 0 ]( end, &end );
@@ -24,7 +24,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     }
     {
       COMMENT( "Generating Coronal affine transform.", 2 );
-      transform[ 1 ].Rotate( 180.0, Bial::Transform3D::Z ).Rotate( 90.0, Bial::Transform3D::Y );
+      transform[ 1 ].Rotate( 180.0, Bial::FastTransform::Z ).Rotate( 90.0, Bial::FastTransform::Y );
       Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
       transform[ 1 ]( start, &start );
       transform[ 1 ]( end, &end );
@@ -35,7 +35,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     }
     {
       COMMENT( "Generating Sagittal affine transform.", 2 );
-      transform[ 2 ].Rotate( 180.0, Bial::Transform3D::Z );
+      transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
       Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
       transform[ 2 ]( start, &start );
       transform[ 2 ]( end, &end );
@@ -91,7 +91,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
     const size_t xsize = width( axis );
     const size_t ysize = heigth( axis );
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
-    const Bial::Transform3D &transf = transform[ axis ];
+    const Bial::FastTransform &transf = transform[ axis ];
 
     double factor = 255.0 / ( double ) m_max;
     if( ( modality( ) == Modality::NIfTI ) || ( modality( ) == Modality::BW ) ) {
@@ -196,7 +196,7 @@ Bial::Point3D GuiImage::getPosition( QPointF pos, size_t axis ) {
   return( point );
 }
 
-Bial::Transform3D GuiImage::getTransform( size_t axis ) {
+Bial::FastTransform GuiImage::getTransform( size_t axis ) {
   return( transform.at( axis ) );
 }
 

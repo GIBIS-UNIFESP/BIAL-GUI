@@ -106,14 +106,14 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   COMMENT( "ImageViewer::updateOverlay", 0 );
   views[ axis ]->scene( )->updateOverlay( pt );
   GuiImage *img = controller->currentImage( );
-  Bial::Transform3D transform = img->getTransform( axis );
+  Bial::FastTransform transform = img->getTransform( axis );
   Bial::Point3D pt3d = transform( ( double ) pt.x( ), ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
   for( size_t other = 0; other < 3; ++other ) {
     if(controller->currentFormat()->overlay()){
       views[ other ]->scene( )->setOverlay(true);
       if( other != axis ) {
-        Bial::Transform3D otherTransf = img->getTransform( other ).Inverse( );
+        Bial::FastTransform otherTransf = img->getTransform( other ).Inverse( );
         Bial::Point3D otherPt = otherTransf( pt3d );
         views[ other ]->scene( )->updateOverlay( QPointF( otherPt.x, otherPt.y ) );
       }
