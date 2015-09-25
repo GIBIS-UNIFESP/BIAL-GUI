@@ -58,6 +58,8 @@ private slots:
   void setViews123( );
   void setViews0123( );
 
+  void sliceChanged(size_t axis, size_t slice);
+
 public slots:
 
   void toggleOverlay();

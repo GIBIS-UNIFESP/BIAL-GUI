@@ -48,6 +48,7 @@ void ImageViewer::setController( Controller *value ) {
   /*  connect( this, &ImageViewer::mouseClicked, controller, &Controller::changeOthersSlices ); */
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
+    connect( view, &ImageWidget::sliceChanged, this, &ImageViewer::sliceChanged );
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
     getScene( axis )->addItem( controller->getPixmapItem( axis ) );
@@ -65,7 +66,7 @@ void ImageViewer::updateViews( ) {
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
     views[ axis ]->setSlice( img->currentSlice( axis ) );
-    getScene( axis )->setOverlay( controller->currentFormat()->overlay());
+    getScene( axis )->setOverlay( controller->currentFormat( )->overlay( ) );
   }
 }
 
@@ -75,11 +76,11 @@ void ImageViewer::changeImage( ) {
   if( !img ) {
     return;
   }
-  DisplayFormat * format = controller->currentFormat( );
+  DisplayFormat *format = controller->currentFormat( );
   for( size_t axis = 0; axis < 4; ++axis ) {
-    views[ axis ]->scene( )->setOverlay(false);
-    views[ axis ]->scene( )->setOverlayPen(format->overlayColor());
-    if( format->hasViewerControls() ) {
+    views[ axis ]->scene( )->setOverlay( false );
+    views[ axis ]->scene( )->setOverlayPen( format->overlayColor( ) );
+    if( format->hasViewerControls( ) ) {
       views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
       views[ axis ]->setSlice( img->currentSlice( axis ) );
       views[ axis ]->showControls( );
@@ -88,10 +89,10 @@ void ImageViewer::changeImage( ) {
       views[ axis ]->hideControls( );
     }
   }
-  setLayoutType( format->currentLayout() );
-  setViewMode( format->currentViews() );
+  setLayoutType( format->currentLayout( ) );
+  setViewMode( format->currentViews( ) );
   for( size_t axis = 0; axis < 4; ++axis ) {
-    if( controller) {
+    if( controller ) {
       QRectF r = controller->getPixmapItem( axis )->boundingRect( );
       views[ axis ]->scene( )->setSceneRect( r );
       QGraphicsView *view = views[ axis ]->graphicsView( );
@@ -110,8 +111,8 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   Bial::Point3D pt3d = transform( ( double ) pt.x( ), ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
   for( size_t other = 0; other < 3; ++other ) {
-    if(controller->currentFormat()->overlay()){
-      views[ other ]->scene( )->setOverlay(true);
+    if( controller->currentFormat( )->overlay( ) ) {
+      views[ other ]->scene( )->setOverlay( true );
       if( other != axis ) {
         Bial::FastTransform otherTransf = img->getTransform( other ).Inverse( );
         Bial::Point3D otherPt = otherTransf( pt3d );
@@ -267,14 +268,19 @@ void ImageViewer::setViews0123( ) {
   updateViews( );
 }
 
+void ImageViewer::sliceChanged( size_t axis, size_t slice ) {
+  Q_UNUSED(slice)
+  updateOverlay(getScene(axis)->overlayPos(), axis);
+}
+
 void ImageViewer::toggleOverlay( ) {
-  if(controller->currentImage()){
-    controller->currentFormat()->toggleOverlay();
+  if( controller->currentImage( ) ) {
+    controller->currentFormat( )->toggleOverlay( );
   }
 }
 
 void ImageViewer::resizeEvent( QResizeEvent* ) {
-  changeImage();
+  changeImage( );
 }
 
 bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
@@ -296,7 +302,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
       emit mouseMoved( scnPos, axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMousePress ) {
-      if(mouseEvt->button() == Qt::LeftButton){
+      if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = true;
         timer.restart( );
         controller->changeOthersSlices( scnPos, axis );
@@ -305,7 +311,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
       /* emit mouseClicked( scnPos, mouseEvt->buttons( ), axis ); */
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
-      if(mouseEvt->button() == Qt::LeftButton){
+      if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = false;
         controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
