@@ -41,7 +41,7 @@ private slots:
 
   void setLayoutType(Layout layout);
   void updateOverlay(QPointF pt, size_t axis );
-  void setViewMode(Views views);
+  void setViewMode(Views view);
 
   void setGridLayout( );
   void setHorizontalLayout( );
@@ -49,14 +49,6 @@ private slots:
 
   void hideViews( );
   void showViews( );
-
-  void setView0( );
-  void setView1( );
-  void setView2( );
-  void setView3( );
-  void setViews012( );
-  void setViews123( );
-  void setViews0123( );
 
   void sliceChanged(size_t axis, size_t slice);
 

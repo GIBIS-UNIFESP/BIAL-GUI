@@ -194,83 +194,18 @@ void ImageViewer::showViews( ) {
   updateViews( );
 }
 
-void ImageViewer::setViewMode( Views views ) {
-  switch( views ) {
-      case Views::SHOW0: {
-      setView0( );
-      break;
-    }
-      case Views::SHOW1: {
-      setView1( );
-      break;
-    }
-      case Views::SHOW2: {
-      setView2( );
-      break;
-    }
-      case Views::SHOW3: {
-      setView3( );
-      break;
-    }
-      case Views::SHOW012: {
-      setViews012( );
-      break;
-    }
-      case Views::SHOW123: {
-      setViews123( );
-      break;
-    }
-      case Views::SHOW0123: {
-      setViews0123( );
-      break;
-    }
-  }
-}
-
-void ImageViewer::setView0( ) {
+void ImageViewer::setViewMode( Views view ) {
   hideViews( );
-  views[ 0 ]->show( );
-  updateViews( );
-}
-
-void ImageViewer::setView1( ) {
-  hideViews( );
-  views[ 1 ]->show( );
-  updateViews( );
-}
-
-void ImageViewer::setView2( ) {
-  hideViews( );
-  views[ 2 ]->show( );
-  updateViews( );
-}
-
-void ImageViewer::setView3( ) {
-  hideViews( );
-  views[ 3 ]->show( );
-  updateViews( );
-}
-
-void ImageViewer::setViews012( ) {
-  showViews( );
-  views[ 3 ]->hide( );
-  updateViews( );
-}
-
-void ImageViewer::setViews123( ) {
-  showViews( );
-  views[ 0 ]->hide( );
-  updateViews( );
-}
-
-void ImageViewer::setViews0123( ) {
-  showViews( );
+  views[ 0 ]->setVisible( ( int ) view & ( int ) Views::SHOW0 );
+  views[ 1 ]->setVisible( ( int ) view & ( int ) Views::SHOW1 );
+  views[ 2 ]->setVisible( ( int ) view & ( int ) Views::SHOW2 );
+  views[ 3 ]->setVisible( ( int ) view & ( int ) Views::SHOW3 );
   updateViews( );
 }
 
 void ImageViewer::sliceChanged( size_t axis, size_t slice ) {
-  Q_UNUSED(slice)
-  updateOverlay(getScene(axis)->overlayPos(), axis);
+  Q_UNUSED( slice )
+  updateOverlay( getScene( axis )->overlayPos( ), axis );
 }
 
 void ImageViewer::toggleOverlay( ) {
