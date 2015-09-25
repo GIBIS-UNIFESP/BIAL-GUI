@@ -173,10 +173,13 @@ void DisplayFormat::setCurrentViews( const Views &currentViews ) {
   m_currentViews = currentViews;
   emit updated( );
 }
+
 void DisplayFormat::setOverlay( bool overlay ) {
   COMMENT( "Overlay set to " << overlay, 0 );
-  m_overlay = overlay;
-  emit updated( );
+  if(m_hasOverlay){
+    m_overlay = overlay;
+    emit updated( );
+  }
 }
 
 void DisplayFormat::toggleOverlay( ) {

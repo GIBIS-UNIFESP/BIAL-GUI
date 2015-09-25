@@ -66,7 +66,8 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     cachedPixmaps.resize( 1 );
     needUpdate.push_back( true );
   }
-  COMMENT("Image " << fileName().toStdString() << " size = (" << width(0) << ", " << heigth(0) << ", " << depth(0) << ")", 0);
+  COMMENT( "Image " << fileName( ).toStdString( ) << " size = (" << width( 0 ) << ", " << heigth( 0 ) << ", " <<
+  depth( 0 ) << ")", 0 );
 }
 
 Modality GuiImage::modality( ) {
@@ -87,77 +88,72 @@ QPixmap GuiImage::getSlice( size_t axis ) {
     throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
                                           toStdString( ) ) ) );
   }
-  try {
-    const size_t xsize = width( axis );
-    const size_t ysize = heigth( axis );
-    QImage res( xsize, ysize, QImage::Format_ARGB32 );
-    const Bial::FastTransform &transf = transform[ axis ];
+  const size_t xsize = width( axis );
+  const size_t ysize = heigth( axis );
+  QImage res( xsize, ysize, QImage::Format_ARGB32 );
+  const Bial::FastTransform &transf = transform[ axis ];
 
-    double factor = 255.0 / ( double ) m_max;
-    if( ( modality( ) == Modality::NIfTI ) || ( modality( ) == Modality::BW ) ) {
+  double factor = 255.0 / ( double ) m_max;
+  if( modality( ) == Modality::NIfTI  ) {
+    for( size_t y = 0; y < ysize; ++y ) {
+      QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+      for( size_t x = 0; x < xsize; ++x ) {   /*  */
+        Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
+        int pixel = 0;
+        if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
+          pixel = static_cast< int >( image( pos.x, pos.y, pos.z ) * factor );
+        }
+        scanLine[ x ] = qRgb( pixel, pixel, pixel );
+      }
+    }
+  }
+  else if( modality( ) == Modality::BW ) {
+    for( size_t y = 0; y < ysize; ++y ) {
+      QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+      for( size_t x = 0; x < xsize; ++x ) {   /*  */
+        Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
+        int pixel = 0;
+        if( image.ValidPixel( pos.x, pos.y ) ) {
+          pixel = static_cast< int >( image( pos.x, pos.y ) * factor );
+        }
+        scanLine[ x ] = qRgb( pixel, pixel, pixel );
+      }
+    }
+  }
+  else if( modality( ) == Modality::RGB ) {
+    if( axis == 0 ) {
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-        for( size_t x = 0; x < xsize; ++x ) { /*  */
+        for( size_t x = 0; x < xsize; ++x ) {   /*  */
+          Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
+          int r( 0 ), g( 0 ), b( 0 );
+          if( image.ValidPixel( pos.x, pos.y ) ) {
+            r = static_cast< int >( image( pos.x, pos.y, 0 ) * factor );
+            g = static_cast< int >( image( pos.x, pos.y, 1 ) * factor );
+            b = static_cast< int >( image( pos.x, pos.y, 2 ) * factor );
+          }
+          scanLine[ x ] = qRgb( r, g, b );
+        }
+      }
+    }
+    else {
+      int r( axis == 1 ), g( axis == 2 ), b( axis == 3 );
+      for( size_t y = 0; y < ysize; ++y ) {
+        QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+        for( size_t x = 0; x < xsize; ++x ) {   /*  */
           Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
           int pixel = 0;
-          if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
-            pixel = static_cast< int >( image( pos.x, pos.y, pos.z ) * factor );
+          if( image.ValidPixel( pos.x, pos.y ) ) {
+            pixel = static_cast< int >( image( pos.x, pos.y, axis - 1 ) * factor );
           }
-          scanLine[ x ] = qRgb( pixel, pixel, pixel );
+          scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
         }
       }
     }
-    else if( modality( ) == Modality::RGB ) {
-      if( axis == 0 ) {
-        for( size_t y = 0; y < ysize; ++y ) {
-          QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int r( 0 ), g( 0 ), b( 0 );
-            if( image.ValidPixel( pos.x, pos.y ) ) {
-              r = static_cast< int >( image( pos.x, pos.y, 0 ) * factor );
-              g = static_cast< int >( image( pos.x, pos.y, 1 ) * factor );
-              b = static_cast< int >( image( pos.x, pos.y, 2 ) * factor );
-            }
-            scanLine[ x ] = qRgb( r, g, b );
-          }
-        }
-      }
-      else {
-        int r( axis == 1 ), g( axis == 2 ), b( axis == 3 );
-        for( size_t y = 0; y < ysize; ++y ) {
-          QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int pixel = 0;
-            if( image.ValidPixel( pos.x, pos.y ) ) {
-              pixel = static_cast< int >( image( pos.x, pos.y, axis - 1 ) * factor );
-            }
-            scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
-          }
-        }
-      }
-    }
-    cachedPixmaps[ axis ] = QPixmap::fromImage( res );
-    needUpdate[ axis ] = false;
-    return( cachedPixmaps[ axis ] );
   }
-  catch( std::bad_alloc &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Memory allocation error." ) );
-    throw( std::runtime_error( msg ) );
-  }
-  catch( std::runtime_error &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Runtime error." ) );
-    throw( std::runtime_error( msg ) );
-  }
-  catch( const std::out_of_range &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Out of range exception." ) );
-    throw( std::out_of_range( msg ) );
-  }
-  catch( const std::logic_error &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Logic Error." ) );
-    throw( std::logic_error( msg ) );
-  }
+  cachedPixmaps[ axis ] = QPixmap::fromImage( res );
+  needUpdate[ axis ] = false;
+  return( cachedPixmaps[ axis ] );
 }
 
 size_t GuiImage::width( size_t axis = 0 ) {
