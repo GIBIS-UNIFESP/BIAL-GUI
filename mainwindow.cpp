@@ -1,5 +1,6 @@
 #include "controller.h"
 #include "mainwindow.h"
+#include "dicomdir.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -39,7 +40,6 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
   loadQss( );
 
   containerUpdated( );
-
 }
 
 void MainWindow::createConnections( ) {
@@ -127,7 +127,8 @@ void MainWindow::containerUpdated( ) {
   }
   bool hasImage = ( controller->currentImage( ) != nullptr );
   COMMENT( "Has Image = " << hasImage, 0 );
-
+  ui->menuWindow->setEnabled( hasImage );
+  ui->controlsDock->setVisible( hasImage );
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );
   ui->menuLayout->setEnabled( hasImage );
@@ -137,6 +138,8 @@ void MainWindow::containerUpdated( ) {
   if( !hasImage ) {
     ui->actionRemove_current_label->setEnabled( false );
   }
+  ui->actionShow_controls_dock->setEnabled( hasImage );
+  ui->actionShow_images_dock->setEnabled( hasImage );
   currentImageChanged( );
 }
 
@@ -217,7 +220,7 @@ void MainWindow::readSettings( ) {
 void MainWindow::commandLineOpen( int argc, char *argv[] ) {
   COMMENT( "Command Line Open with " << argc << " arguments:", 0 );
   if( ( argc == 3 ) && ( QString( argv[ 1 ] ) == "-d" ) ) {
-    /*    LoadDicomdir(QString(argv[2])); */
+    loadDicomdir( QString( argv[ 2 ] ) );
   }
   else {
     QFileInfo file;
@@ -292,6 +295,37 @@ void MainWindow::loadQss( ) {
   setStyleSheet( StyleSheet );
 }
 
+bool MainWindow::loadDicomdir( QString dicomFName ) {
+  COMMENT("Loading DicomDir file", 1);
+  DicomDir dicomdir;
+  if (!dicomdir.open(dicomFName.toStdString())) {
+    statusBar()->showMessage(tr("Could not open dicomdir"), 2000);
+    return false;
+  }
+  const std::vector<std::string> files = dicomdir.getImages();
+  if(files.size() > 0){
+    controller->clear();
+    QProgressDialog progress(tr("Reading dicomdir files..."), tr("Abort"), 0, files.size(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    for (int i = 0, size = files.size(); i < size; ++i) {
+      progress.setValue(i);
+      if (progress.wasCanceled()) {
+        break;
+      }
+      controller->addImage(QString::fromStdString(files[i]).trimmed());
+    }
+    progress.setValue(files.size());
+    if(controller->size() < 1){
+      statusBar()->showMessage(tr("Could not load any dicomdir images"), 2000);
+      return false;
+    }
+    return true;
+  }
+  statusBar()->showMessage(tr("Empty dicomdir!"), 2000);
+  BIAL_WARNING("Empty dicomdir!");
+  return false;
+}
+
 void MainWindow::on_actionAddLabel_triggered( ) {
   controller->addLabel( getFileDialog( ) );
 }
@@ -317,11 +351,7 @@ void MainWindow::on_actionRemove_current_image_triggered( ) {
 }
 
 void MainWindow::on_actionSelect_default_folder_triggered( ) {
-  QDir dir;
-  if( !dir.exists( QDir::homePath( ) + "/.bial/" ) ) {
-    dir.mkdir( QDir::homePath( ) + "/.bial/" );
-  }
-  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ) );
+  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ), QDir::homePath() );
   if( !temp.isEmpty( ) ) {
     defaultFolder = temp;
     QSettings settings;

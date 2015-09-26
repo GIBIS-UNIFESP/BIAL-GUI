@@ -154,7 +154,7 @@ void DisplayFormat::setCurrentLayout( const Layout &currentLayout ) {
 }
 
 void DisplayFormat::setCurrentViews( const Views &currentViews ) {
-  COMMENT( "View set to " << ( int ) currentViews, 0 );
+  COMMENT( "currentViews set to " << ( int ) currentViews, 0 );
   switch( currentViews ) {
       case Views::SHOW0:
       case Views::SHOW1:
@@ -176,7 +176,7 @@ void DisplayFormat::setCurrentViews( const Views &currentViews ) {
 
 void DisplayFormat::setOverlay( bool overlay ) {
   COMMENT( "Overlay set to " << overlay, 0 );
-  if(m_hasOverlay){
+  if( m_hasOverlay ) {
     m_overlay = overlay;
     emit updated( );
   }
@@ -197,20 +197,17 @@ void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }
   m_currentLayout = Layout::GRID;
-  if( m_numberOfViews != numberOfViews ) {
-    if( numberOfViews == 1 ) {
-      m_currentViews = Views::SHOW0;
-      m_showNiftiAxis = true;
-      m_showOrientation = false;
-    }
-    else {
-      m_currentViews = Views::SHOW012;
-      m_showNiftiAxis = false;
-      m_showOrientation = true;
-    }
-    m_numberOfViews = numberOfViews;
-    emit updated( );
+  if( numberOfViews == 1 ) {
+    m_currentViews = Views::SHOW0;
+    m_showNiftiAxis = true;
+    m_showOrientation = false;
   }
+  else {
+    m_currentViews = Views::SHOW012;
+    m_showNiftiAxis = false;
+    m_showOrientation = true;
+  }
+  m_numberOfViews = numberOfViews;
 }
 
 void RGBFormat::setNumberOfViews( int numberOfViews ) {
@@ -218,16 +215,14 @@ void RGBFormat::setNumberOfViews( int numberOfViews ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }
   m_currentLayout = Layout::GRID;
-  if( m_numberOfViews != numberOfViews ) {
-    if( numberOfViews == 1 ) {
-      m_currentViews = Views::SHOW0;
-      m_showPpmChannels = true;
-    }
-    else {
-      m_currentViews = Views::SHOW0123;
-      m_showPpmChannels = false;
-    }
-    m_numberOfViews = numberOfViews;
-    emit updated( );
+  if( numberOfViews == 1 ) {
+    m_currentViews = Views::SHOW0;
+    m_showPpmChannels = true;
   }
+  else {
+    m_currentViews = Views::SHOW0123;
+    m_showPpmChannels = false;
+  }
+  m_numberOfViews = numberOfViews;
+  emit updated( );
 }

@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>268</width>
-        <height>960</height>
+        <height>945</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_11">
@@ -801,7 +801,7 @@
               </property>
               <property name="icon">
                <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/arrows.svg</normaloff>:/icons/icons/arrows.svg</iconset>
+                <normaloff>:/icons/icons/arrows.png</normaloff>:/icons/icons/arrows.png</iconset>
               </property>
              </widget>
             </item>

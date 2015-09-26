@@ -26,6 +26,7 @@ private:
   bool loadFolder( QString dirname );
   void createActions( );
   void loadQss( );
+  bool loadDicomdir( QString dicomFName );
 
 private slots:
   void on_actionRed_background_triggered( );

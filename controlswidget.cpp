@@ -13,6 +13,7 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
   controller = nullptr;
   ui->pushButton4Views->hide( );
   ui->pushButton_3RGB->hide( );
+  ui->groupBoxEditor->hide( );
 }
 
 ControlsWidget::~ControlsWidget( ) {
@@ -27,6 +28,7 @@ void ControlsWidget::setController( Controller *value ) {
   connect( ui->folderHorizontalSlider, &QAbstractSlider::valueChanged, controller, &Controller::setCurrentImagePos );
   connect( ui->folderSpinBox, SIGNAL( valueChanged( int ) ), controller, SLOT( setCurrentImagePos( int ) ) );
   connect( timer, &QTimer::timeout, controller, &Controller::loadNextImage );
+  updateRange( );
 }
 
 void ControlsWidget::imageChanged( ) {
@@ -36,8 +38,14 @@ void ControlsWidget::imageChanged( ) {
   }
   ui->folderHorizontalSlider->setValue( controller->currentImagePos( ) );
   ui->folderSpinBox->setValue( controller->currentImagePos( ) );
-
   DisplayFormat *format = controller->currentFormat( );
+  ui->pushButton1View->setChecked( format->getNumberOfViews( ) == 1 );
+  ui->pushButton3Views->setChecked( format->getNumberOfViews( ) == 3 );
+  ui->pushButton4Views->setChecked( format->getNumberOfViews( ) == 4 );
+  ui->pushButton_1RGB->setChecked( format->getNumberOfViews( ) == 1 );
+  ui->pushButton_3RGB->setChecked( format->getNumberOfViews( ) == 3 );
+  ui->pushButton_4RGB->setChecked( format->getNumberOfViews( ) == 4 );
+
   switch( format->currentLayout( ) ) {
       case Layout::GRID:
       ui->pushButtonGrid->setChecked( true );
@@ -97,23 +105,20 @@ void ControlsWidget::imageUpdated( ) {
 
 void ControlsWidget::updateRange( ) {
   size_t images = controller->size( );
-  if( images > 1 ) {
-    ui->rotateAll->show( );
-    ui->rotate->hide( );
-    ui->folderSpinBox->setEnabled( true );
+  if( images >= 1 ) {
     ui->folderSpinBox->setMaximum( images );
-    ui->folderHorizontalSlider->setEnabled( true );
     ui->folderHorizontalSlider->setMaximum( images - 1 );
     ui->folderHorizontalSlider->setMinimum( 0 );
   }
   else if( images == 0 ) {
-    /*    controller->setCurrentImagePos(images - 1); */
-    ui->folderSpinBox->setEnabled( false );
     ui->folderSpinBox->setMaximum( 0 );
-    ui->folderHorizontalSlider->setEnabled( false );
     ui->folderHorizontalSlider->setMaximum( 0 );
     ui->folderHorizontalSlider->setMinimum( 0 );
   }
+  ui->folderSpinBox->setEnabled( images > 1 );
+  ui->folderHorizontalSlider->setEnabled( images > 1 );
+  ui->groupBoxFolderControls->setVisible( images > 1 );
+  setVisible( images > 0 );
 }
 
 void ControlsWidget::on_spinBoxSpeed_valueChanged( int value ) {
@@ -130,65 +135,65 @@ void ControlsWidget::on_buttonPlay_clicked( bool checked ) {
 }
 
 void ControlsWidget::on_pushButton1View_clicked( ) {
-  controller->currentFormat()->setNumberOfViews(1);
+  controller->currentFormat( )->setNumberOfViews( 1 );
 }
 
 void ControlsWidget::on_pushButton3Views_clicked( ) {
-  controller->currentFormat()->setNumberOfViews(3);
+  controller->currentFormat( )->setNumberOfViews( 3 );
 }
 
 void ControlsWidget::on_pushButton4Views_clicked( ) {
-  controller->currentFormat()->setNumberOfViews(4);
+  controller->currentFormat( )->setNumberOfViews( 4 );
 }
 
 void ControlsWidget::on_pushButton_1RGB_clicked( ) {
-  controller->currentFormat()->setNumberOfViews(1);
+  controller->currentFormat( )->setNumberOfViews( 1 );
 }
 
 void ControlsWidget::on_pushButton_3RGB_clicked( ) {
-  controller->currentFormat()->setNumberOfViews(3);
+  controller->currentFormat( )->setNumberOfViews( 3 );
 }
 
 void ControlsWidget::on_pushButton_4RGB_clicked( ) {
-  controller->currentFormat()->setNumberOfViews(4);
+  controller->currentFormat( )->setNumberOfViews( 4 );
 }
 
 void ControlsWidget::on_pushButtonGrid_clicked( ) {
-  controller->currentFormat()->setCurrentLayout(Layout::GRID);
+  controller->currentFormat( )->setCurrentLayout( Layout::GRID );
 }
 
 void ControlsWidget::on_pushButtonHorizontal_clicked( ) {
-  controller->currentFormat()->setCurrentLayout(Layout::HORIZONTAL);
+  controller->currentFormat( )->setCurrentLayout( Layout::HORIZONTAL );
 }
 
 void ControlsWidget::on_pushButtonVertical_clicked( ) {
-  controller->currentFormat()->setCurrentLayout(Layout::VERTICAL);
+  controller->currentFormat( )->setCurrentLayout( Layout::VERTICAL );
 }
 
 void ControlsWidget::on_pushButtonAxial_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW0);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW0 );
 }
 
 void ControlsWidget::on_pushButtonCoronal_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW1);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW1 );
 }
 
 void ControlsWidget::on_pushButtonSagittal_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW2);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW2 );
 }
 
 void ControlsWidget::on_pushButton_RGB_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW0);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW0 );
 }
 
 void ControlsWidget::on_pushButton_R_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW1);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW1 );
 }
 
 void ControlsWidget::on_pushButton_G_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW2);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW2 );
 }
 
 void ControlsWidget::on_pushButton_B_clicked( ) {
-  controller->currentFormat()->setCurrentViews(Views::SHOW3);
+  controller->currentFormat( )->setCurrentViews( Views::SHOW3 );
 }

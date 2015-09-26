@@ -13,31 +13,37 @@ TEMPLATE = app
 
 include(../bial/bial.pri)
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    controlswidget.cpp \
-    imageviewer.cpp \
-    thumbswidget.cpp \
-    imagewidget.cpp \
+SOURCES += \
     controller.cpp \
+    controlswidget.cpp \
+    dicomdir.cpp \
+    displayformat.cpp \
+    graphicsscene.cpp \
     guiimage.cpp \
+    imageviewer.cpp \
+    imagewidget.cpp \
+    main.cpp\
+    mainwindow.cpp \
     pixmaplabelitem.cpp \
     thumbnail.cpp \
-    displayformat.cpp \
-    graphicsscene.cpp
+    thumbswidget.cpp \
 
-HEADERS  += mainwindow.h \
+
+HEADERS  += \
+       controller.h \
     controlswidget.h \
-    imageviewer.h \
-    thumbswidget.h \
-    imagewidget.h \
-    viewerinterface.h \
-    controller.h \
+    dicomdir.h \
+    displayformat.h \
+    graphicsscene.h \
     guiimage.h \
+    imageviewer.h \
+    imagewidget.h \
+    mainwindow.h \
     pixmaplabelitem.h \
     thumbnail.hpp \
-    displayformat.h \
-    graphicsscene.h
+    thumbswidget.h \
+    viewerinterface.h \
+
 
 FORMS    += mainwindow.ui \
     controlswidget.ui \
