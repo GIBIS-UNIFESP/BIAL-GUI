@@ -4,6 +4,7 @@
 #include "controller.h"
 
 #include <QMainWindow>
+#include <QApplication>
 
 namespace Ui {
   class MainWindow;
@@ -28,6 +29,9 @@ private:
   void loadQss( );
   bool loadDicomdir( QString dicomFName );
 
+signals:
+  void updateProgress(int p);
+
 private slots:
   void on_actionRed_background_triggered( );
   void on_actionGreen_background_triggered( );
@@ -42,7 +46,6 @@ private slots:
   void readSettings( );
   void openRecentFile( );
   void updateRecentFileActions( );
-
 
   void on_actionAddLabel_triggered( );
   void on_actionOpen_folder_triggered( );
@@ -75,5 +78,16 @@ private:
   QString defaultFolder;
   QAction *recentFileActs[ Controller::MaxRecentFiles ];
 };
+
+class CursorChanger {
+  public:
+    CursorChanger(const QCursor &cursor ) {
+      QApplication::setOverrideCursor(cursor);
+    }
+    ~CursorChanger() {
+      QApplication::restoreOverrideCursor();
+    }
+};
+
 
 #endif /* MAINWINDOW_H */

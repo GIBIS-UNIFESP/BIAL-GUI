@@ -155,21 +155,6 @@ void DisplayFormat::setCurrentLayout( const Layout &currentLayout ) {
 
 void DisplayFormat::setCurrentViews( const Views &currentViews ) {
   COMMENT( "currentViews set to " << ( int ) currentViews, 0 );
-  switch( currentViews ) {
-      case Views::SHOW0:
-      case Views::SHOW1:
-      case Views::SHOW2:
-      case Views::SHOW3:
-      setNumberOfViews( 1 );
-      break;
-      case Views::SHOW012:
-      case Views::SHOW123:
-      setNumberOfViews( 3 );
-      break;
-      case Views::SHOW0123:
-      setNumberOfViews( 4 );
-      break;
-  }
   m_currentViews = currentViews;
   emit updated( );
 }
@@ -193,6 +178,7 @@ void BWFormat::setNumberOfViews( int numberOfViews ) {
 }
 
 void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
+  COMMENT("Number of views set to "<< numberOfViews << ".", 0);
   if( ( numberOfViews != 1 ) && ( numberOfViews != 3 ) ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }
@@ -208,6 +194,7 @@ void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
     m_showOrientation = true;
   }
   m_numberOfViews = numberOfViews;
+  emit updated();
 }
 
 void RGBFormat::setNumberOfViews( int numberOfViews ) {

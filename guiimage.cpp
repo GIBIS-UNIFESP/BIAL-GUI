@@ -1,8 +1,10 @@
 #include "guiimage.h"
 #include <QPixmap>
+#include "gdcm.h"
 
-GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_fileName( fname ) {
-  image = Bial::Image< int >::Read( fname.toStdString( ) );
+GuiImage::GuiImage( QString fname,
+                    QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage( fname.toStdString( ) ) ),
+  m_fileName( fname ) {
   transform.resize( 4 );
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
   m_currentSlice.insert( 0, 4, 0 );
@@ -67,7 +69,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_file
     needUpdate.push_back( true );
   }
   COMMENT( "Image " << fileName( ).toStdString( ) << " size = (" << width( 0 ) << ", " << heigth( 0 ) << ", " <<
-  depth( 0 ) << ")", 0 );
+           depth( 0 ) << ")", 0 );
 }
 
 Modality GuiImage::modality( ) {
@@ -94,10 +96,10 @@ QPixmap GuiImage::getSlice( size_t axis ) {
   const Bial::FastTransform &transf = transform[ axis ];
 
   double factor = 255.0 / ( double ) m_max;
-  if( modality( ) == Modality::NIfTI  ) {
+  if( modality( ) == Modality::NIfTI ) {
     for( size_t y = 0; y < ysize; ++y ) {
       QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-      for( size_t x = 0; x < xsize; ++x ) {   /*  */
+      for( size_t x = 0; x < xsize; ++x ) { /*  */
         Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
         int pixel = 0;
         if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
@@ -110,7 +112,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
   else if( modality( ) == Modality::BW ) {
     for( size_t y = 0; y < ysize; ++y ) {
       QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-      for( size_t x = 0; x < xsize; ++x ) {   /*  */
+      for( size_t x = 0; x < xsize; ++x ) { /*  */
         Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
         int pixel = 0;
         if( image.ValidPixel( pos.x, pos.y ) ) {
@@ -124,7 +126,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
     if( axis == 0 ) {
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-        for( size_t x = 0; x < xsize; ++x ) {   /*  */
+        for( size_t x = 0; x < xsize; ++x ) { /*  */
           Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
           int r( 0 ), g( 0 ), b( 0 );
           if( image.ValidPixel( pos.x, pos.y ) ) {
@@ -140,7 +142,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
       int r( axis == 1 ), g( axis == 2 ), b( axis == 3 );
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-        for( size_t x = 0; x < xsize; ++x ) {   /*  */
+        for( size_t x = 0; x < xsize; ++x ) { /*  */
           Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
           int pixel = 0;
           if( image.ValidPixel( pos.x, pos.y ) ) {

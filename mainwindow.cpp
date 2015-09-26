@@ -40,6 +40,10 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
   loadQss( );
 
   containerUpdated( );
+
+#ifndef LIBGDCM
+  ui->actionOpen_DicomDir->setVisible(false);
+#endif
 }
 
 void MainWindow::createConnections( ) {
@@ -180,6 +184,7 @@ bool MainWindow::loadFolder( QString dirname ) {
   QFileInfoList list = folder.entryInfoList( QDir::NoDotAndDotDot | QDir::Files, QDir::DirsFirst | QDir::Name );
   bool value = false;
   /*  qDebug() << "list size: " << list.size(); */
+  CursorChanger c(Qt::WaitCursor);
 
   QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
   progress.setWindowModality( Qt::WindowModal );
@@ -203,6 +208,7 @@ bool MainWindow::loadFolder( QString dirname ) {
     }
   }
   progress.setValue( list.size( ) );
+
   return( value );
 }
 
@@ -297,6 +303,7 @@ void MainWindow::loadQss( ) {
 
 bool MainWindow::loadDicomdir( QString dicomFName ) {
   COMMENT( "Loading DicomDir file", 1 );
+  CursorChanger c(Qt::WaitCursor);
   DicomDir dicomdir;
   if( !dicomdir.open( dicomFName.toStdString( ) ) ) {
     statusBar( )->showMessage( tr( "Could not open dicomdir" ), 2000 );
@@ -323,6 +330,7 @@ bool MainWindow::loadDicomdir( QString dicomFName ) {
   }
   statusBar( )->showMessage( tr( "Empty dicomdir!" ), 2000 );
   BIAL_WARNING( "Empty dicomdir!" );
+
   return( false );
 }
 
@@ -343,7 +351,9 @@ void MainWindow::on_actionOpen_folder_triggered( ) {
 }
 
 void MainWindow::on_actionOpen_DicomDir_triggered( ) {
-
+  QString fileName = QFileDialog::getOpenFileName( this, tr( "Open" ), defaultFolder,
+                                                           tr( "*" ) );
+  loadDicomdir(fileName);
 }
 
 void MainWindow::on_actionAdd_image_triggered( ) {
@@ -403,14 +413,17 @@ void MainWindow::mouseMoved( QPointF scnPos, size_t axis ) {
 }
 
 void MainWindow::on_actionAxial_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 1 );
   controller->currentFormat( )->setCurrentViews( Views::SHOW0 );
 }
 
 void MainWindow::on_actionCoronal_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 1 );
   controller->currentFormat( )->setCurrentViews( Views::SHOW1 );
 }
 
 void MainWindow::on_actionSagittal_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 1 );
   controller->currentFormat( )->setCurrentViews( Views::SHOW2 );
 }
 

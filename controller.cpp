@@ -75,12 +75,12 @@ bool Controller::addImage( QString fname ) {
 
 bool Controller::addLabel( QString label ) {
   /* TODO Controller::addLabel( QString label ) */
-  return false;
+  return( false );
 }
 
 bool Controller::removeCurrentLabel( ) {
   /* TODO Controller::removeCurrentLabel( ) */
-  return false;
+  return( false );
 }
 
 void Controller::removeCurrentImage( ) {

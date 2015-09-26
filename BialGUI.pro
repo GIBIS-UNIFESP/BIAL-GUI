@@ -12,12 +12,14 @@ TARGET = BialGUI
 TEMPLATE = app
 
 include(../bial/bial.pri)
+include(gdcm.pri)
 
 SOURCES += \
     controller.cpp \
     controlswidget.cpp \
     dicomdir.cpp \
     displayformat.cpp \
+    gdcm.cpp \
     graphicsscene.cpp \
     guiimage.cpp \
     imageviewer.cpp \
@@ -30,10 +32,11 @@ SOURCES += \
 
 
 HEADERS  += \
-       controller.h \
+    controller.h \
     controlswidget.h \
     dicomdir.h \
     displayformat.h \
+    gdcm.h \
     graphicsscene.h \
     guiimage.h \
     imageviewer.h \
