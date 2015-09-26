@@ -46,6 +46,7 @@ private slots:
 
   void on_actionAddLabel_triggered( );
   void on_actionOpen_folder_triggered( );
+  void on_actionOpen_DicomDir_triggered( );
   void on_actionAdd_image_triggered( );
   void on_actionRemove_current_image_triggered( );
   void on_actionSelect_default_folder_triggered( );

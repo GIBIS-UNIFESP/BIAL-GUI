@@ -1,6 +1,6 @@
 #include "controller.h"
-#include "mainwindow.h"
 #include "dicomdir.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -163,9 +163,9 @@ void MainWindow::on_actionOpen_image_triggered( ) {
 QString MainWindow::getFileDialog( ) {
   return( QFileDialog::getOpenFileName( this, tr( "Open" ), defaultFolder,
                                         tr( "All images (*.pbm *.pbm.gz *.pgm *.pgm.gz *.ppm *.ppm.gz *.dcm "
-                                            "*.dcm.gz *.nii *.nii.gz);; PBM images (*.pbm *.pbm.gz);; PGM images "
+                                            "*.dcm.gz *.nii *.nii.gz *.scn *.scn.gz);; PBM images (*.pbm *.pbm.gz);; PGM images "
                                             "(*.pgm *.pgm.gz);; PPM images (*.ppm *.ppm.gz);; DICOM images "
-                                            "(*.dcm *.dcm.gz);; NIfTI images (*.nii *.nii.gz);; All files (*)" ) ) );
+                                            "(*.dcm *.dcm.gz);; NIfTI images (*.nii *.nii.gz);; SCN Files (*.scn *.scn.gz);; All files (*)" ) ) );
 }
 
 bool MainWindow::loadFile( QString filename ) {
@@ -296,34 +296,34 @@ void MainWindow::loadQss( ) {
 }
 
 bool MainWindow::loadDicomdir( QString dicomFName ) {
-  COMMENT("Loading DicomDir file", 1);
+  COMMENT( "Loading DicomDir file", 1 );
   DicomDir dicomdir;
-  if (!dicomdir.open(dicomFName.toStdString())) {
-    statusBar()->showMessage(tr("Could not open dicomdir"), 2000);
-    return false;
+  if( !dicomdir.open( dicomFName.toStdString( ) ) ) {
+    statusBar( )->showMessage( tr( "Could not open dicomdir" ), 2000 );
+    return( false );
   }
-  const std::vector<std::string> files = dicomdir.getImages();
-  if(files.size() > 0){
-    controller->clear();
-    QProgressDialog progress(tr("Reading dicomdir files..."), tr("Abort"), 0, files.size(), this);
-    progress.setWindowModality(Qt::WindowModal);
-    for (int i = 0, size = files.size(); i < size; ++i) {
-      progress.setValue(i);
-      if (progress.wasCanceled()) {
+  const std::vector< std::string > files = dicomdir.getImages( );
+  if( files.size( ) > 0 ) {
+    controller->clear( );
+    QProgressDialog progress( tr( "Reading dicomdir files..." ), tr( "Abort" ), 0, files.size( ), this );
+    progress.setWindowModality( Qt::WindowModal );
+    for( int i = 0, size = files.size( ); i < size; ++i ) {
+      progress.setValue( i );
+      if( progress.wasCanceled( ) ) {
         break;
       }
-      controller->addImage(QString::fromStdString(files[i]).trimmed());
+      controller->addImage( QString::fromStdString( files[ i ] ).trimmed( ) );
     }
-    progress.setValue(files.size());
-    if(controller->size() < 1){
-      statusBar()->showMessage(tr("Could not load any dicomdir images"), 2000);
-      return false;
+    progress.setValue( files.size( ) );
+    if( controller->size( ) < 1 ) {
+      statusBar( )->showMessage( tr( "Could not load any dicomdir images" ), 2000 );
+      return( false );
     }
-    return true;
+    return( true );
   }
-  statusBar()->showMessage(tr("Empty dicomdir!"), 2000);
-  BIAL_WARNING("Empty dicomdir!");
-  return false;
+  statusBar( )->showMessage( tr( "Empty dicomdir!" ), 2000 );
+  BIAL_WARNING( "Empty dicomdir!" );
+  return( false );
 }
 
 void MainWindow::on_actionAddLabel_triggered( ) {
@@ -342,6 +342,10 @@ void MainWindow::on_actionOpen_folder_triggered( ) {
   }
 }
 
+void MainWindow::on_actionOpen_DicomDir_triggered( ) {
+
+}
+
 void MainWindow::on_actionAdd_image_triggered( ) {
   controller->addImage( getFileDialog( ) );
 }
@@ -351,7 +355,7 @@ void MainWindow::on_actionRemove_current_image_triggered( ) {
 }
 
 void MainWindow::on_actionSelect_default_folder_triggered( ) {
-  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ), QDir::homePath() );
+  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ), QDir::homePath( ) );
   if( !temp.isEmpty( ) ) {
     defaultFolder = temp;
     QSettings settings;
