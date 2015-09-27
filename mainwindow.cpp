@@ -18,27 +18,16 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
   controller->setThumbsWidget( ui->thumbsWidget );
 
   ui->controlsWidget->setController( controller );
-
-/*  ui->controlsWidget->installImageViewer( ui->imageViewer ); */
-
   ui->controlsDock->hide( );
-
   ui->imageViewer->setController( controller );
-
   ui->actionPrint->setEnabled( false );
 
   setupLogoview( );
-
   createConnections( );
-
   currentImageChanged( );
-
   readSettings( );
-
   createActions( );
-
   loadQss( );
-
   containerUpdated( );
 
 #ifndef LIBGDCM

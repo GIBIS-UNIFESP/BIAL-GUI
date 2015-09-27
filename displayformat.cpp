@@ -9,6 +9,7 @@ BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
   defaultViews = Views::SHOW0;
+  m_numberOfViews = 1;
   m_hasViewerControls = false;
   m_enableTools = true;
   m_rotateAll = false;
@@ -31,6 +32,7 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW012;
   defaultViews = Views::SHOW0;
+  m_numberOfViews = 3;
   m_hasViewerControls = true;
   m_enableTools = true;
   m_rotateAll = true;
@@ -53,6 +55,7 @@ RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
   defaultViews = Views::SHOW0;
+  m_numberOfViews = 1;
   m_hasViewerControls = false;
   m_enableTools = false;
   m_rotateAll = true;
@@ -78,6 +81,7 @@ DisplayFormat::~DisplayFormat( ) {
   QSettings settings;
   settings.beginGroup( "DisplayFormat" );
   settings.beginGroup( QString( "Type%1" ).arg( ( int ) modality( ) ) );
+  settings.setValue( "numberOfViews", m_numberOfViews);
   settings.setValue( "currentLayout", ( int ) m_currentLayout );
   settings.setValue( "currentViews", ( int ) m_currentViews );
   settings.setValue( "defaultViews", ( int ) defaultViews );
@@ -87,6 +91,9 @@ void DisplayFormat::loadSettings( ) {
   QSettings settings;
   settings.beginGroup( "DisplayFormat" );
   settings.beginGroup( QString( "Type%1" ).arg( ( int ) modality( ) ) );
+  if(settings.contains("numberOfViews")){
+    setNumberOfViews( settings.value("numberOfViews").toInt() );
+  }
   if(settings.contains("currentLayout")){
     m_currentLayout = (Layout) settings.value("currentLayout").toInt();
   }
