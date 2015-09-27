@@ -62,6 +62,8 @@ private slots:
 
   void on_pushButtonInterpolation_clicked();
 
+  void on_rotateAll_clicked();
+
 private:
   Ui::ControlsWidget *ui;
   Controller *controller;

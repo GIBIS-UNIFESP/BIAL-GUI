@@ -188,6 +188,29 @@ void Controller::setZoom( int value ) {
   update( );
 }
 
+void Controller::setInterpolation( bool isSmooth ) {
+  for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
+    if( isSmooth ) {
+      m_pixmapItems[ axis ]->setTransformationMode( Qt::SmoothTransformation );
+    }
+    else {
+      m_pixmapItems[ axis ]->setTransformationMode( Qt::FastTransformation );
+    }
+  }
+}
+
+void Controller::rotateAll90() {
+  for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
+    currentImage( )->setRotation( axis, currentImage( )->getRotation( axis ) + 90.0 );
+  }
+  emit currentImageChanged( );
+}
+
+void Controller::rotate90(size_t axis) {
+  currentImage( )->setRotation( axis, currentImage( )->getRotation( axis ) + 90.0 );
+  emit currentImageChanged( );
+}
+
 void Controller::setRecentFile( QString fname ) {
   COMMENT( "Setting recent file to : \"" << fname.toStdString( ) << "\"", 1 );
   if( !QFile( fname ).exists( ) ) {

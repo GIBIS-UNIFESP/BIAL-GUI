@@ -37,6 +37,7 @@ public:
 
 signals:
   void sliceChanged( size_t viewNbr, size_t slice );
+  void rotate( size_t viewNbr );
 
 private slots:
 

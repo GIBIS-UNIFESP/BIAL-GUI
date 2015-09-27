@@ -49,6 +49,7 @@ void ImageViewer::setController( Controller *value ) {
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
     connect( view, &ImageWidget::sliceChanged, this, &ImageViewer::sliceChanged );
+    connect( view, &ImageWidget::rotate, controller, &Controller::rotate90);
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
     getScene( axis )->addItem( controller->getPixmapItem( axis ) );

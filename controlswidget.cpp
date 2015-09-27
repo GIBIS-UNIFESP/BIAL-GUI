@@ -2,7 +2,6 @@
 #include "controlswidget.h"
 #include "imageviewer.h"
 #include "ui_controlswidget.h"
-
 #include <QTimer>
 
 ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new Ui::ControlsWidget ) {
@@ -199,12 +198,9 @@ void ControlsWidget::on_pushButton_B_clicked( ) {
 
 void ControlsWidget::on_pushButtonInterpolation_clicked( ) {
   COMMENT( "Toggled interpolation button.", 1 );
-  for( int axis = 0; axis < 4; ++axis ) {
-    if( ui->pushButtonInterpolation->isChecked() ) {
-      controller->getPixmapItem( axis )->setTransformationMode( Qt::SmoothTransformation );
-    }
-    else {
-      controller->getPixmapItem( axis )->setTransformationMode( Qt::FastTransformation );
-    }
-  }
+  controller->setInterpolation(ui->pushButtonInterpolation->isChecked( ) );
+}
+
+void ControlsWidget::on_rotateAll_clicked( ) {
+  controller->rotateAll90();
 }

@@ -15,6 +15,7 @@ class GuiImage : public QObject {
   QString m_fileName;
   QVector<QPixmap>cachedPixmaps;
   QVector<bool>needUpdate;
+  QVector<double>m_rotation;
 
 public:
   explicit GuiImage( QString fName, QObject *parent = 0 );
@@ -32,6 +33,9 @@ public:
   Bial::FastTransform getTransform( size_t axis );
 
   const Bial::Image< int > &getImage( ) const;
+
+  void setRotation(size_t axis, double angle);
+  double getRotation(size_t axis);
 
   int max( );
 signals:

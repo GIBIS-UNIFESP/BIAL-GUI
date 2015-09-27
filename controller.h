@@ -2,8 +2,8 @@
 #define CONTROLLER_H
 
 #include "guiimage.h"
-#include "pixmaplabelitem.h"
 
+#include <QGraphicsPixmapItem>
 #include <QObject>
 #include <QVector>
 
@@ -198,6 +198,12 @@ public slots:
    * @param value
    */
   void setZoom( int value );
+
+
+  void setInterpolation(bool isSmooth);
+
+  void rotateAll90();
+  void rotate90(size_t axis);
 private:
   /**
    * @brief setRecentFile

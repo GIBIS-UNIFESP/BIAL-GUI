@@ -81,7 +81,7 @@ void ImageWidget::on_spinBox_valueChanged( int position ) {
 }
 
 void ImageWidget::on_rotateButton_clicked( ) {
-
+  emit rotate( m_viewNumber );
 }
 
 void ImageWidget::on_horizontalSlider_valueChanged( int position ) {
