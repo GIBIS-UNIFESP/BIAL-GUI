@@ -60,6 +60,8 @@ private slots:
 
   void on_pushButton_B_clicked();
 
+  void on_pushButtonInterpolation_clicked();
+
 private:
   Ui::ControlsWidget *ui;
   Controller *controller;

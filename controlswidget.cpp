@@ -13,7 +13,7 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
   controller = nullptr;
   ui->pushButton4Views->hide( );
   ui->pushButton_3RGB->hide( );
-//  ui->groupBoxEditor->hide( );
+/*  ui->groupBoxEditor->hide( ); */
 }
 
 ControlsWidget::~ControlsWidget( ) {
@@ -45,7 +45,6 @@ void ControlsWidget::imageChanged( ) {
   ui->pushButton_1RGB->setChecked( format->getNumberOfViews( ) == 1 );
   ui->pushButton_3RGB->setChecked( format->getNumberOfViews( ) == 3 );
   ui->pushButton_4RGB->setChecked( format->getNumberOfViews( ) == 4 );
-
   switch( format->currentLayout( ) ) {
       case Layout::GRID:
       ui->pushButtonGrid->setChecked( true );
@@ -196,4 +195,16 @@ void ControlsWidget::on_pushButton_G_clicked( ) {
 
 void ControlsWidget::on_pushButton_B_clicked( ) {
   controller->currentFormat( )->setCurrentViews( Views::SHOW3 );
+}
+
+void ControlsWidget::on_pushButtonInterpolation_clicked( ) {
+  COMMENT( "Toggled interpolation button.", 1 );
+  for( int axis = 0; axis < 4; ++axis ) {
+    if( ui->pushButtonInterpolation->isChecked() ) {
+      controller->getPixmapItem( axis )->setTransformationMode( Qt::SmoothTransformation );
+    }
+    else {
+      controller->getPixmapItem( axis )->setTransformationMode( Qt::FastTransformation );
+    }
+  }
 }

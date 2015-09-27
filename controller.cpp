@@ -8,7 +8,7 @@
 Controller::Controller( int views, QObject *parent ) : QObject( parent ), bwFormat(
     new BWFormat( this ) ), rgbFormat( new RGBFormat( this ) ), niftiFormat( new NIfTIFormat( this ) ) {
   for( int item = 0; item < views; ++item ) {
-    m_pixmapItems.append( new PixmapLabelItem( ) );
+    m_pixmapItems.append( new QGraphicsPixmapItem( ) );
   }
   m_currentImagePos = -1;
   connect( rgbFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
@@ -121,14 +121,13 @@ void Controller::update( ) {
     for( int axis = 0; axis < 4; ++axis ) {
       if( showItens[ axis ] ) {
         const QPixmap &pix = img->getSlice( axis );
-        m_pixmapItems.at( axis )->setImage( pix );
+        m_pixmapItems.at( axis )->setPixmap( pix );
       }
     }
   }
   else {
     for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
-      m_pixmapItems[ axis ]->setImage( QPixmap( ) );
-      m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
+      m_pixmapItems[ axis ]->setPixmap( QPixmap( ) );
     }
   }
   emit imageUpdated( );
@@ -226,6 +225,6 @@ DisplayFormat* Controller::currentFormat( ) {
   }
 }
 
-PixmapLabelItem* Controller::getPixmapItem( size_t axis ) {
+QGraphicsPixmapItem* Controller::getPixmapItem( size_t axis ) {
   return( m_pixmapItems.at( axis ) );
 }

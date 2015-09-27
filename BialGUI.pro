@@ -26,7 +26,6 @@ SOURCES += \
     imagewidget.cpp \
     main.cpp\
     mainwindow.cpp \
-    pixmaplabelitem.cpp \
     thumbnail.cpp \
     thumbswidget.cpp \
 
@@ -42,7 +41,6 @@ HEADERS  += \
     imageviewer.h \
     imagewidget.h \
     mainwindow.h \
-    pixmaplabelitem.h \
     thumbnail.hpp \
     thumbswidget.h \
     viewerinterface.h \

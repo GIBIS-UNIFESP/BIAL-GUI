@@ -32,7 +32,7 @@ class Controller : public QObject {
    *        and one for the label.
    *
    */
-  QVector< PixmapLabelItem* > m_pixmapItems;
+  QVector< QGraphicsPixmapItem * > m_pixmapItems;
   /**
    *
    * @brief m_currentImagePos holds the current image position.
@@ -135,7 +135,7 @@ public:
    */
   DisplayFormat * currentFormat( );
 
-  PixmapLabelItem* getPixmapItem( size_t axis );
+  QGraphicsPixmapItem* getPixmapItem( size_t axis );
   DisplayFormat * getNiftiFormat() const;
   void setNiftiFormat(DisplayFormat * value);
 
