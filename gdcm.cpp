@@ -69,7 +69,6 @@ Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
   gdcm::ImageReader ir;
   ir.SetFileName( filename.c_str( ) );
   if( !ir.Read( ) ) {
-    BIAL_WARNING( "GDCM Image Reader Failed to read file." )
     return( Bial::Image< int >::Read( filename ) );
   }
   COMMENT( "Getting image from GDCM ImageReader.", 1 );

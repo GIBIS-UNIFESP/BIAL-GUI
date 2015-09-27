@@ -95,6 +95,7 @@ protected:
   bool m_showPpmViews;
   bool m_showPpmChannels;
 
+  Views defaultViews;
   int m_numberOfViews;
   QColor m_overlayColor;
 };
@@ -108,7 +109,6 @@ public:
 class NIfTIFormat : public DisplayFormat {
 public:
   NIfTIFormat( QObject *parent = 0 );
-  virtual void setCurrentViews( const Views &currentViews );
   void setNumberOfViews( int numberOfViews );
 };
 

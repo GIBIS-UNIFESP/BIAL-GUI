@@ -1,11 +1,13 @@
 #include "Common.hpp"
 #include "displayformat.h"
 
+#include <QDebug>
+
 BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::BW;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
-
+  defaultViews = Views::SHOW0;
   m_hasViewerControls = false;
   m_enableTools = true;
   m_rotateAll = false;
@@ -26,6 +28,7 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::NIfTI;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW012;
+  defaultViews = Views::SHOW0;
   m_hasViewerControls = true;
   m_enableTools = true;
   m_rotateAll = true;
@@ -42,15 +45,11 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_overlay = false;
 }
 
-void NIfTIFormat::setCurrentViews( const Views &currentViews ) {
-  m_currentViews = currentViews;
-  emit updated( );
-}
-
 RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::RGB;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
+  defaultViews = Views::SHOW0;
   m_hasViewerControls = false;
   m_enableTools = false;
   m_rotateAll = true;
@@ -156,6 +155,9 @@ void DisplayFormat::setCurrentLayout( const Layout &currentLayout ) {
 void DisplayFormat::setCurrentViews( const Views &currentViews ) {
   COMMENT( "currentViews set to " << ( int ) currentViews, 0 );
   m_currentViews = currentViews;
+  if( (int) currentViews <= (int) Views::SHOW3 ) {
+    defaultViews = currentViews;
+  }
   emit updated( );
 }
 
@@ -178,13 +180,13 @@ void BWFormat::setNumberOfViews( int numberOfViews ) {
 }
 
 void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
-  COMMENT("Number of views set to "<< numberOfViews << ".", 0);
+  COMMENT( "Number of views set to " << numberOfViews << ".", 0 );
   if( ( numberOfViews != 1 ) && ( numberOfViews != 3 ) ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }
-  m_currentLayout = Layout::GRID;
   if( numberOfViews == 1 ) {
-    m_currentViews = Views::SHOW0;
+    qDebug() << "defaultViews = " << (int) defaultViews;
+    m_currentViews = defaultViews;
     m_showNiftiAxis = true;
     m_showOrientation = false;
   }
@@ -194,16 +196,15 @@ void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
     m_showOrientation = true;
   }
   m_numberOfViews = numberOfViews;
-  emit updated();
+  emit updated( );
 }
 
 void RGBFormat::setNumberOfViews( int numberOfViews ) {
   if( ( numberOfViews != 1 ) && ( numberOfViews != 4 ) ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }
-  m_currentLayout = Layout::GRID;
   if( numberOfViews == 1 ) {
-    m_currentViews = Views::SHOW0;
+    m_currentViews = defaultViews;
     m_showPpmChannels = true;
   }
   else {
