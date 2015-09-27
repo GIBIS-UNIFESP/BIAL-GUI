@@ -20,6 +20,8 @@ class DisplayFormat : public QObject {
   Q_OBJECT
 public:
   explicit DisplayFormat( QObject *parent );
+  ~DisplayFormat();
+
 
   Modality modality( ) const;
 
@@ -77,6 +79,7 @@ protected:
   Layout m_currentLayout;
   Views m_currentViews;
 
+  void loadSettings();
   bool m_overlay;
 
   bool m_hasViewerControls;

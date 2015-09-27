@@ -2,6 +2,7 @@
 #include "displayformat.h"
 
 #include <QDebug>
+#include <QSettings>
 
 BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::BW;
@@ -22,6 +23,7 @@ BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has3Views = false;
   m_has4Views = false;
   m_overlay = false;
+  loadSettings();
 }
 
 NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
@@ -43,6 +45,7 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has3Views = true;
   m_has4Views = false;
   m_overlay = false;
+  loadSettings();
 }
 
 RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
@@ -64,10 +67,35 @@ RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has3Views = false;
   m_has4Views = true;
   m_overlay = false;
+  loadSettings();
 }
 
 DisplayFormat::DisplayFormat( QObject *parent ) : QObject( parent ) {
   m_overlayColor = Qt::green;
+}
+
+DisplayFormat::~DisplayFormat( ) {
+  QSettings settings;
+  settings.beginGroup( "DisplayFormat" );
+  settings.beginGroup( QString( "Type%1" ).arg( ( int ) modality( ) ) );
+  settings.setValue( "currentLayout", ( int ) m_currentLayout );
+  settings.setValue( "currentViews", ( int ) m_currentViews );
+  settings.setValue( "defaultViews", ( int ) defaultViews );
+}
+
+void DisplayFormat::loadSettings( ) {
+  QSettings settings;
+  settings.beginGroup( "DisplayFormat" );
+  settings.beginGroup( QString( "Type%1" ).arg( ( int ) modality( ) ) );
+  if(settings.contains("currentLayout")){
+    m_currentLayout = (Layout) settings.value("currentLayout").toInt();
+  }
+  if(settings.contains("currentViews")){
+    m_currentViews = (Views) settings.value("currentViews").toInt();
+  }
+  if(settings.contains("defaultViews")){
+    defaultViews = (Views) settings.value("defaultViews").toInt();
+  }
 }
 
 Modality DisplayFormat::modality( ) const {
@@ -155,7 +183,7 @@ void DisplayFormat::setCurrentLayout( const Layout &currentLayout ) {
 void DisplayFormat::setCurrentViews( const Views &currentViews ) {
   COMMENT( "currentViews set to " << ( int ) currentViews, 0 );
   m_currentViews = currentViews;
-  if( (int) currentViews <= (int) Views::SHOW3 ) {
+  if( ( int ) currentViews <= ( int ) Views::SHOW3 ) {
     defaultViews = currentViews;
   }
   emit updated( );
@@ -185,7 +213,6 @@ void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }
   if( numberOfViews == 1 ) {
-    qDebug() << "defaultViews = " << (int) defaultViews;
     m_currentViews = defaultViews;
     m_showNiftiAxis = true;
     m_showOrientation = false;

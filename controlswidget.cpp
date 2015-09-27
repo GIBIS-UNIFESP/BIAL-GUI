@@ -13,7 +13,7 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
   controller = nullptr;
   ui->pushButton4Views->hide( );
   ui->pushButton_3RGB->hide( );
-  ui->groupBoxEditor->hide( );
+//  ui->groupBoxEditor->hide( );
 }
 
 ControlsWidget::~ControlsWidget( ) {
