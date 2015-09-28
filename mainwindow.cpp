@@ -38,9 +38,11 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 void MainWindow::createConnections( ) {
   /* Show/Hide docks. */
   connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );
+  connect( ui->actionHistogram_dock, &QAction::toggled, ui->dockWidgetHistogram, &QDockWidget::setVisible );
   connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible );
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
   connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
+  connect( ui->dockWidgetHistogram, &QDockWidget::visibilityChanged , ui->actionHistogram_dock, &QAction::setChecked);
 
   /* Controller. */
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
@@ -90,7 +92,6 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 void MainWindow::currentImageChanged( ) {
   if( controller->currentImage( ) ) {
     DisplayFormat *format = controller->currentFormat( );
-    ui->dockWidgetHistogram->show( );
 
     ui->menuLayout->setEnabled( format->modality( ) != Modality::BW );
     ui->menuOverlay->setEnabled( format->hasOverlay( ) );
@@ -111,25 +112,22 @@ void MainWindow::currentImageChanged( ) {
     ui->action3_Views->setVisible( format->has3Views( ) );
     ui->action4_Views->setVisible( format->has4Views( ) );
   }
-  else {
-    ui->dockWidgetHistogram->hide( );
-  }
 }
 
 void MainWindow::imageUpdated( ) {
-  const Bial::Signal &hist = controller->currentImage()->getHistogram();
-  QCustomPlot * plot = ui->histogramWidget;
-  QVector<double> x(hist.size()), y(hist.size());
-  for(size_t bin = 0; bin < hist.size(); ++bin){
-    x[bin] = hist.Data(bin);
-    y[bin] = hist[bin];
+  const Bial::Signal &hist = controller->currentImage( )->getHistogram( );
+  QCustomPlot *plot = ui->histogramWidget;
+  QVector< double > x( hist.size( ) ), y( hist.size( ) );
+  for( size_t bin = 0; bin < hist.size( ); ++bin ) {
+    x[ bin ] = hist.Data( bin );
+    y[ bin ] = hist[ bin ];
   }
-  plot->addGraph();
-  plot->graph(0)->setData(x, y);
-  plot->xAxis->setLabel("Intensity");
-  plot->yAxis->setLabel("Frequency");
-  plot->rescaleAxes(true);
-  plot->replot();
+  plot->addGraph( );
+  plot->graph( 0 )->setData( x, y );
+  plot->xAxis->setLabel( "Intensity" );
+  plot->yAxis->setLabel( "Frequency" );
+  plot->rescaleAxes( true );
+  plot->replot( );
 }
 
 void MainWindow::containerUpdated( ) {
@@ -152,6 +150,7 @@ void MainWindow::containerUpdated( ) {
   ui->actionAddLabel->setEnabled( hasImage );
   if( !hasImage ) {
     ui->actionRemove_current_label->setEnabled( false );
+    ui->dockWidgetHistogram->hide( );
   }
   ui->actionShow_controls_dock->setEnabled( hasImage );
   ui->actionShow_images_dock->setEnabled( hasImage );

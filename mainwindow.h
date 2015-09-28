@@ -3,8 +3,8 @@
 
 #include "controller.h"
 
-#include <QMainWindow>
 #include <QApplication>
+#include <QMainWindow>
 
 namespace Ui {
   class MainWindow;
@@ -30,7 +30,7 @@ private:
   bool loadDicomdir( QString dicomFName );
 
 signals:
-  void updateProgress(int p);
+  void updateProgress( int p );
 
 private slots:
   void on_actionRed_background_triggered( );
@@ -73,6 +73,7 @@ private slots:
   void on_actionGreenPen_triggered( );
   void on_actionBlackPen_triggered( );
 
+
 private:
   Ui::MainWindow *ui;
   Controller *controller;
@@ -81,13 +82,13 @@ private:
 };
 
 class CursorChanger {
-  public:
-    CursorChanger(const QCursor &cursor ) {
-      QApplication::setOverrideCursor(cursor);
-    }
-    ~CursorChanger() {
-      QApplication::restoreOverrideCursor();
-    }
+public:
+  CursorChanger( const QCursor &cursor ) {
+    QApplication::setOverrideCursor( cursor );
+  }
+  ~CursorChanger( ) {
+    QApplication::restoreOverrideCursor( );
+  }
 };
 
 

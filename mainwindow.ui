@@ -142,6 +142,7 @@
     </widget>
     <addaction name="separator"/>
     <addaction name="actionShow_controls_dock"/>
+    <addaction name="actionHistogram_dock"/>
     <addaction name="actionShow_images_dock"/>
     <addaction name="separator"/>
     <addaction name="menuBackground_color"/>
@@ -278,7 +279,14 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <widget class="QCustomPlot" name="histogramWidget" native="true"/>
+      <widget class="QCustomPlot" name="histogramWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>250</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -444,7 +452,7 @@
     <string>Thumbnails dock</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+2</string>
+    <string>Ctrl+3</string>
    </property>
   </action>
   <action name="actionRemove_current_label">
@@ -534,6 +542,17 @@
   <action name="actionAll_channels">
    <property name="text">
     <string>All channels</string>
+   </property>
+  </action>
+  <action name="actionHistogram_dock">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Histogram dock</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
  </widget>

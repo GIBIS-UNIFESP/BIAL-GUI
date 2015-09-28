@@ -51,7 +51,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     cachedPixmaps.resize( 1 );
     needUpdate.push_back( true );
   }
-  histogram = Bial::Signal::Histogram( image );
+  histogram = Bial::Signal::ZeroStartHistogram( image );
   equalized = histogram;
   equalized.Equalize( );
   for( size_t val = 0; val < equalized.size( ); ++val ) {
@@ -91,7 +91,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
             pixel = image( pos.x, pos.y, pos.z );
           }
           if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalized[ equalized.Bin( pixel ) ] );
+            pixel = static_cast< int >( equalized[ pixel ] );
           }
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
