@@ -123,6 +123,11 @@ QPixmap GuiImage::getSlice( size_t axis ) {
               g = image( pos.x, pos.y, 1 );
               b = image( pos.x, pos.y, 2 );
             }
+            if( m_equalizeHistogram ) {
+              r = static_cast< int >( equalized[ equalized.Bin( r ) ] );
+              g = static_cast< int >( equalized[ equalized.Bin( g ) ] );
+              b = static_cast< int >( equalized[ equalized.Bin( b ) ] );
+            }
             scanLine[ x ] = qRgb( r, g, b );
           }
         }
@@ -136,6 +141,9 @@ QPixmap GuiImage::getSlice( size_t axis ) {
             int pixel = 0;
             if( image.ValidPixel( pos.x, pos.y ) ) {
               pixel = image( pos.x, pos.y, axis - 1 );
+            }
+            if( m_equalizeHistogram ) {
+              pixel = static_cast< int >( equalized[ equalized.Bin( pixel ) ] );
             }
             scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
           }
