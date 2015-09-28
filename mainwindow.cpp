@@ -128,8 +128,7 @@ void MainWindow::imageUpdated( ) {
   plot->graph(0)->setData(x, y);
   plot->xAxis->setLabel("Intensity");
   plot->yAxis->setLabel("Frequency");
-  plot->xAxis->setRange(x.first(), x.last());
-  plot->yAxis->setRange(0, hist.MaximumFrequency());
+  plot->rescaleAxes(true);
   plot->replot();
 }
 
