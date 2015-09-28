@@ -2,31 +2,14 @@
 #include "guiimage.h"
 #include <QPixmap>
 
-bool GuiImage::getEqualizeHistogram( ) const {
-  return( m_equalizeHistogram );
-}
-
-void GuiImage::setEqualizeHistogram( bool equalizeHistogram ) {
-  m_equalizeHistogram = equalizeHistogram;
-}
-
-void GuiImage::updateBoundings( size_t axis ) {
-  Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-  transform[ axis ]( start, &start );
-  transform[ axis ]( end, &end );
-  bounding[ axis ] = Bial::BBox( start, end );
-  transform[ axis ] = transform[ axis ].Inverse( );
-  transform[ axis ].Translate( bounding[ axis ].pMin.x, bounding[ axis ].pMin.y, bounding[ axis ].pMin.z );
-  bounding[ axis ] = bounding[ axis ].Normalized( );
-}
-
-GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
-                                                                                   fname.toStdString( ) ) ), m_fileName(
-    fname ) {
+GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ),
+  image( GDCM::OpenGImage(fname.toStdString( ) ) ),
+  m_fileName( fname ) {
   transform.resize( 4 );
+  m_equalizeHistogram = false;
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
   m_currentSlice.insert( 0, 4, 0 );
-
+  image.SetRange( 0, 255 );
   m_max = image.Maximum( );
   if( image.Dims( ) == 3 ) {
     COMMENT( "NIfTI image detected.", 2 );
@@ -92,16 +75,10 @@ QPixmap GuiImage::getSlice( size_t axis ) {
       throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
                                             toStdString( ) ) ) );
     }
-    m_equalizeHistogram = true;
     const size_t xsize = width( axis );
     const size_t ysize = heigth( axis );
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
     const Bial::FastTransform &transf = transform[ axis ];
-
-    double factor = 255.0 / ( double ) m_max;
-    if( m_equalizeHistogram ) {
-      factor = 255.0 / ( double ) equalized.size( );
-    }
     if( modality( ) == Modality::NIfTI ) {
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
@@ -109,12 +86,11 @@ QPixmap GuiImage::getSlice( size_t axis ) {
           Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
           int pixel = 0;
           if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
-            pixel = static_cast< int >( image( pos.x, pos.y, pos.z ) );
+            pixel = image( pos.x, pos.y, pos.z );
           }
           if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalized[ pixel ] );
+            pixel = static_cast< int >( equalized[ equalized.Bin( pixel ) ] );
           }
-          pixel = static_cast< int >( pixel * factor );
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
@@ -126,12 +102,11 @@ QPixmap GuiImage::getSlice( size_t axis ) {
           Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
           int pixel = 0;
           if( image.ValidPixel( pos.x, pos.y ) ) {
-            pixel = static_cast< int >( image( pos.x, pos.y ) );
+            pixel = image( pos.x, pos.y );
           }
           if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalized[ pixel ] );
+            pixel = static_cast< int >( equalized[ equalized.Bin( pixel ) ] );
           }
-          pixel = static_cast< int >( pixel * factor );
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
@@ -144,9 +119,9 @@ QPixmap GuiImage::getSlice( size_t axis ) {
             Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
             int r( 0 ), g( 0 ), b( 0 );
             if( image.ValidPixel( pos.x, pos.y ) ) {
-              r = static_cast< int >( image( pos.x, pos.y, 0 ) * factor );
-              g = static_cast< int >( image( pos.x, pos.y, 1 ) * factor );
-              b = static_cast< int >( image( pos.x, pos.y, 2 ) * factor );
+              r = image( pos.x, pos.y, 0 );
+              g = image( pos.x, pos.y, 1 );
+              b = image( pos.x, pos.y, 2 );
             }
             scanLine[ x ] = qRgb( r, g, b );
           }
@@ -160,7 +135,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
             Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
             int pixel = 0;
             if( image.ValidPixel( pos.x, pos.y ) ) {
-              pixel = static_cast< int >( image( pos.x, pos.y, axis - 1 ) * factor );
+              pixel = image( pos.x, pos.y, axis - 1 );
             }
             scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
           }
@@ -227,7 +202,7 @@ void GuiImage::rotate90( size_t axis ) {
 }
 
 void GuiImage::rotateAll90( ) {
-  for( int axis = 0; axis < transform.size( ); ++axis ) {
+  for( int axis = 0; axis < needUpdate.size( ); ++axis ) {
     rotate90( axis );
   }
 }
@@ -238,4 +213,26 @@ int GuiImage::max( ) {
 
 size_t GuiImage::currentSlice( size_t axis ) {
   return( m_currentSlice[ axis ] );
+}
+
+bool GuiImage::getEqualizeHistogram( ) const {
+  return( m_equalizeHistogram );
+}
+
+void GuiImage::setEqualizeHistogram( bool equalizeHistogram ) {
+  m_equalizeHistogram = equalizeHistogram;
+  for( int axis = 0; axis < needUpdate.size( ); ++axis ) {
+    needUpdate[axis] = true;
+  }
+  emit imageUpdated( );
+}
+
+void GuiImage::updateBoundings( size_t axis ) {
+  Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
+  transform[ axis ]( start, &start );
+  transform[ axis ]( end, &end );
+  bounding[ axis ] = Bial::BBox( start, end );
+  transform[ axis ] = transform[ axis ].Inverse( );
+  transform[ axis ].Translate( bounding[ axis ].pMin.x, bounding[ axis ].pMin.y, bounding[ axis ].pMin.z );
+  bounding[ axis ] = bounding[ axis ].Normalized( );
 }

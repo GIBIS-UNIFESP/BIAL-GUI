@@ -66,6 +66,8 @@ private slots:
 
   void on_rotate_clicked();
 
+  void on_pushButtonHistogramNormalization_clicked();
+
 private:
   Ui::ControlsWidget *ui;
   Controller *controller;

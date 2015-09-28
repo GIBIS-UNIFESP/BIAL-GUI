@@ -14,11 +14,11 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
   ui->pushButton_3RGB->hide( );
 /*  ui->groupBoxEditor->hide( ); */
 
-  ui->pushButtonFitInView->setEnabled(false);
-  ui->horizontalSliderZoom->setEnabled(false);
-  ui->horizontalSliderBrightness->setEnabled(false);
-  ui->horizontalSliderContrast->setEnabled(false);
-  ui->horizontalSliderZoom->setEnabled(false);
+  ui->pushButtonFitInView->setEnabled( false );
+  ui->horizontalSliderZoom->setEnabled( false );
+  ui->horizontalSliderBrightness->setEnabled( false );
+  ui->horizontalSliderContrast->setEnabled( false );
+  ui->horizontalSliderZoom->setEnabled( false );
 }
 
 ControlsWidget::~ControlsWidget( ) {
@@ -41,6 +41,7 @@ void ControlsWidget::imageChanged( ) {
   if( img == nullptr ) {
     return;
   }
+  ui->pushButtonHistogramNormalization->setChecked( img->getEqualizeHistogram( ) );
   ui->folderHorizontalSlider->setValue( controller->currentImagePos( ) );
   ui->folderSpinBox->setValue( controller->currentImagePos( ) );
   DisplayFormat *format = controller->currentFormat( );
@@ -213,4 +214,10 @@ void ControlsWidget::on_rotateAll_clicked( ) {
 
 void ControlsWidget::on_rotate_clicked( ) {
   controller->rotateAll90( );
+}
+
+void ControlsWidget::on_pushButtonHistogramNormalization_clicked( ) {
+  if(controller->currentImage()){
+    controller->currentImage()->setEqualizeHistogram(ui->pushButtonHistogramNormalization->isChecked());
+  }
 }
