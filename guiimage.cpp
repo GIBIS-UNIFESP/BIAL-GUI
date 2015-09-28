@@ -17,11 +17,13 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     {
       COMMENT( "Generating Axial affine transform.", 2 );
       transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
+      transform[ 0 ].Scale( 1, -1, -1 );
       updateBoundings( 0 );
     }
     {
       COMMENT( "Generating Coronal affine transform.", 2 );
       transform[ 1 ].Rotate( 180.0, Bial::FastTransform::Z ).Rotate( 90.0, Bial::FastTransform::Y );
+      transform[ 1 ].Scale( -1, 1, 1 );
       updateBoundings( 1 );
     }
     {
@@ -244,8 +246,8 @@ Bial::Signal GuiImage::getHistogram( ) const {
 
 void GuiImage::updateBoundings( size_t axis ) {
   Bial::Point3D start;
-  Bial::Point3D end(image.size( 0 ), image.size( 1 ), 1);
-  if(image.Dims() > 2){
+  Bial::Point3D end( image.size( 0 ), image.size( 1 ), 1 );
+  if( image.Dims( ) > 2 ) {
     end = Bial::Point3D( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
   }
   transform[ axis ]( start, &start );
