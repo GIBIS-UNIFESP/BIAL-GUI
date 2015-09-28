@@ -812,10 +812,10 @@
             <item>
              <widget class="QPushButton" name="pushButtonInterpolation">
               <property name="toolTip">
-               <string>Interpolation</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Smooth Interpolation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string>Int.</string>
+               <string>Smooth</string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -825,10 +825,10 @@
             <item>
              <widget class="QPushButton" name="pushButtonHistogramNormalization">
               <property name="toolTip">
-               <string>Histogram Normalization</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Histogram Equalization&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string>Hist. N.</string>
+               <string>Equalize</string>
               </property>
               <property name="checkable">
                <bool>true</bool>

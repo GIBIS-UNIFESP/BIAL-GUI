@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QPixmap>
 #include <QVector>
-
+#include <Signal.hpp>
 #include "displayformat.h"
 class GuiImage : public QObject {
   Q_OBJECT
@@ -15,7 +15,8 @@ class GuiImage : public QObject {
   QString m_fileName;
   QVector<QPixmap>cachedPixmaps;
   QVector<bool>needUpdate;
-
+  Bial::Signal equalized;
+  bool m_equalizeHistogram;
   void updateBoundings(size_t axis);
 
 public:
@@ -39,6 +40,9 @@ public:
   void rotateAll90();
 
   int max( );
+  bool getEqualizeHistogram() const;
+  void setEqualizeHistogram(bool equalizeHistogram);
+
 signals:
   void imageUpdated( );
 

@@ -13,6 +13,12 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
   ui->pushButton4Views->hide( );
   ui->pushButton_3RGB->hide( );
 /*  ui->groupBoxEditor->hide( ); */
+
+  ui->pushButtonFitInView->setEnabled(false);
+  ui->horizontalSliderZoom->setEnabled(false);
+  ui->horizontalSliderBrightness->setEnabled(false);
+  ui->horizontalSliderContrast->setEnabled(false);
+  ui->horizontalSliderZoom->setEnabled(false);
 }
 
 ControlsWidget::~ControlsWidget( ) {
