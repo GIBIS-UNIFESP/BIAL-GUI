@@ -198,9 +198,13 @@ void ControlsWidget::on_pushButton_B_clicked( ) {
 
 void ControlsWidget::on_pushButtonInterpolation_clicked( ) {
   COMMENT( "Toggled interpolation button.", 1 );
-  controller->setInterpolation(ui->pushButtonInterpolation->isChecked( ) );
+  controller->setInterpolation( ui->pushButtonInterpolation->isChecked( ) );
 }
 
 void ControlsWidget::on_rotateAll_clicked( ) {
-  controller->rotateAll90();
+  controller->rotateAll90( );
+}
+
+void ControlsWidget::on_rotate_clicked( ) {
+  controller->rotateAll90( );
 }

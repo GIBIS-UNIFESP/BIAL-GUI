@@ -64,6 +64,8 @@ private slots:
 
   void on_rotateAll_clicked();
 
+  void on_rotate_clicked();
+
 private:
   Ui::ControlsWidget *ui;
   Controller *controller;

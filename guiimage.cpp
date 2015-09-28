@@ -2,6 +2,16 @@
 #include "guiimage.h"
 #include <QPixmap>
 
+void GuiImage::updateBoundings( size_t axis ) {
+  Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
+  transform[ axis ]( start, &start );
+  transform[ axis ]( end, &end );
+  bounding[ axis ] = Bial::BBox( start, end );
+  transform[ axis ] = transform[ axis ].Inverse( );
+  transform[ axis ].Translate( bounding[ axis ].pMin.x, bounding[ axis ].pMin.y, bounding[ axis ].pMin.z );
+  bounding[ axis ] = bounding[ axis ].Normalized( );
+}
+
 GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
                                                                                    fname.toStdString( ) ) ), m_fileName(
     fname ) {
@@ -16,38 +26,19 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     {
       COMMENT( "Generating Axial affine transform.", 2 );
       transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
-      Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-      transform[ 0 ]( start, &start );
-      transform[ 0 ]( end, &end );
-      bounding[ 0 ] = Bial::BBox( start, end );
-      transform[ 0 ] = transform[ 0 ].Inverse( );
-      transform[ 0 ].Translate( bounding[ 0 ].pMin.x, bounding[ 0 ].pMin.y, bounding[ 0 ].pMin.z );
-      bounding[ 0 ] = bounding[ 0 ].Normalized( );
+      updateBoundings( 0 );
     }
     {
       COMMENT( "Generating Coronal affine transform.", 2 );
       transform[ 1 ].Rotate( 180.0, Bial::FastTransform::Z ).Rotate( 90.0, Bial::FastTransform::Y );
-      Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-      transform[ 1 ]( start, &start );
-      transform[ 1 ]( end, &end );
-      bounding[ 1 ] = Bial::BBox( start, end );
-      transform[ 1 ] = transform[ 1 ].Inverse( );
-      transform[ 1 ].Translate( bounding[ 1 ].pMin.x, bounding[ 1 ].pMin.y, bounding[ 1 ].pMin.z );
-      bounding[ 1 ] = bounding[ 1 ].Normalized( );
+      updateBoundings( 1 );
     }
     {
       COMMENT( "Generating Sagittal affine transform.", 2 );
       transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
-      Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-      transform[ 2 ]( start, &start );
-      transform[ 2 ]( end, &end );
-      bounding[ 2 ] = Bial::BBox( start, end );
-      transform[ 2 ] = transform[ 2 ].Inverse( );
-      transform[ 2 ].Translate( bounding[ 2 ].pMin.x, bounding[ 2 ].pMin.y, bounding[ 2 ].pMin.z );
-      bounding[ 2 ] = bounding[ 2 ].Normalized( );
+      updateBoundings( 2 );
     }
     cachedPixmaps.resize( 3 );
-    m_rotation.insert( 0, 3, 0.0 );
     needUpdate.insert( 0, 3, true );
     for( int axis = 0; axis < m_currentSlice.size( ); ++axis ) {
       setCurrentSlice( axis, depth( axis ) / 2 );
@@ -59,7 +50,6 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
     cachedPixmaps.resize( 4 );
-    m_rotation.insert( 0, 4, 0.0 );
     needUpdate.insert( 0, 4, true );
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
@@ -67,7 +57,6 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     m_modality = Modality::BW;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
-    m_rotation.insert( 0, 1, 0.0 );
     cachedPixmaps.resize( 1 );
     needUpdate.push_back( true );
   }
@@ -157,11 +146,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
     cachedPixmaps[ axis ] = QPixmap::fromImage( res );
     needUpdate[ axis ] = false;
   }
-  QTransform transform;
-  transform.translate( cachedPixmaps[ axis ].width( ) / 2.0, cachedPixmaps[ axis ].height( ) / 2.0 );
-  transform.rotate( m_rotation[ axis ] );
-  transform.translate( -cachedPixmaps[ axis ].width( ) / 2.0, -cachedPixmaps[ axis ].height( ) / 2.0 );
-  return( cachedPixmaps[ axis ].transformed(transform) );
+  return( cachedPixmaps[ axis ] );
 }
 
 size_t GuiImage::width( size_t axis = 0 ) {
@@ -208,19 +193,24 @@ const Bial::Image< int > &GuiImage::getImage( ) const {
   return( image );
 }
 
-void GuiImage::setRotation( size_t axis, double angle ) {
-  m_rotation[ axis ] = angle;
-  emit imageUpdated();
+void GuiImage::rotate90( size_t axis ) {
+  Bial::FastTransform transf;
+  transf.Rotate( -90.0, Bial::FastTransform::Z );
+  transform[ axis ] = transf * transform[ axis ].Inverse( );
+  updateBoundings( axis );
+  needUpdate[ axis ] = true;
+  emit imageUpdated( );
 }
 
-double GuiImage::getRotation( size_t axis ) {
-  return( m_rotation[ axis ] );
+void GuiImage::rotateAll90( ) {
+  for( int axis = 0; axis < transform.size( ); ++axis ) {
+    rotate90( axis );
+  }
 }
 
 int GuiImage::max( ) {
   return( m_max );
 }
-
 
 size_t GuiImage::currentSlice( size_t axis ) {
   return( m_currentSlice[ axis ] );

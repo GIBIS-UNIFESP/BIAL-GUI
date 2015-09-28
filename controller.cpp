@@ -200,14 +200,12 @@ void Controller::setInterpolation( bool isSmooth ) {
 }
 
 void Controller::rotateAll90() {
-  for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
-    currentImage( )->setRotation( axis, currentImage( )->getRotation( axis ) + 90.0 );
-  }
+  currentImage()->rotateAll90();
   emit currentImageChanged( );
 }
 
 void Controller::rotate90(size_t axis) {
-  currentImage( )->setRotation( axis, currentImage( )->getRotation( axis ) + 90.0 );
+  currentImage( )->rotate90(axis);
   emit currentImageChanged( );
 }
 
