@@ -31,7 +31,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
   containerUpdated( );
 
 #ifndef LIBGDCM
-  ui->actionOpen_DicomDir->setVisible(false);
+  ui->actionOpen_DicomDir->setVisible( false );
 #endif
 }
 
@@ -44,6 +44,7 @@ void MainWindow::createConnections( ) {
 
   /* Controller. */
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
+  connect( controller, &Controller::imageUpdated, this, &MainWindow::imageUpdated );
   connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
   connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
 
@@ -89,6 +90,8 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 void MainWindow::currentImageChanged( ) {
   if( controller->currentImage( ) ) {
     DisplayFormat *format = controller->currentFormat( );
+    ui->dockWidgetHistogram->show( );
+
     ui->menuLayout->setEnabled( format->modality( ) != Modality::BW );
     ui->menuOverlay->setEnabled( format->hasOverlay( ) );
 
@@ -108,6 +111,26 @@ void MainWindow::currentImageChanged( ) {
     ui->action3_Views->setVisible( format->has3Views( ) );
     ui->action4_Views->setVisible( format->has4Views( ) );
   }
+  else {
+    ui->dockWidgetHistogram->hide( );
+  }
+}
+
+void MainWindow::imageUpdated( ) {
+  const Bial::Signal &hist = controller->currentImage()->getHistogram();
+  QCustomPlot * plot = ui->histogramWidget;
+  QVector<double> x(hist.size()), y(hist.size());
+  for(size_t bin = 0; bin < hist.size(); ++bin){
+    x[bin] = hist.Data(bin);
+    y[bin] = hist[bin];
+  }
+  plot->addGraph();
+  plot->graph(0)->setData(x, y);
+  plot->xAxis->setLabel("Intensity");
+  plot->yAxis->setLabel("Frequency");
+  plot->xAxis->setRange(x.first(), x.last());
+  plot->yAxis->setRange(0, hist.MaximumFrequency());
+  plot->replot();
 }
 
 void MainWindow::containerUpdated( ) {
@@ -173,7 +196,7 @@ bool MainWindow::loadFolder( QString dirname ) {
   QFileInfoList list = folder.entryInfoList( QDir::NoDotAndDotDot | QDir::Files, QDir::DirsFirst | QDir::Name );
   bool value = false;
   /*  qDebug() << "list size: " << list.size(); */
-  CursorChanger c(Qt::WaitCursor);
+  CursorChanger c( Qt::WaitCursor );
 
   QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
   progress.setWindowModality( Qt::WindowModal );
@@ -292,7 +315,7 @@ void MainWindow::loadQss( ) {
 
 bool MainWindow::loadDicomdir( QString dicomFName ) {
   COMMENT( "Loading DicomDir file", 1 );
-  CursorChanger c(Qt::WaitCursor);
+  CursorChanger c( Qt::WaitCursor );
   DicomDir dicomdir;
   if( !dicomdir.open( dicomFName.toStdString( ) ) ) {
     statusBar( )->showMessage( tr( "Could not open dicomdir" ), 2000 );
@@ -341,8 +364,8 @@ void MainWindow::on_actionOpen_folder_triggered( ) {
 
 void MainWindow::on_actionOpen_DicomDir_triggered( ) {
   QString fileName = QFileDialog::getOpenFileName( this, tr( "Open" ), defaultFolder,
-                                                           tr( "*" ) );
-  loadDicomdir(fileName);
+                                                   tr( "*" ) );
+  loadDicomdir( fileName );
 }
 
 void MainWindow::on_actionAdd_image_triggered( ) {

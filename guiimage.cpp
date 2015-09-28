@@ -2,9 +2,9 @@
 #include "guiimage.h"
 #include <QPixmap>
 
-GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ),
-  image( GDCM::OpenGImage(fname.toStdString( ) ) ),
-  m_fileName( fname ) {
+GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
+                                                                                   fname.toStdString( ) ) ), m_fileName(
+    fname ) {
   transform.resize( 4 );
   m_equalizeHistogram = false;
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
@@ -51,7 +51,9 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ),
     cachedPixmaps.resize( 1 );
     needUpdate.push_back( true );
   }
-  equalized = Bial::Signal::EqualizedHistogram( image );
+  histogram = Bial::Signal::Histogram( image );
+  equalized = histogram;
+  equalized.Equalize( );
   for( size_t val = 0; val < equalized.size( ); ++val ) {
     equalized[ val ] = round( equalized[ val ] );
   }
@@ -230,13 +232,22 @@ bool GuiImage::getEqualizeHistogram( ) const {
 void GuiImage::setEqualizeHistogram( bool equalizeHistogram ) {
   m_equalizeHistogram = equalizeHistogram;
   for( int axis = 0; axis < needUpdate.size( ); ++axis ) {
-    needUpdate[axis] = true;
+    needUpdate[ axis ] = true;
   }
   emit imageUpdated( );
 }
 
+
+Bial::Signal GuiImage::getHistogram( ) const {
+  return( histogram );
+}
+
 void GuiImage::updateBoundings( size_t axis ) {
-  Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
+  Bial::Point3D start;
+  Bial::Point3D end(image.size( 0 ), image.size( 1 ), 1);
+  if(image.Dims() > 2){
+    end = Bial::Point3D( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
+  }
   transform[ axis ]( start, &start );
   transform[ axis ]( end, &end );
   bounding[ axis ] = Bial::BBox( start, end );

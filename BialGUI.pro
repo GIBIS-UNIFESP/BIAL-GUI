@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,6 +28,7 @@ SOURCES += \
     mainwindow.cpp \
     thumbnail.cpp \
     thumbswidget.cpp \
+    thirdParty/qcustomplot.cpp
 
 
 HEADERS  += \
@@ -44,6 +45,7 @@ HEADERS  += \
     thumbnail.hpp \
     thumbswidget.h \
     viewerinterface.h \
+    thirdParty/qcustomplot.h
 
 
 FORMS    += mainwindow.ui \
