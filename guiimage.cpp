@@ -53,11 +53,18 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     cachedPixmaps.resize( 1 );
     needUpdate.push_back( true );
   }
+  COMMENT( "Computing equalizaztion transform.", 2 );
   histogram = Bial::Signal::ZeroStartHistogram( image );
+  equalization = histogram;
+  equalization[ 0 ] = 0;
+  equalization.Equalize( );
+  for( size_t val = 0; val < equalization.size( ); ++val ) {
+    equalization[ val ] = std::round( equalization[ val ] );
+  }
+  COMMENT( "Computing equalized histogram.", 2 );
   equalized = histogram;
-  equalized.Equalize( );
   for( size_t val = 0; val < equalized.size( ); ++val ) {
-    equalized[ val ] = round( equalized[ val ] );
+    equalized[ equalization[ val ] ] = histogram[ val ];
   }
   COMMENT( "Image " << fileName( ).toStdString( ) << " size = (" << width( 0 ) << ", " << heigth( 0 ) << ", " <<
            depth( 0 ) << ")", 0 );
@@ -93,7 +100,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
             pixel = image( pos.x, pos.y, pos.z );
           }
           if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalized[ pixel ] );
+            pixel = static_cast< int >( equalization[ pixel ] );
           }
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
@@ -109,7 +116,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
             pixel = image( pos.x, pos.y );
           }
           if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalized[ equalized.Bin( pixel ) ] );
+            pixel = static_cast< int >( equalization[ equalization.Bin( pixel ) ] );
           }
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
@@ -128,9 +135,9 @@ QPixmap GuiImage::getSlice( size_t axis ) {
               b = image( pos.x, pos.y, 2 );
             }
             if( m_equalizeHistogram ) {
-              r = static_cast< int >( equalized[ equalized.Bin( r ) ] );
-              g = static_cast< int >( equalized[ equalized.Bin( g ) ] );
-              b = static_cast< int >( equalized[ equalized.Bin( b ) ] );
+              r = static_cast< int >( equalization[ equalization.Bin( r ) ] );
+              g = static_cast< int >( equalization[ equalization.Bin( g ) ] );
+              b = static_cast< int >( equalization[ equalization.Bin( b ) ] );
             }
             scanLine[ x ] = qRgb( r, g, b );
           }
@@ -147,7 +154,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
               pixel = image( pos.x, pos.y, axis - 1 );
             }
             if( m_equalizeHistogram ) {
-              pixel = static_cast< int >( equalized[ equalized.Bin( pixel ) ] );
+              pixel = static_cast< int >( equalization[ equalization.Bin( pixel ) ] );
             }
             scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
           }
@@ -240,7 +247,9 @@ void GuiImage::setEqualizeHistogram( bool equalizeHistogram ) {
 }
 
 
-Bial::Signal GuiImage::getHistogram( ) const {
+const Bial::Signal &GuiImage::getHistogram( ) const {
+  if( m_equalizeHistogram )
+    return( equalized );
   return( histogram );
 }
 

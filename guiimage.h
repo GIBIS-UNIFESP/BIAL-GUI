@@ -15,7 +15,7 @@ class GuiImage : public QObject {
   QString m_fileName;
   QVector<QPixmap>cachedPixmaps;
   QVector<bool>needUpdate;
-  Bial::Signal equalized, histogram;
+  Bial::Signal equalization, histogram, equalized;
   bool m_equalizeHistogram;
   void updateBoundings(size_t axis);
 
@@ -43,7 +43,7 @@ public:
   bool getEqualizeHistogram() const;
   void setEqualizeHistogram(bool equalizeHistogram);
 
-  Bial::Signal getHistogram() const;
+  const Bial::Signal &getHistogram() const;
 
 signals:
   void imageUpdated( );
