@@ -14,76 +14,82 @@
  */
 
 #include "Common.hpp"
+
+#include <QDir>
+#include <QFileInfo>
+#include <QDir>
+#include <QFile>
+
 #ifndef DICOMDIR_H
 #define DICOMDIR_H
 class ImageInfo {
-  std::string uid;
-  std::string referencedFileID;
-  std::string dir;
+  QString uid;
+  QString referencedFileID;
+  QDir dir;
 public:
   ImageInfo( );
-  std::string getUid( ) const;
-  void setUid( const std::string &value );
-  std::string getReferencedFileID( ) const;
-  void setReferencedFileID( const std::string &value );
-  std::string getDir( ) const;
-  void setDir( const std::string &value );
-  std::string getFileName( );
+  QString getUid( ) const;
+  void setUid( const QString &value );
+  QString getReferencedFileID( ) const;
+  void setReferencedFileID( const QString &value );
+  QDir getDir( ) const;
+  void setDir( const QDir &value );
+  QString getFileName( );
 };
 class Series {
   std::vector< ImageInfo > images;
-  std::string uid;
-  std::string modality;
-  std::string descr;
+  QString uid;
+  QString modality;
+  QString descr;
 public:
   void addImage( const ImageInfo &imageInfo );
-  std::string getUid( ) const;
-  void setUid( const std::string &value );
-  std::string getModality( ) const;
-  void setModality( const std::string &value );
-  std::string getDescr( ) const;
-  void setDescr( const std::string &value );
-  std::vector< std::string > getImages( );
+  QString getUid( ) const;
+  void setUid( const QString &value );
+  QString getModality( ) const;
+  void setModality( const QString &value );
+  QString getDescr( ) const;
+  void setDescr( const QString &value );
+  QStringList getImages( );
 };
 class Study {
   std::vector< Series > series;
-  std::string uid;
-  std::string date;
-  std::string descr;
+  QString uid;
+  QString date;
+  QString descr;
 public:
   void addSeries( const Series &s );
-  std::string getUid( ) const;
-  void setUid( const std::string &value );
-  std::string getDate( ) const;
-  void setDate( const std::string &value );
-  std::string getDescr( ) const;
-  void setDescr( const std::string &value );
-  std::vector< std::string > getImages( );
+  QString getUid( ) const;
+  void setUid( const QString &value );
+  QString getDate( ) const;
+  void setDate( const QString &value );
+  QString getDescr( ) const;
+  void setDescr( const QString &value );
+  QStringList getImages( );
 };
 class Patient {
   std::vector< Study > study;
-  std::string name;
-  std::string id;
+  QString name;
+  QString id;
 public:
   void addStudy( const Study &s );
-  std::string getName( ) const;
-  void setName( const std::string &value );
-  std::string getId( ) const;
-  void setId( const std::string &value );
-  std::vector< std::string > getImages( );
+  QString getName( ) const;
+  void setName( const QString &value );
+  QString getId( ) const;
+  void setId( const QString &value );
+  QStringList getImages( );
 };
 class DicomDir {
   std::vector< Patient > patient;
-  std::string filename;
-  std::string title;
-  std::string dir;
+  QString filename;
+  QString title;
+  QString dir;
 public:
   DicomDir( );
-  bool open( const std::string &filename );
-  std::string getTitle( ) const;
-  void setTitle( const std::string &value );
-  std::string getFilename( ) const;
-  std::vector< std::string > getImages( );
+  bool open( const QString &filename );
+  QString getTitle( ) const;
+  void setTitle( const QString &value );
+  QString getFilename( ) const;
+  QStringList getImages( );
 };
 
 #endif /* DICOMDIR_H */

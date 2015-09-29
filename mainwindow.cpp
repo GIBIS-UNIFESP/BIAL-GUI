@@ -315,11 +315,11 @@ bool MainWindow::loadDicomdir( QString dicomFName ) {
   COMMENT( "Loading DicomDir file", 1 );
   CursorChanger c( Qt::WaitCursor );
   DicomDir dicomdir;
-  if( !dicomdir.open( dicomFName.toStdString( ) ) ) {
+  if( !dicomdir.open( dicomFName ) ) {
     statusBar( )->showMessage( tr( "Could not open dicomdir" ), 2000 );
     return( false );
   }
-  const std::vector< std::string > files = dicomdir.getImages( );
+  const QStringList files = dicomdir.getImages( );
   if( files.size( ) > 0 ) {
     controller->clear( );
     QProgressDialog progress( tr( "Reading dicomdir files..." ), tr( "Abort" ), 0, files.size( ), this );
@@ -329,7 +329,7 @@ bool MainWindow::loadDicomdir( QString dicomFName ) {
       if( progress.wasCanceled( ) ) {
         break;
       }
-      controller->addImage( QString::fromStdString( files[ i ] ).trimmed( ) );
+      controller->addImage( files[ i ].trimmed( ) );
     }
     progress.setValue( files.size( ) );
     if( controller->size( ) < 1 ) {

@@ -5,64 +5,64 @@
 #include <gdcmStreamImageReader.h>
 #include <gdcmStringFilter.h>
 #endif
-#include "File.hpp"
 
 /* ImageInfo */
-std::string ImageInfo::getDir( ) const {
+QDir ImageInfo::getDir( ) const {
   return( dir );
 }
 
-void ImageInfo::setDir( const std::string &value ) {
+void ImageInfo::setDir( const QDir &value ) {
   dir = value;
 }
 
-std::string ImageInfo::getFileName( ) {
-  std::string imgpath = referencedFileID;
-  for( size_t pos = 0; pos < imgpath.size( ); ++pos ) {
+QString ImageInfo::getFileName( ) {
+  QString imgpath = QDir::fromNativeSeparators( referencedFileID );
+  for( int pos = 0; pos < imgpath.size( ); ++pos ) {
     if( ( ( imgpath[ pos ] == '\\' ) || ( imgpath[ pos ] == '/' ) ) && ( imgpath[ pos ] != DIR_SEPARATOR ) ) {
       imgpath[ pos ] = DIR_SEPARATOR;
     }
   }
-  return( dir + imgpath );
+//  QStringList list = imgpath.split( DIR_SEPARATOR );
+  return( dir.absoluteFilePath( imgpath ) );
 }
 
 ImageInfo::ImageInfo( ) {
 }
 
-std::string ImageInfo::getReferencedFileID( ) const {
+QString ImageInfo::getReferencedFileID( ) const {
   return( referencedFileID );
 }
 
-void ImageInfo::setReferencedFileID( const std::string &value ) {
+void ImageInfo::setReferencedFileID( const QString &value ) {
   referencedFileID = value;
 }
 
-std::string ImageInfo::getUid( ) const {
+QString ImageInfo::getUid( ) const {
   return( uid );
 }
 
-void ImageInfo::setUid( const std::string &value ) {
+void ImageInfo::setUid( const QString &value ) {
   uid = value;
 }
 
-std::string Series::getUid( ) const {
+QString Series::getUid( ) const {
   return( uid );
 }
 
-void Series::setUid( const std::string &value ) {
+void Series::setUid( const QString &value ) {
   uid = value;
 }
 
-std::string Series::getDescr( ) const {
+QString Series::getDescr( ) const {
   return( descr );
 }
 
-void Series::setDescr( const std::string &value ) {
+void Series::setDescr( const QString &value ) {
   descr = value;
 }
 
-std::vector< std::string > Series::getImages( ) {
-  std::vector< std::string > files;
+QStringList Series::getImages( ) {
+  QStringList files;
   for( auto itr = images.begin( ); itr != images.end( ); ++itr ) {
     files.push_back( itr->getFileName( ) );
   }
@@ -73,27 +73,27 @@ void Series::addImage( const ImageInfo &imageInfo ) {
   images.push_back( imageInfo );
 }
 
-std::string Series::getModality( ) const {
+QString Series::getModality( ) const {
   return( modality );
 }
 
-void Series::setModality( const std::string &value ) {
+void Series::setModality( const QString &value ) {
   modality = value;
 }
 /* Study */
-std::string Study::getUid( ) const {
+QString Study::getUid( ) const {
   return( uid );
 }
 
-void Study::setUid( const std::string &value ) {
+void Study::setUid( const QString &value ) {
   uid = value;
 }
 
-std::string Study::getDescr( ) const {
+QString Study::getDescr( ) const {
   return( descr );
 }
 
-void Study::setDescr( const std::string &value ) {
+void Study::setDescr( const QString &value ) {
   descr = value;
 }
 
@@ -101,36 +101,36 @@ void Study::addSeries( const Series &s ) {
   series.push_back( s );
 }
 
-std::string Study::getDate( ) const {
+QString Study::getDate( ) const {
   return( date );
 }
 
-void Study::setDate( const std::string &value ) {
+void Study::setDate( const QString &value ) {
   date = value;
 }
 
-std::vector< std::string > Study::getImages( ) {
-  std::vector< std::string > files;
+QStringList Study::getImages( ) {
+  QStringList files;
   for( auto itr = series.begin( ); itr != series.end( ); ++itr ) {
-    std::vector< std::string > sFiles = itr->getImages( );
-    files.insert( files.end( ), sFiles.begin( ), sFiles.end( ) );
+    QStringList sFiles = itr->getImages( );
+    files << sFiles;
   }
   return( files );
 }
 /* Patient */
-std::string Patient::getName( ) const {
+QString Patient::getName( ) const {
   return( name );
 }
 
-void Patient::setName( const std::string &value ) {
+void Patient::setName( const QString &value ) {
   name = value;
 }
 
-std::string Patient::getId( ) const {
+QString Patient::getId( ) const {
   return( id );
 }
 
-void Patient::setId( const std::string &value ) {
+void Patient::setId( const QString &value ) {
   id = value;
 }
 
@@ -138,43 +138,44 @@ void Patient::addStudy( const Study &s ) {
   study.push_back( s );
 }
 
-std::vector< std::string > Patient::getImages( ) {
-  std::vector< std::string > files;
+QStringList Patient::getImages( ) {
+  QStringList files;
   for( auto itr = study.begin( ); itr != study.end( ); ++itr ) {
-    std::vector< std::string > sFiles = itr->getImages( );
-    files.insert( files.end( ), sFiles.begin( ), sFiles.end( ) );
+    QStringList sFiles = itr->getImages( );
+    files << sFiles;
   }
   return( files );
 }
 /* Dicomdir */
 #ifdef LIBGDCM
-std::string str( const gdcm::Value &val ) {
+QString str( const gdcm::Value &val ) {
   std::stringstream strm;
   strm << val;
-  return( strm.str( ) );
+  return( QString::fromStdString( strm.str( ) ) );
 }
 
-std::string str( gdcm::SmartPointer< gdcm::Value > val ) {
+QString str( gdcm::SmartPointer< gdcm::Value > val ) {
   std::stringstream strm;
   strm << *val;
-  return( strm.str( ) );
+  return( QString::fromStdString( strm.str( ) ) );
 }
 #endif
 DicomDir::DicomDir( ) {
 }
 
-bool DicomDir::open( const std::string &filename ) {
+bool DicomDir::open( const QString &filename ) {
   this->filename = filename;
-  title = Bial::File::Basename( filename );
+  QFileInfo fileInfo( filename );
+  title = fileInfo.baseName( );
   /* TODO Verify if file exists ( The function Bial::File::Exists do not exists yes ) */
-  std::string dir = Bial::File::Directory( filename );
+  QDir dir = fileInfo.dir( );
 #ifndef LIBGDCM
   BIAL_WARNING( "GDCM library not found and/or reprocessor variable LIBGDCM not set!" );
   return( false );
 #else
   gdcm::Reader reader;
-  COMMENT( "Opening dicomdir file: " << filename, 1 );
-  reader.SetFileName( filename.c_str( ) );
+  COMMENT( "Opening dicomdir file: " << filename.toStdString( ), 1 );
+  reader.SetFileName( filename.toUtf8( ) );
   if( !reader.Read( ) ) {
     BIAL_WARNING( "Cannot read file!" );
     return( false );
@@ -199,7 +200,7 @@ bool DicomDir::open( const std::string &filename ) {
   }
   for( auto it = ds.GetDES( ).begin( ); it != ds.GetDES( ).end( ); ++it ) {
     const gdcm::DataElement &de = *it;
-    if( de.GetTag( ) == gdcm::Tag( 0x004, 0x1220 ) ) {   /* verifies if it is a valid ... */
+    if( de.GetTag( ) == gdcm::Tag( 0x004, 0x1220 ) ) { /* verifies if it is a valid ... */
       gdcm::SmartPointer< gdcm::SequenceOfItems > sq = de.GetValueAsSQ( );
       COMMENT( "Iterating through DicomDir itens", 1 );
       for( size_t itemNr = 1; itemNr < sq->GetNumberOfItems( ); ++itemNr ) {
@@ -311,11 +312,11 @@ bool DicomDir::open( const std::string &filename ) {
   return( true );
 }
 
-std::vector< std::string > DicomDir::getImages( ) {
-  std::vector< std::string > files;
+QStringList DicomDir::getImages( ) {
+  QStringList files;
   for( auto itr = patient.begin( ); itr != patient.end( ); ++itr ) {
-    std::vector< std::string > pFiles = itr->getImages( );
-    files.insert( files.end( ), pFiles.begin( ), pFiles.end( ) );
+    QStringList pFiles = itr->getImages( );
+    files << pFiles;
   }
   return( files );
 }
