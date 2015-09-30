@@ -5,8 +5,8 @@
 #include <QRgb>
 
 GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
-                                                                                   fname.toStdString( ) ) ), m_fileName(
-    fname ) {
+        fname.toStdString( ) ) ), m_fileName(
+          fname ) {
   transform.resize( 4 );
   m_equalizeHistogram = false;
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
@@ -33,8 +33,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
         transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
         updateBoundings( 2 );
       }
-    }
-    else {
+    } else {
       {
         COMMENT( "Generating Axial affine transform.", 2 );
         transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
@@ -56,16 +55,14 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     for( int view = 0; view < m_currentSlice.size( ); ++view ) {
       setCurrentSlice( view, depth( view ) / 2 );
     }
-  }
-  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
+  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
     COMMENT( "PPM image detected.", 2 );
     m_modality = Modality::RGB2D;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
     cachedPixmaps.resize( 4 );
     needUpdate.insert( 0, 4, true );
-  }
-  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
+  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
     COMMENT( "Gray image detected.", 2 );
     m_modality = Modality::BW2D;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
@@ -128,8 +125,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
-    }
-    else if( modality( ) == Modality::BW2D ) {
+    } else if( modality( ) == Modality::BW2D ) {
       COMMENT( "Generating Grayscale view.", 2 );
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
@@ -146,8 +142,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
-    }
-    else if( modality( ) == Modality::RGB2D ) {
+    } else if( modality( ) == Modality::RGB2D ) {
       if( needUpdate[ 0 ] ) {
         COMMENT( "Generating RGB view.", 2 );
         for( size_t y = 0; y < ysize; ++y ) {
@@ -214,8 +209,7 @@ void GuiImage::setCurrentSlice( size_t view, size_t slice ) {
       needUpdate[ view ] = true;
       emit imageUpdated( );
     }
-  }
-  else {
+  } else {
     throw std::out_of_range( BIAL_ERROR( "Axis out of range." ) );
   }
 }
@@ -293,6 +287,23 @@ const Bial::Signal &GuiImage::getHistogram( ) const {
     return( equalized );
   }
   return( histogram );
+}
+
+int GuiImage::getPixel(int x, int y, int z) {
+  int color;
+  if(modality() == Modality::BW2D){
+    if(image.ValidPixel(x, y, z)){
+      color = image.at(x, y );
+    }
+  }else{
+    if(image.ValidPixel(x, y, z)){
+      color = image.at(x, y, z);
+    }
+  }
+  if(m_equalizeHistogram){
+    return equalization[color];
+  }
+  return color;
 }
 
 void GuiImage::updateBoundings( size_t axis ) {

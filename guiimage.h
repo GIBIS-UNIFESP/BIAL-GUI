@@ -68,7 +68,6 @@ class GuiImage : public QObject {
    * @brief m_max is the maximum value at the input image.
    */
   int m_max;
-
 private:
   /**
    * @brief updateBoundings is called each time the transformation matrix is updated. <br>
@@ -191,6 +190,14 @@ public:
    */
   const Bial::Signal &getHistogram() const;
 
+  /**
+   * @brief getPixel returns the pixel intensity of the image at the given position.
+   * @param x
+   * @param y
+   * @param z
+   * @return
+   */
+  int getPixel(int x, int y, int z = 0);
 signals:
   /**
    * @brief imageUpdated is called each time a internal property is updated,
