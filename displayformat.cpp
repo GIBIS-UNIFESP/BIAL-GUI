@@ -24,6 +24,7 @@ BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has3Views = false;
   m_has4Views = false;
   m_overlay = false;
+  m_maximumNumberOfViews = 1;
   loadSettings();
 }
 
@@ -47,6 +48,7 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has3Views = true;
   m_has4Views = false;
   m_overlay = false;
+  m_maximumNumberOfViews = 3;
   loadSettings();
 }
 
@@ -70,6 +72,7 @@ RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has3Views = false;
   m_has4Views = true;
   m_overlay = false;
+  m_maximumNumberOfViews = 4;
   loadSettings();
 }
 
@@ -104,6 +107,11 @@ void DisplayFormat::loadSettings( ) {
     defaultViews = (Views) settings.value("defaultViews").toInt();
   }
 }
+size_t DisplayFormat::getMaximumNumberOfViews() const
+{
+  return m_maximumNumberOfViews;
+}
+
 
 Modality DisplayFormat::modality( ) const {
   return( m_modality );

@@ -20,7 +20,7 @@ class DisplayFormat : public QObject {
   Q_OBJECT
 public:
   explicit DisplayFormat( QObject *parent );
-  ~DisplayFormat();
+  ~DisplayFormat( );
 
 
   Modality modality( ) const;
@@ -68,8 +68,10 @@ public:
   int getNumberOfViews( ) const;
   virtual void setNumberOfViews( int numberOfViews ) = 0;
 
-  QColor overlayColor() const;
-  void setOverlayColor(const QColor & overlayColor);
+  QColor overlayColor( ) const;
+  void setOverlayColor( const QColor &overlayColor );
+
+  size_t getMaximumNumberOfViews( ) const;
 
 signals:
   void updated( );
@@ -79,7 +81,7 @@ protected:
   Layout m_currentLayout;
   Views m_currentViews;
 
-  void loadSettings();
+  void loadSettings( );
   bool m_overlay;
 
   bool m_hasViewerControls;
@@ -100,6 +102,7 @@ protected:
 
   Views defaultViews;
   int m_numberOfViews;
+  size_t m_maximumNumberOfViews;
   QColor m_overlayColor;
 };
 

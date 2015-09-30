@@ -113,7 +113,8 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   Bial::Point3D pt3d = transform( ( double ) pt.x( ),
                                   ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
-  for( size_t other = 0; other < (size_t) controller->currentFormat()->getNumberOfViews(); ++other ) {
+  size_t size = controller->currentFormat()->getMaximumNumberOfViews();
+  for( size_t other = 0; other < size; ++other ) {
     if( controller->currentFormat( )->overlay( ) ) {
       views[ other ]->scene( )->setOverlay( true );
       if( other != axis ) {
@@ -236,6 +237,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
         timer.restart( );
         controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
+        emit mouseDragged(scnPos, mouseEvt->buttons( ), axis);
       }
       emit mouseMoved( scnPos, axis );
     }
@@ -246,7 +248,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
         controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
       }
-      /* emit mouseClicked( scnPos, mouseEvt->buttons( ), axis ); */
+      emit mouseClicked( scnPos, mouseEvt->buttons( ), axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
       if( mouseEvt->button( ) == Qt::LeftButton ) {
@@ -254,6 +256,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
         controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
       }
+      emit mouseReleased( scnPos, mouseEvt->buttons( ), axis );
     }
   }
   return( QWidget::eventFilter( obj, evt ) );

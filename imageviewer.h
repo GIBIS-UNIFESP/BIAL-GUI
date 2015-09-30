@@ -32,7 +32,9 @@ public:
   void setController(Controller * value);
 
 signals:
-//  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseReleased(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseDragged(QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseMoved(QPointF pt, size_t axis );
 
 private slots:

@@ -51,7 +51,9 @@ void MainWindow::createConnections( ) {
   connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
 
   /* ImageViewer */
-  connect( ui->imageViewer, &ImageViewer::mouseMoved, this, &MainWindow::mouseMoved );
+  connect( ui->imageViewer, &ImageViewer::mouseClicked, this, &MainWindow::updateIntensity );
+  connect( ui->imageViewer, &ImageViewer::mouseReleased, this, &MainWindow::updateIntensity );
+  connect( ui->imageViewer, &ImageViewer::mouseDragged, this, &MainWindow::updateIntensity );
 
   /* Overlay */
   connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay );
@@ -389,7 +391,7 @@ void MainWindow::on_actionRemove_current_label_triggered( ) {
   controller->removeCurrentLabel( );
 }
 
-void MainWindow::mouseMoved( QPointF scnPos, size_t axis ) {
+void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size_t axis ) {
   GuiImage *img = controller->currentImage( );
   if( img != nullptr ) {
     Bial::Point3D pt = img->getPosition( scnPos, axis );

@@ -56,7 +56,7 @@ private slots:
   void on_actionSelect_default_folder_triggered( );
   void on_actionRemove_current_label_triggered( );
 
-  void mouseMoved( QPointF scnPos, size_t axis );
+  void updateIntensity(QPointF scnPos, Qt::MouseButtons buttons, size_t axis );
 
   void on_actionAxial_triggered( );
   void on_actionCoronal_triggered( );
