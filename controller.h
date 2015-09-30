@@ -136,10 +136,10 @@ public:
   DisplayFormat * currentFormat( );
   /**
    * @brief getPixmapItem returns the PixmapItem of the view.
-   * @param axis is the number of the view;
+   * @param view is the number of the view;
    * @return
    */
-  QGraphicsPixmapItem* getPixmapItem( size_t axis );
+  QGraphicsPixmapItem* getPixmapItem( size_t view );
 
 signals:
   /**
@@ -184,17 +184,17 @@ public slots:
    * @brief changeOthersSlices is called when the mouse is clicked over
    *  an 3d image view (axial, sagittal and coronal).
    * @param posF is the mouse pointer position in the scene.
-   * @param axis is the number of the view's axis.
+   * @param view is the number of the view's axis.
    *
    */
-  void changeOthersSlices(QPointF posF, size_t axis );
+  void changeOthersSlices(QPointF posF, size_t view );
   /**
    * @brief setCurrentSlice is called by the imageViewer when the slider or
    *  the spinbox have theis values updated.
-   * @param axis
+   * @param view
    * @param slice
    */
-  void setCurrentSlice( size_t axis, size_t slice );
+  void setCurrentSlice( size_t view, size_t slice );
   /**
    * @brief setZoom updates the zoom factor.
    * @param value
@@ -211,9 +211,20 @@ public slots:
   void rotateAll90();
   /**
    * @brief rotate90 rotates a view in 90 degrees.
-   * @param axis View axis
+   * @param view View number
    */
-  void rotate90(size_t axis);
+  void rotate90(size_t view);
+  /**
+   * @brief flipH mirrors the current view on X axis.
+   * @param view View number
+   */
+  void flipH(size_t view);
+  /**
+   * @brief flipV mirrors the current view on Y axis.
+   * @param view View number
+   */
+  void flipV(size_t view);
+
 private:
   /**
    * @brief setRecentFile

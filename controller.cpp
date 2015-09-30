@@ -154,15 +154,15 @@ void Controller::loadNextImage( ) {
   }
 }
 
-void Controller::changeOthersSlices( QPointF posF, size_t axis ) {
+void Controller::changeOthersSlices( QPointF posF, size_t view ) {
   COMMENT( "Changing slice position of other frames based on image position.", 2 );
   if( currentImage( ) ) {
     if( ( currentImage( )->modality( ) == Modality::BW3D ) ) {
-      Bial::FastTransform transform = currentImage( )->getTransform( axis );
+      Bial::FastTransform transform = currentImage( )->getTransform( view );
       Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
-                                    ( double ) currentImage( )->currentSlice( axis ) );
+                                    ( double ) currentImage( )->currentSlice( view ) );
       for( size_t other = 0; other < 3; ++other ) {
-        if( other != axis ) {
+        if( other != view ) {
           Bial::FastTransform otherTransf = currentImage( )->getTransform( other ).Inverse( );
           Bial::Point3D otherPt = otherTransf( pt );
           size_t pos = static_cast< size_t >( round( otherPt.z ) );
@@ -178,8 +178,8 @@ void Controller::changeOthersSlices( QPointF posF, size_t axis ) {
   }
 }
 
-void Controller::setCurrentSlice( size_t axis, size_t slice ) {
-  currentImage( )->setCurrentSlice( axis, slice );
+void Controller::setCurrentSlice( size_t view, size_t slice ) {
+  currentImage( )->setCurrentSlice( view, slice );
 }
 
 void Controller::setZoom( int value ) {
@@ -189,12 +189,12 @@ void Controller::setZoom( int value ) {
 }
 
 void Controller::setInterpolation( bool isSmooth ) {
-  for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
+  for( int view = 0; view < m_pixmapItems.size( ); ++view ) {
     if( isSmooth ) {
-      m_pixmapItems[ axis ]->setTransformationMode( Qt::SmoothTransformation );
+      m_pixmapItems[ view ]->setTransformationMode( Qt::SmoothTransformation );
     }
     else {
-      m_pixmapItems[ axis ]->setTransformationMode( Qt::FastTransformation );
+      m_pixmapItems[ view ]->setTransformationMode( Qt::FastTransformation );
     }
   }
 }
@@ -204,8 +204,18 @@ void Controller::rotateAll90( ) {
   emit currentImageChanged( );
 }
 
-void Controller::rotate90( size_t axis ) {
-  currentImage( )->rotate90( axis );
+void Controller::rotate90( size_t view ) {
+  currentImage( )->rotate90( view );
+  emit currentImageChanged( );
+}
+
+void Controller::flipH( size_t view ) {
+  currentImage( )->flipH( view );
+  emit currentImageChanged( );
+}
+
+void Controller::flipV( size_t view ) {
+  currentImage( )->flipV( view );
   emit currentImageChanged( );
 }
 
@@ -246,6 +256,6 @@ DisplayFormat* Controller::currentFormat( ) {
   }
 }
 
-QGraphicsPixmapItem* Controller::getPixmapItem( size_t axis ) {
-  return( m_pixmapItems.at( axis ) );
+QGraphicsPixmapItem* Controller::getPixmapItem( size_t view ) {
+  return( m_pixmapItems.at( view ) );
 }

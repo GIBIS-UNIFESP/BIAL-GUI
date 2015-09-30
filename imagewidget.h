@@ -38,6 +38,8 @@ public:
 signals:
   void sliceChanged( size_t viewNbr, size_t slice );
   void rotate( size_t viewNbr );
+  void fliph( size_t viewNbr );
+  void flipv( size_t viewNbr );
 
 private slots:
 
@@ -46,6 +48,10 @@ private slots:
   void on_rotateButton_clicked( );
 
   void on_horizontalSlider_valueChanged( int position );
+
+  void on_flip_h_button_clicked();
+
+  void on_flip_v_button_clicked();
 
 private:
   Ui::ImageWidget *ui;

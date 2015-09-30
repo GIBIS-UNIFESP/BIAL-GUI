@@ -74,7 +74,7 @@ private:
    * @brief updateBoundings is called each time the transformation matrix is updated. <br>
    * This function applys the affone transform to the input image boundings, and fixes
    * negative positions.
-   * @param axis
+   * @param view
    */
   void updateBoundings(size_t axis);
 
@@ -98,51 +98,51 @@ public:
   /**
    * @brief getSlice calculates and returns a QImage with the current slice of the view. <br>
    * @see setCurrentSlice
-   * @param axis
+   * @param view
    * @return
    */
-  QPixmap getSlice( size_t axis );
+  QPixmap getSlice(size_t view );
   /**
    * @brief width is the view width.
-   * @param axis
+   * @param view
    * @return
    */
-  size_t width( size_t axis );
+  size_t width(size_t view );
   /**
    * @brief heigth is the view heigth.
-   * @param axis
+   * @param view
    * @return
    */
-  size_t heigth( size_t axis );
+  size_t heigth(size_t view );
   /**
    * @brief depth is the number of slices of the view.
-   * @param axis
+   * @param view
    * @return
    */
-  size_t depth( size_t axis );
+  size_t depth(size_t view );
   /**
    * @brief currentSlice is the view's current slice.
-   * @param axis
+   * @param view
    * @return
    */
-  size_t currentSlice( size_t axis );
+  size_t currentSlice( size_t view );
   /**
    * @brief currentSlice sets the view's current slice.
-   * @param axis
+   * @param view
    * @param slice
    * @return
    */
-  void setCurrentSlice( size_t axis, size_t slice );
+  void setCurrentSlice(size_t view, size_t slice );
   /**
    * @brief getPosition transforms the scene position to the input image coordinates.
    * @param pos is the graphicsscene position.
-   * @param axis is the view number.
+   * @param view is the view number.
    * @return The input image coordinates.
    */
-  Bial::Point3D getPosition( QPointF pos, size_t axis );
+  Bial::Point3D getPosition(QPointF pos, size_t view );
   /**
    * @brief getTransform returns the transform matrix of the views.
-   * @param axis
+   * @param view
    * @return
    */
   Bial::FastTransform getTransform( size_t axis );
@@ -157,9 +157,19 @@ public:
   void rotateAll90();
   /**
    * @brief rotate90 rotates a view in 90 degrees.
-   * @param axis View axis
+   * @param view View number
    */
-  void rotate90(size_t axis);
+  void rotate90(size_t view);
+  /**
+   * @brief flipH mirrors the current view on X axis.
+   * @param view View number
+   */
+  void flipH(size_t view);
+  /**
+   * @brief flipV mirrors the current view on Y axis.
+   * @param view View number
+   */
+  void flipV(size_t view);
   /**
    * @brief max is the maximum intensity of the input image.
    * @return

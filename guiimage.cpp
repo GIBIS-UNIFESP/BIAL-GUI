@@ -1,5 +1,6 @@
 #include "gdcm.h"
 #include "guiimage.h"
+#include <NiftiHeader.hpp>
 #include <QPixmap>
 #include <QRgb>
 
@@ -14,27 +15,46 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   if( image.Dims( ) == 3 ) {
     COMMENT( "NIfTI image detected.", 2 );
     m_modality = Modality::BW3D;
-    {
-      COMMENT( "Generating Axial affine transform.", 2 );
-      transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
-      transform[ 0 ].Scale( 1, -1, -1 );
-      updateBoundings( 0 );
+    if( Bial::NiftiHeader::IsNiftiFile( fname.toStdString( ) ) ) {
+      {
+        COMMENT( "Generating Axial affine transform.", 2 );
+        transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
+        transform[ 0 ].Scale( 1, -1, -1 );
+        updateBoundings( 0 );
+      }
+      {
+        COMMENT( "Generating Coronal affine transform.", 2 );
+        transform[ 1 ].Rotate( 180.0, Bial::FastTransform::Z ).Rotate( 90.0, Bial::FastTransform::Y );
+        transform[ 1 ].Scale( -1, 1, 1 );
+        updateBoundings( 1 );
+      }
+      {
+        COMMENT( "Generating Sagittal affine transform.", 2 );
+        transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
+        updateBoundings( 2 );
+      }
     }
-    {
-      COMMENT( "Generating Coronal affine transform.", 2 );
-      transform[ 1 ].Rotate( 180.0, Bial::FastTransform::Z ).Rotate( 90.0, Bial::FastTransform::Y );
-      transform[ 1 ].Scale( -1, 1, 1 );
-      updateBoundings( 1 );
-    }
-    {
-      COMMENT( "Generating Sagittal affine transform.", 2 );
-      transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
-      updateBoundings( 2 );
+    else {
+      {
+        COMMENT( "Generating Axial affine transform.", 2 );
+        transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
+        updateBoundings( 0 );
+      }
+      {
+        COMMENT( "Generating Coronal affine transform.", 2 );
+        transform[ 1 ].Rotate( 90.0, Bial::FastTransform::Y );
+        updateBoundings( 1 );
+      }
+      {
+        COMMENT( "Generating Sagittal affine transform.", 2 );
+        transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
+        updateBoundings( 2 );
+      }
     }
     cachedPixmaps.resize( 3 );
     needUpdate.insert( 0, 3, true );
-    for( int axis = 0; axis < m_currentSlice.size( ); ++axis ) {
-      setCurrentSlice( axis, depth( axis ) / 2 );
+    for( int view = 0; view < m_currentSlice.size( ); ++view ) {
+      setCurrentSlice( view, depth( view ) / 2 );
     }
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
@@ -78,21 +98,21 @@ QString GuiImage::fileName( ) {
   return( m_fileName );
 }
 
-QPixmap GuiImage::getSlice( size_t axis ) {
-  size_t slice = currentSlice( axis );
-  COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << axis << ", slice = " << slice, 0 );
-  if( needUpdate[ axis ] ) {
-    if( slice >= depth( axis ) ) {
-      throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
+QPixmap GuiImage::getSlice( size_t view ) {
+  size_t slice = currentSlice( view );
+  COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << view << ", slice = " << slice, 0 );
+  if( needUpdate[ view ] ) {
+    if( slice >= depth( view ) ) {
+      throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( view ) ).
                                             toStdString( ) ) ) );
     }
-    const size_t xsize = width( axis );
-    const size_t ysize = heigth( axis );
+    const size_t xsize = width( view );
+    const size_t ysize = heigth( view );
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
     double factor = 255.0 / ( double ) m_max;
-    const Bial::FastTransform &transf = transform[ axis ];
+    const Bial::FastTransform &transf = transform[ view ];
     if( modality( ) == Modality::BW3D ) {
-      COMMENT("Generating Nifti view.", 2);
+      COMMENT( "Generating Nifti view.", 2 );
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
         for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -110,7 +130,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
       }
     }
     else if( modality( ) == Modality::BW2D ) {
-      COMMENT("Generating Grayscale view.", 2);
+      COMMENT( "Generating Grayscale view.", 2 );
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
         for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -129,7 +149,7 @@ QPixmap GuiImage::getSlice( size_t axis ) {
     }
     else if( modality( ) == Modality::RGB2D ) {
       if( needUpdate[ 0 ] ) {
-        COMMENT("Generating RGB view.", 2);
+        COMMENT( "Generating RGB view.", 2 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -154,44 +174,44 @@ QPixmap GuiImage::getSlice( size_t axis ) {
         cachedPixmaps[ 0 ] = QPixmap::fromImage( res );
         needUpdate[ 0 ] = false;
       }
-      if( axis > 0 ) {
+      if( view > 0 ) {
         res = cachedPixmaps[ 0 ].toImage( );
-        int r( axis == 1 ), g( axis == 2 ), b( axis == 3 );
+        int r( view == 1 ), g( view == 2 ), b( view == 3 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) {
             QRgb clr = scanLine[ x ];
-            scanLine[ x ] = qRgb( qRed(clr) * r, qGreen(clr) * g , qBlue(clr) * b);
+            scanLine[ x ] = qRgb( qRed( clr ) * r, qGreen( clr ) * g, qBlue( clr ) * b );
           }
         }
       }
     }
-    if( needUpdate[ axis ] ) {
-      cachedPixmaps[ axis ] = QPixmap::fromImage( res );
-      needUpdate[ axis ] = false;
+    if( needUpdate[ view ] ) {
+      cachedPixmaps[ view ] = QPixmap::fromImage( res );
+      needUpdate[ view ] = false;
     }
   }
-  return( cachedPixmaps[ axis ] );
+  return( cachedPixmaps[ view ] );
 }
 
-size_t GuiImage::width( size_t axis = 0 ) {
-  return( abs( round( bounding.at( axis ).pMax.x ) ) );
+size_t GuiImage::width( size_t view = 0 ) {
+  return( abs( round( bounding.at( view ).pMax.x ) ) );
 }
 
-size_t GuiImage::heigth( size_t axis = 0 ) {
-  return( abs( round( bounding.at( axis ).pMax.y ) ) );
+size_t GuiImage::heigth( size_t view = 0 ) {
+  return( abs( round( bounding.at( view ).pMax.y ) ) );
 }
 
-size_t GuiImage::depth( size_t axis = 0 ) {
-  return( abs( round( bounding.at( axis ).pMax.z ) ) );
+size_t GuiImage::depth( size_t view = 0 ) {
+  return( abs( round( bounding.at( view ).pMax.z ) ) );
 }
 
-void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
+void GuiImage::setCurrentSlice( size_t view, size_t slice ) {
   size_t sz = m_currentSlice.size( );
-  if( axis < sz ) {
-    if( ( m_currentSlice[ axis ] != slice ) && ( slice < depth( axis ) ) ) {
-      m_currentSlice[ axis ] = slice;
-      needUpdate[ axis ] = true;
+  if( view < sz ) {
+    if( ( m_currentSlice[ view ] != slice ) && ( slice < depth( view ) ) ) {
+      m_currentSlice[ view ] = slice;
+      needUpdate[ view ] = true;
       emit imageUpdated( );
     }
   }
@@ -200,9 +220,9 @@ void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
   }
 }
 
-Bial::Point3D GuiImage::getPosition( QPointF pos, size_t axis ) {
-  Bial::Point3D point( pos.x( ), pos.y( ), ( double ) m_currentSlice[ axis ] );
-  transform[ axis ]( point, &point );
+Bial::Point3D GuiImage::getPosition( QPointF pos, size_t view ) {
+  Bial::Point3D point( pos.x( ), pos.y( ), ( double ) m_currentSlice[ view ] );
+  transform[ view ]( point, &point );
   return( point );
 }
 
@@ -214,12 +234,30 @@ const Bial::Image< int > &GuiImage::getImage( ) const {
   return( image );
 }
 
-void GuiImage::rotate90( size_t axis ) {
+void GuiImage::rotate90( size_t view ) {
   Bial::FastTransform transf;
   transf.Rotate( -90.0, Bial::FastTransform::Z );
-  transform[ axis ] = transf * transform[ axis ].Inverse( );
-  updateBoundings( axis );
-  needUpdate[ axis ] = true;
+  transform[ view ] = transf * transform[ view ].Inverse( );
+  updateBoundings( view );
+  needUpdate[ view ] = true;
+  emit imageUpdated( );
+}
+
+void GuiImage::flipH( size_t view ) {
+  Bial::FastTransform transf;
+  transf.Scale(-1,1,1);
+  transform[ view ] = transf * transform[ view ].Inverse( );
+  updateBoundings( view );
+  needUpdate[ view ] = true;
+  emit imageUpdated( );
+}
+
+void GuiImage::flipV( size_t view ) {
+  Bial::FastTransform transf;
+  transf.Scale(1,-1,1);
+  transform[ view ] = transf * transform[ view ].Inverse( );
+  updateBoundings( view );
+  needUpdate[ view ] = true;
   emit imageUpdated( );
 }
 
@@ -233,8 +271,8 @@ int GuiImage::max( ) {
   return( m_max );
 }
 
-size_t GuiImage::currentSlice( size_t axis ) {
-  return( m_currentSlice[ axis ] );
+size_t GuiImage::currentSlice(size_t view ) {
+  return( m_currentSlice[ view ] );
 }
 
 bool GuiImage::getEqualizeHistogram( ) const {

@@ -50,6 +50,8 @@ void ImageViewer::setController( Controller *value ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
     connect( view, &ImageWidget::sliceChanged, this, &ImageViewer::sliceChanged );
     connect( view, &ImageWidget::rotate, controller, &Controller::rotate90 );
+    connect( view, &ImageWidget::fliph, controller, &Controller::flipH );
+    connect( view, &ImageWidget::flipv, controller, &Controller::flipV );
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
     getScene( axis )->addItem( controller->getPixmapItem( axis ) );

@@ -88,3 +88,11 @@ void ImageWidget::on_horizontalSlider_valueChanged( int position ) {
   emit sliceChanged( m_viewNumber, position );
 
 }
+
+void ImageWidget::on_flip_h_button_clicked( ) {
+  emit fliph( m_viewNumber );
+}
+
+void ImageWidget::on_flip_v_button_clicked( ) {
+  emit flipv( m_viewNumber );
+}

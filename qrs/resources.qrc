@@ -27,6 +27,8 @@
         <file>icons/stop.svg</file>
         <file>icons/3colors.png</file>
         <file>icons/arrows.png</file>
+        <file>icons/flip_h.png</file>
+        <file>icons/flip_v.png</file>
     </qresource>
     <qresource prefix="/translations">
         <file>bial_br.qm</file>
