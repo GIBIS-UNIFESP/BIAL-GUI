@@ -125,7 +125,14 @@ void MainWindow::imageUpdated( ) {
     y[ bin ] = hist[ bin ];
   }
   plot->addGraph( );
+  plot->setInteraction(QCP::iRangeDrag, true);
+  plot->setInteraction(QCP::iRangeZoom, true);
+  plot->graph(0)->clearData();
   plot->graph( 0 )->setData( x, y );
+//  plot->axisRect(0)->setRangeDrag(Qt::Horizontal);
+//  plot->axisRect(0)->setRangeZoom(Qt::Vertical);
+  plot->axisRect(0)->setRangeZoomAxes(plot->xAxis,plot->yAxis);
+  plot->graph(0)->setLineStyle(QCPGraph::lsImpulse);
   plot->xAxis->setLabel( "Intensity" );
   plot->yAxis->setLabel( "Frequency" );
   plot->rescaleAxes( true );
@@ -392,6 +399,7 @@ void MainWindow::on_actionRemove_current_label_triggered( ) {
 }
 
 void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size_t axis ) {
+  Q_UNUSED(buttons)
   GuiImage *img = controller->currentImage( );
   if( img != nullptr ) {
     Bial::Point3D pt = img->getPosition( scnPos, axis );

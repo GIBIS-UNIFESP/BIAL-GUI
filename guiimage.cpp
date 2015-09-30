@@ -82,7 +82,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     equalization[ val ] = std::round( equalization[ val ] );
   }
   COMMENT( "Computing equalized histogram.", 2 );
-  equalized = histogram;
+  equalized = Bial::Signal(histogram.size(),0.0,1.0);
   for( size_t val = 0; val < equalized.size( ); ++val ) {
     equalized[ equalization[ val ] ] = histogram[ val ];
   }
