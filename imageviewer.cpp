@@ -16,7 +16,7 @@ ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
   for( size_t i = 0; i < views.size( ); ++i ) {
     views[ i ] = new ImageWidget( this );
     views[ i ]->hideControls( );
-    views[ i ]->scene( )->installEventFilter( this );
+    getScene( i )->installEventFilter( this );
     views[ i ]->setViewNumber( i );
   }
   layout = new QGridLayout( this );
@@ -49,7 +49,7 @@ void ImageViewer::setController( Controller *value ) {
   for( ImageWidget *view : views ) {
     connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
     connect( view, &ImageWidget::sliceChanged, this, &ImageViewer::sliceChanged );
-    connect( view, &ImageWidget::rotate, controller, &Controller::rotate90);
+    connect( view, &ImageWidget::rotate, controller, &Controller::rotate90 );
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
     getScene( axis )->addItem( controller->getPixmapItem( axis ) );
@@ -79,8 +79,9 @@ void ImageViewer::changeImage( ) {
   }
   DisplayFormat *format = controller->currentFormat( );
   for( size_t axis = 0; axis < 4; ++axis ) {
-    views[ axis ]->scene( )->setOverlay( false );
-    views[ axis ]->scene( )->setOverlayPen( format->overlayColor( ) );
+
+    getScene( axis )->setOverlay( false );
+    getScene( axis )->setOverlayPen( format->overlayColor( ) );
     if( format->hasViewerControls( ) ) {
       views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
       views[ axis ]->setSlice( img->currentSlice( axis ) );
@@ -90,12 +91,17 @@ void ImageViewer::changeImage( ) {
       views[ axis ]->hideControls( );
     }
   }
+  if( format->modality( ) == Modality::RGB2D ) {
+    getScene(1)->setOverlayPen( QPen( Qt::green ) );
+    getScene(2)->setOverlayPen( QPen( Qt::red ) );
+    getScene(3)->setOverlayPen( QPen( Qt::yellow ) );
+  }
   setLayoutType( format->currentLayout( ) );
   setViewMode( format->currentViews( ) );
   for( size_t axis = 0; axis < 4; ++axis ) {
     if( controller ) {
       QRectF r = controller->getPixmapItem( axis )->boundingRect( );
-      views[ axis ]->scene( )->setSceneRect( r );
+      getScene( axis )->setSceneRect( r );
       QGraphicsView *view = views[ axis ]->graphicsView( );
       view->fitInView( controller->getPixmapItem( axis ), Qt::KeepAspectRatio );
     }
@@ -108,12 +114,12 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   GuiImage *img = controller->currentImage( );
   pt.setX( qMin( qMax( pt.x( ), 0.0 ), ( double ) img->width( axis ) ) );
   pt.setY( qMin( qMax( pt.y( ), 0.0 ), ( double ) img->heigth( axis ) ) );
-  views[ axis ]->scene( )->setOverlayPos( pt );
+  getScene( axis )->setOverlayPos( pt );
   Bial::FastTransform transform = img->getTransform( axis );
   Bial::Point3D pt3d = transform( ( double ) pt.x( ),
                                   ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
-  size_t size = controller->currentFormat()->getMaximumNumberOfViews();
+  size_t size = controller->currentFormat( )->getMaximumNumberOfViews( );
   for( size_t other = 0; other < size; ++other ) {
     if( controller->currentFormat( )->overlay( ) ) {
       views[ other ]->scene( )->setOverlay( true );
@@ -237,7 +243,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
         timer.restart( );
         controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
-        emit mouseDragged(scnPos, mouseEvt->buttons( ), axis);
+        emit mouseDragged( scnPos, mouseEvt->buttons( ), axis );
       }
       emit mouseMoved( scnPos, axis );
     }

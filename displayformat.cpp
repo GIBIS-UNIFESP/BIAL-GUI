@@ -19,7 +19,7 @@ BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_showOrientation = false;
   m_showPpmViews = false;
   m_showPpmChannels = false;
-  m_hasOverlay = false;
+  m_hasOverlay = true;
   m_hasLayout = false;
   m_has3Views = false;
   m_has4Views = false;
