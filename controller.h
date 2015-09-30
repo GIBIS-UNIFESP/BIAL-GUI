@@ -16,9 +16,9 @@ class ThumbsWidget;
 class Controller : public QObject {
   Q_OBJECT
 
-  DisplayFormat * bwFormat;
-  DisplayFormat * rgbFormat;
-  DisplayFormat * niftiFormat;
+  DisplayFormat * bw2dFormat;
+  DisplayFormat * rgb2dFormat;
+  DisplayFormat * bw3dFormat;
   /**
    *
    * @brief m_images holds all opened images.
@@ -134,10 +134,12 @@ public:
    * @brief currentFormat
    */
   DisplayFormat * currentFormat( );
-
+  /**
+   * @brief getPixmapItem returns the PixmapItem of the view.
+   * @param axis is the number of the view;
+   * @return
+   */
   QGraphicsPixmapItem* getPixmapItem( size_t axis );
-  DisplayFormat * getNiftiFormat() const;
-  void setNiftiFormat(DisplayFormat * value);
 
 signals:
   /**
@@ -194,15 +196,23 @@ public slots:
    */
   void setCurrentSlice( size_t axis, size_t slice );
   /**
-   * @brief setZoom
+   * @brief setZoom updates the zoom factor.
    * @param value
    */
   void setZoom( int value );
-
-
+  /**
+   * @brief setInterpolation switches between smoot and fast interpolation.
+   * @param isSmooth
+   */
   void setInterpolation(bool isSmooth);
-
+  /**
+   * @brief rotateAll90 rotates all views in 90 degrees.
+   */
   void rotateAll90();
+  /**
+   * @brief rotate90 rotates a view in 90 degrees.
+   * @param axis View axis
+   */
   void rotate90(size_t axis);
 private:
   /**

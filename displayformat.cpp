@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QSettings>
 
-BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
+BW2DFormat::BW2DFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::BW2D;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
@@ -28,7 +28,7 @@ BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
   loadSettings();
 }
 
-NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
+BW3DFormat::BW3DFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::BW3D;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW012;
@@ -52,7 +52,7 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
   loadSettings();
 }
 
-RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
+RGB2DFormat::RGB2DFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_modality = Modality::RGB2D;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
@@ -216,13 +216,13 @@ void DisplayFormat::toggleOverlay( ) {
   setOverlay( !overlay( ) );
 }
 
-void BWFormat::setNumberOfViews( int numberOfViews ) {
+void BW2DFormat::setNumberOfViews( int numberOfViews ) {
   if( numberOfViews != 1 ) {
     throw std::invalid_argument( "The number of views cannot be changed!" );
   }
 }
 
-void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
+void BW3DFormat::setNumberOfViews( int numberOfViews ) {
   COMMENT( "Number of views set to " << numberOfViews << ".", 0 );
   if( ( numberOfViews != 1 ) && ( numberOfViews != 3 ) ) {
     throw std::invalid_argument( "Invalid number of views!" );
@@ -241,7 +241,7 @@ void NIfTIFormat::setNumberOfViews( int numberOfViews ) {
   emit updated( );
 }
 
-void RGBFormat::setNumberOfViews( int numberOfViews ) {
+void RGB2DFormat::setNumberOfViews( int numberOfViews ) {
   if( ( numberOfViews != 1 ) && ( numberOfViews != 4 ) ) {
     throw std::invalid_argument( "Invalid number of views!" );
   }

@@ -5,18 +5,18 @@
 #include <QFile>
 #include <qsettings.h>
 
-Controller::Controller( int views, QObject *parent ) : QObject( parent ), bwFormat(
-    new BWFormat( this ) ), rgbFormat( new RGBFormat( this ) ), niftiFormat( new NIfTIFormat( this ) ) {
+Controller::Controller( int views, QObject *parent ) : QObject( parent ), bw2dFormat(
+    new BW2DFormat( this ) ), rgb2dFormat( new RGB2DFormat( this ) ), bw3dFormat( new BW3DFormat( this ) ) {
   for( int item = 0; item < views; ++item ) {
     m_pixmapItems.append( new QGraphicsPixmapItem( ) );
   }
   m_currentImagePos = -1;
-  connect( rgbFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
-  connect( niftiFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
-  connect( bwFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
-  connect( rgbFormat, &DisplayFormat::updated, this, &Controller::update );
-  connect( niftiFormat, &DisplayFormat::updated, this, &Controller::update );
-  connect( bwFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( rgb2dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( bw3dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( bw2dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( rgb2dFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( bw3dFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( bw2dFormat, &DisplayFormat::updated, this, &Controller::update );
 }
 
 GuiImage* Controller::currentImage( ) {
@@ -199,13 +199,13 @@ void Controller::setInterpolation( bool isSmooth ) {
   }
 }
 
-void Controller::rotateAll90() {
-  currentImage()->rotateAll90();
+void Controller::rotateAll90( ) {
+  currentImage( )->rotateAll90( );
   emit currentImageChanged( );
 }
 
-void Controller::rotate90(size_t axis) {
-  currentImage( )->rotate90(axis);
+void Controller::rotate90( size_t axis ) {
+  currentImage( )->rotate90( axis );
   emit currentImageChanged( );
 }
 
@@ -236,13 +236,13 @@ void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
 DisplayFormat* Controller::currentFormat( ) {
   Modality mod = currentImage( )->modality( );
   if( mod == Modality::RGB2D ) {
-    return( rgbFormat );
+    return( rgb2dFormat );
   }
   else if( mod == Modality::BW3D ) {
-    return( niftiFormat );
+    return( bw3dFormat );
   }
   else {
-    return( bwFormat );
+    return( bw2dFormat );
   }
 }
 

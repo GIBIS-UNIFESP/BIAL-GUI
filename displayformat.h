@@ -106,21 +106,21 @@ protected:
   QColor m_overlayColor;
 };
 
-class BWFormat : public DisplayFormat {
+class BW2DFormat : public DisplayFormat {
 public:
-  BWFormat( QObject *parent = 0 );
+  BW2DFormat( QObject *parent = 0 );
   void setNumberOfViews( int numberOfViews );
 };
 
-class NIfTIFormat : public DisplayFormat {
+class BW3DFormat : public DisplayFormat {
 public:
-  NIfTIFormat( QObject *parent = 0 );
+  BW3DFormat( QObject *parent = 0 );
   void setNumberOfViews( int numberOfViews );
 };
 
-class RGBFormat : public DisplayFormat {
+class RGB2DFormat : public DisplayFormat {
 public:
-  RGBFormat( QObject *parent = 0 );
+  RGB2DFormat( QObject *parent = 0 );
   void setNumberOfViews( int numberOfViews );
 };
 
