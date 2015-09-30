@@ -1,6 +1,7 @@
 #include "gdcm.h"
 #include "guiimage.h"
 #include <QPixmap>
+#include <QRgb>
 
 GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
                                                                                    fname.toStdString( ) ) ), m_fileName(
@@ -9,11 +10,10 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   m_equalizeHistogram = false;
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
   m_currentSlice.insert( 0, 4, 0 );
-  image.SetRange( 0, 255 );
   m_max = image.Maximum( );
   if( image.Dims( ) == 3 ) {
     COMMENT( "NIfTI image detected.", 2 );
-    m_modality = Modality::NIfTI;
+    m_modality = Modality::BW3D;
     {
       COMMENT( "Generating Axial affine transform.", 2 );
       transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
@@ -39,7 +39,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
     COMMENT( "PPM image detected.", 2 );
-    m_modality = Modality::RGB;
+    m_modality = Modality::RGB2D;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
     cachedPixmaps.resize( 4 );
@@ -47,7 +47,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
     COMMENT( "Gray image detected.", 2 );
-    m_modality = Modality::BW;
+    m_modality = Modality::BW2D;
     Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
     bounding[ 0 ] = box;
     cachedPixmaps.resize( 1 );
@@ -89,8 +89,10 @@ QPixmap GuiImage::getSlice( size_t axis ) {
     const size_t xsize = width( axis );
     const size_t ysize = heigth( axis );
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
+    double factor = 255.0 / ( double ) m_max;
     const Bial::FastTransform &transf = transform[ axis ];
-    if( modality( ) == Modality::NIfTI ) {
+    if( modality( ) == Modality::BW3D ) {
+      COMMENT("Generating Nifti view.", 2);
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
         for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -102,11 +104,13 @@ QPixmap GuiImage::getSlice( size_t axis ) {
           if( m_equalizeHistogram ) {
             pixel = static_cast< int >( equalization[ pixel ] );
           }
+          pixel *= factor;
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
     }
-    else if( modality( ) == Modality::BW ) {
+    else if( modality( ) == Modality::BW2D ) {
+      COMMENT("Generating Grayscale view.", 2);
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
         for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -118,12 +122,14 @@ QPixmap GuiImage::getSlice( size_t axis ) {
           if( m_equalizeHistogram ) {
             pixel = static_cast< int >( equalization[ equalization.Bin( pixel ) ] );
           }
+          pixel *= factor;
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
         }
       }
     }
-    else if( modality( ) == Modality::RGB ) {
-      if( axis == 0 ) {
+    else if( modality( ) == Modality::RGB2D ) {
+      if( needUpdate[ 0 ] ) {
+        COMMENT("Generating RGB view.", 2);
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) { /*  */
@@ -139,30 +145,31 @@ QPixmap GuiImage::getSlice( size_t axis ) {
               g = static_cast< int >( equalization[ equalization.Bin( g ) ] );
               b = static_cast< int >( equalization[ equalization.Bin( b ) ] );
             }
+            r *= factor;
+            g *= factor;
+            b *= factor;
             scanLine[ x ] = qRgb( r, g, b );
           }
         }
+        cachedPixmaps[ 0 ] = QPixmap::fromImage( res );
+        needUpdate[ 0 ] = false;
       }
-      else {
+      if( axis > 0 ) {
+        res = cachedPixmaps[ 0 ].toImage( );
         int r( axis == 1 ), g( axis == 2 ), b( axis == 3 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int pixel = 0;
-            if( image.ValidPixel( pos.x, pos.y ) ) {
-              pixel = image( pos.x, pos.y, axis - 1 );
-            }
-            if( m_equalizeHistogram ) {
-              pixel = static_cast< int >( equalization[ equalization.Bin( pixel ) ] );
-            }
-            scanLine[ x ] = qRgb( pixel * r, pixel * g, pixel * b );
+          for( size_t x = 0; x < xsize; ++x ) {
+            QRgb clr = scanLine[ x ];
+            scanLine[ x ] = qRgb( qRed(clr) * r, qGreen(clr) * g , qBlue(clr) * b);
           }
         }
       }
     }
-    cachedPixmaps[ axis ] = QPixmap::fromImage( res );
-    needUpdate[ axis ] = false;
+    if( needUpdate[ axis ] ) {
+      cachedPixmaps[ axis ] = QPixmap::fromImage( res );
+      needUpdate[ axis ] = false;
+    }
   }
   return( cachedPixmaps[ axis ] );
 }
@@ -248,8 +255,9 @@ void GuiImage::setEqualizeHistogram( bool equalizeHistogram ) {
 
 
 const Bial::Signal &GuiImage::getHistogram( ) const {
-  if( m_equalizeHistogram )
+  if( m_equalizeHistogram ) {
     return( equalized );
+  }
   return( histogram );
 }
 

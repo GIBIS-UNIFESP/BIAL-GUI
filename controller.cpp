@@ -157,7 +157,7 @@ void Controller::loadNextImage( ) {
 void Controller::changeOthersSlices( QPointF posF, size_t axis ) {
   COMMENT( "Changing slice position of other frames based on image position.", 2 );
   if( currentImage( ) ) {
-    if( ( currentImage( )->modality( ) == Modality::NIfTI ) ) {
+    if( ( currentImage( )->modality( ) == Modality::BW3D ) ) {
       Bial::FastTransform transform = currentImage( )->getTransform( axis );
       Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
                                     ( double ) currentImage( )->currentSlice( axis ) );
@@ -235,10 +235,10 @@ void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
 
 DisplayFormat* Controller::currentFormat( ) {
   Modality mod = currentImage( )->modality( );
-  if( mod == Modality::RGB ) {
+  if( mod == Modality::RGB2D ) {
     return( rgbFormat );
   }
-  else if( mod == Modality::NIfTI ) {
+  else if( mod == Modality::BW3D ) {
     return( niftiFormat );
   }
   else {

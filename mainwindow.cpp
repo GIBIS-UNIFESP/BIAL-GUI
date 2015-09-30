@@ -95,21 +95,21 @@ void MainWindow::currentImageChanged( ) {
   if( controller->currentImage( ) ) {
     DisplayFormat *format = controller->currentFormat( );
 
-    ui->menuLayout->setEnabled( format->modality( ) != Modality::BW );
+    ui->menuLayout->setEnabled( format->modality( ) != Modality::BW2D );
     ui->menuOverlay->setEnabled( format->hasOverlay( ) );
 
     ui->actionGrid->setVisible( format->showOrientation( ) );
     ui->actionHorizontal->setVisible( format->showOrientation( ) );
     ui->actionVertical->setVisible( format->showOrientation( ) );
 
-    ui->actionAxial->setVisible( format->modality( ) == Modality::NIfTI );
-    ui->actionCoronal->setVisible( format->modality( ) == Modality::NIfTI );
-    ui->actionSagittal->setVisible( format->modality( ) == Modality::NIfTI );
+    ui->actionAxial->setVisible( format->modality( ) == Modality::BW3D );
+    ui->actionCoronal->setVisible( format->modality( ) == Modality::BW3D );
+    ui->actionSagittal->setVisible( format->modality( ) == Modality::BW3D );
 
-    ui->actionRed_channel->setVisible( format->modality( ) == Modality::RGB );
-    ui->actionGreen_channel->setVisible( format->modality( ) == Modality::RGB );
-    ui->actionBlue_channel->setVisible( format->modality( ) == Modality::RGB );
-    ui->actionAll_channels->setVisible( format->modality( ) == Modality::RGB );
+    ui->actionRed_channel->setVisible( format->modality( ) == Modality::RGB2D );
+    ui->actionGreen_channel->setVisible( format->modality( ) == Modality::RGB2D );
+    ui->actionBlue_channel->setVisible( format->modality( ) == Modality::RGB2D );
+    ui->actionAll_channels->setVisible( format->modality( ) == Modality::RGB2D );
 
     ui->action3_Views->setVisible( format->has3Views( ) );
     ui->action4_Views->setVisible( format->has4Views( ) );
@@ -397,20 +397,20 @@ void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size
     Bial::Point3D pt = img->getPosition( scnPos, axis );
     QString msg;
     int max = img->max( );
-    if( img->modality( ) == Modality::NIfTI ) {
+    if( img->modality( ) == Modality::BW3D ) {
       if( img->getImage( ).ValidPixel( pt.x, pt.y, pt.z ) ) {
         int color = img->getImage( ).at( pt.x, pt.y, pt.z );
         msg = QString( "Axis %1 : (%2, %3, %4) = %5/%6" ).arg( axis ).arg( ( int ) pt.x ).arg(
           ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max );
       }
     }
-    else if( img->modality( ) == Modality::BW ) {
+    else if( img->modality( ) == Modality::BW2D ) {
       if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
         int color = img->getImage( ).at( pt.x, pt.y );
         msg = QString( "(%1, %2) = %3/%4" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( color ).arg( max );
       }
     }
-    else if( img->modality( ) == Modality::RGB ) {
+    else if( img->modality( ) == Modality::RGB2D ) {
       if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
         int r = img->getImage( ).at( pt.x, pt.y, 0 );
         int g = img->getImage( ).at( pt.x, pt.y, 1 );

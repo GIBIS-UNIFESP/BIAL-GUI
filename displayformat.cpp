@@ -5,7 +5,7 @@
 #include <QSettings>
 
 BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
-  m_modality = Modality::BW;
+  m_modality = Modality::BW2D;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
   defaultViews = Views::SHOW0;
@@ -29,7 +29,7 @@ BWFormat::BWFormat( QObject *parent ) : DisplayFormat( parent ) {
 }
 
 NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
-  m_modality = Modality::NIfTI;
+  m_modality = Modality::BW3D;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW012;
   defaultViews = Views::SHOW0;
@@ -53,7 +53,7 @@ NIfTIFormat::NIfTIFormat( QObject *parent ) : DisplayFormat( parent ) {
 }
 
 RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
-  m_modality = Modality::RGB;
+  m_modality = Modality::RGB2D;
   m_currentLayout = Layout::GRID;
   m_currentViews = Views::SHOW0;
   defaultViews = Views::SHOW0;

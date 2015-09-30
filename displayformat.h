@@ -7,7 +7,7 @@
 #include <array>
 
 enum class Modality {
-  BW, RGB, NIfTI
+  BW2D, RGB2D, BW3D
 };
 enum class Layout {
   GRID, HORIZONTAL, VERTICAL
