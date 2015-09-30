@@ -99,7 +99,7 @@ void ControlsWidget::imageChanged( ) {
   ui->groupBoxPpmChannels->setVisible( format->showPpmChannels( ) );
   ui->rotate->setVisible( format->rotateSingle( ) );
   ui->rotateAll->setVisible( format->rotateAll( ) );
-  ui->groupBoxLabels->setVisible( img->hasLabels( ) );
+  ui->groupBoxLabels->setVisible( false );
 
   /* TODO Continue ... */
 }
