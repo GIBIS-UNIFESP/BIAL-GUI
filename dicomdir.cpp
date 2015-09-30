@@ -22,8 +22,21 @@ QString ImageInfo::getFileName( ) {
       imgpath[ pos ] = DIR_SEPARATOR;
     }
   }
-//  QStringList list = imgpath.split( DIR_SEPARATOR );
-  return( dir.absoluteFilePath( imgpath ) );
+  QStringList list = imgpath.split( DIR_SEPARATOR );
+  QFileInfo info;
+  for(QString str : list){
+    info.setFile(dir.absoluteFilePath(str));
+    for( int i = 0; i < 2 && !info.exists(); ++ i) {
+      if(i == 0){
+        str = str.toUpper();
+      }else{
+        str = str.toLower();
+      }
+      info.setFile(dir.absoluteFilePath(str));
+    }
+    dir.cd(str);
+  }
+  return( info.absoluteFilePath() );
 }
 
 ImageInfo::ImageInfo( ) {

@@ -113,7 +113,7 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   Bial::Point3D pt3d = transform( ( double ) pt.x( ),
                                   ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
-  for( int other = 0; other < controller->currentFormat()->getNumberOfViews(); ++other ) {
+  for( size_t other = 0; other < (size_t) controller->currentFormat()->getNumberOfViews(); ++other ) {
     if( controller->currentFormat( )->overlay( ) ) {
       views[ other ]->scene( )->setOverlay( true );
       if( other != axis ) {
