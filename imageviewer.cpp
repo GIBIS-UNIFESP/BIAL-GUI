@@ -94,8 +94,8 @@ void ImageViewer::changeImage( ) {
     }
   }
   if( format->modality( ) == Modality::RGB2D ) {
-    getScene(1)->setOverlayPen( QPen( Qt::cyan ) );
-    getScene(2)->setOverlayPen( QPen( Qt::magenta ) );
+    getScene(1)->setOverlayPen( QPen( Qt::green ) );
+    getScene(2)->setOverlayPen( QPen( Qt::red ) );
     getScene(3)->setOverlayPen( QPen( Qt::yellow ) );
   }
   setLayoutType( format->currentLayout( ) );

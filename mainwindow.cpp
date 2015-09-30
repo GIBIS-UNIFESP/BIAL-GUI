@@ -129,8 +129,8 @@ void MainWindow::imageUpdated( ) {
   plot->setInteraction(QCP::iRangeZoom, true);
   plot->graph(0)->clearData();
   plot->graph( 0 )->setData( x, y );
-//  plot->axisRect(0)->setRangeDrag(Qt::Horizontal);
-//  plot->axisRect(0)->setRangeZoom(Qt::Vertical);
+  plot->axisRect(0)->setRangeDrag(Qt::Vertical);
+  plot->axisRect(0)->setRangeZoom(Qt::Vertical);
   plot->axisRect(0)->setRangeZoomAxes(plot->xAxis,plot->yAxis);
   plot->graph(0)->setLineStyle(QCPGraph::lsImpulse);
   plot->xAxis->setLabel( "Intensity" );

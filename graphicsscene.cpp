@@ -35,7 +35,7 @@ void GraphicsScene::drawForeground( QPainter *painter, const QRectF &rect ) {
   if( m_overlay ) {
     painter->setRenderHint( QPainter::Antialiasing );
     painter->setPen( m_overlayPen );
-    painter->setOpacity( 0.5 );
+//    painter->setOpacity( 1.0 );
     painter->drawLine( m_overlayPos.x( ), 0, m_overlayPos.x( ), height( ) ); /* vertical */
     painter->drawLine( 0, m_overlayPos.y( ), width( ), m_overlayPos.y( ) ); /* horizontal */
   }
