@@ -65,7 +65,7 @@ RGBFormat::RGBFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_showPpmViews = true;
   m_showOrientation = false;
   m_showPpmChannels = true;
-  m_hasOverlay = false;
+  m_hasOverlay = true;
   m_hasLayout = false;
   m_has3Views = false;
   m_has4Views = true;

@@ -104,7 +104,7 @@ void ImageViewer::changeImage( ) {
 }
 
 void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
-  COMMENT( "ImageViewer::updateOverlay", 0 );
+  COMMENT( "ImageViewer::updateOverlay", 2 );
   GuiImage *img = controller->currentImage( );
   pt.setX( qMin( qMax( pt.x( ), 0.0 ), ( double ) img->width( axis ) ) );
   pt.setY( qMin( qMax( pt.y( ), 0.0 ), ( double ) img->heigth( axis ) ) );
@@ -113,7 +113,7 @@ void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
   Bial::Point3D pt3d = transform( ( double ) pt.x( ),
                                   ( double ) pt.y( ),
                                   ( double ) img->currentSlice( axis ) );
-  for( size_t other = 0; other < 3; ++other ) {
+  for( int other = 0; other < controller->currentFormat()->getNumberOfViews(); ++other ) {
     if( controller->currentFormat( )->overlay( ) ) {
       views[ other ]->scene( )->setOverlay( true );
       if( other != axis ) {
