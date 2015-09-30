@@ -186,10 +186,6 @@ size_t GuiImage::depth( size_t axis = 0 ) {
   return( abs( round( bounding.at( axis ).pMax.z ) ) );
 }
 
-bool GuiImage::hasLabels( ) {
-  return( false );
-}
-
 void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
   size_t sz = m_currentSlice.size( );
   if( axis < sz ) {
