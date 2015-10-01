@@ -14,7 +14,6 @@ ControlsWidget::ControlsWidget( QWidget *parent ) : QWidget( parent ), ui( new U
   ui->pushButton_3RGB->hide( );
 /*  ui->groupBoxEditor->hide( ); */
 
-  ui->pushButtonFitInView->setEnabled( false );
   ui->horizontalSliderZoom->setEnabled( false );
   ui->horizontalSliderBrightness->setEnabled( false );
   ui->horizontalSliderContrast->setEnabled( false );
@@ -98,7 +97,6 @@ void ControlsWidget::imageChanged( ) {
   ui->groupBoxPpmViews->setVisible( format->showPpmViews( ) );
   ui->groupBoxPpmChannels->setVisible( format->showPpmChannels( ) );
   ui->rotate->setVisible( format->rotateSingle( ) );
-  ui->rotateAll->setVisible( format->rotateAll( ) );
   ui->groupBoxLabels->setVisible( false );
 
   /* TODO Continue ... */
@@ -208,16 +206,16 @@ void ControlsWidget::on_pushButtonInterpolation_clicked( ) {
   controller->setInterpolation( ui->pushButtonInterpolation->isChecked( ) );
 }
 
-void ControlsWidget::on_rotateAll_clicked( ) {
-  controller->rotateAll90( );
-}
-
 void ControlsWidget::on_rotate_clicked( ) {
   controller->rotateAll90( );
 }
 
 void ControlsWidget::on_pushButtonHistogramNormalization_clicked( ) {
-  if(controller->currentImage()){
-    controller->currentImage()->setEqualizeHistogram(ui->pushButtonHistogramNormalization->isChecked());
+  if( controller->currentImage( ) ) {
+    controller->currentImage( )->setEqualizeHistogram( ui->pushButtonHistogramNormalization->isChecked( ) );
   }
+}
+
+void ControlsWidget::on_pushButtonFitInView_clicked( ) {
+  emit controller->currentImageChanged();
 }

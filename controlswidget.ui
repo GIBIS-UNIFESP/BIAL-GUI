@@ -758,20 +758,6 @@
           <item row="2" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QPushButton" name="rotateAll">
-              <property name="toolTip">
-               <string>Rotate all</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/rotate.png</normaloff>:/icons/rotate.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="rotate">
               <property name="toolTip">
                <string>Rotate</string>

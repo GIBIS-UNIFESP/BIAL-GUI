@@ -62,11 +62,11 @@ private slots:
 
   void on_pushButtonInterpolation_clicked();
 
-  void on_rotateAll_clicked();
-
   void on_rotate_clicked();
 
   void on_pushButtonHistogramNormalization_clicked();
+
+  void on_pushButtonFitInView_clicked();
 
 private:
   Ui::ControlsWidget *ui;
