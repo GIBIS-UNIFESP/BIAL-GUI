@@ -241,7 +241,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
   if( mouseEvt ) {
     QPointF scnPos = mouseEvt->scenePos( );
     if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseMove ) {
-      if( dragging && ( timer.elapsed( ) > 100 ) ) {
+      if( dragging && ( timer.elapsed( ) > 25 ) ) {
         timer.restart( );
         controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );

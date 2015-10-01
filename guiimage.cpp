@@ -6,8 +6,8 @@
 #include <QRgb>
 #include <QTime>
 
-//#include <QDebug>
-//#include <QTime>
+#include <QDebug>
+#include <QTime>
 
 
 GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
@@ -84,7 +84,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   Bial::Signal levi = histogram;
   levi[ 0 ] = 0;
   levi.Equalize( );
-  equalization.resize(levi.size());
+  equalization.resize( levi.size( ) );
   for( size_t val = 0; val < levi.size( ); ++val ) {
     equalization[ val ] = std::round( levi[ val ] );
   }
@@ -120,32 +120,16 @@ QPixmap GuiImage::getSlice( size_t view ) {
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
     double factor = 255.0 / ( double ) m_max;
     const Bial::FastTransform &transf = transform[ view ];
-    if( modality( ) == Modality::BW3D ) {
-      COMMENT( "Generating Nifti view.", 2 );
+    if( modality( ) == Modality::BW3D || modality() == Modality::BW2D) {
+      COMMENT( "Generating BW view.", 2 );
+#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor)
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-        for( size_t x = 0; x < xsize; ++x ) { /*  */
+        for( size_t x = 0; x < xsize; ++x ) {
           int pixel = 0;
           int xx, yy, zz;
           transf( x, y, slice, &xx, &yy, &zz );
           pixel = image( xx, yy, zz );
-          if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalization[ pixel ] );
-          }
-          pixel *= factor;
-          scanLine[ x ] = qRgb( pixel, pixel, pixel );
-        }
-      }
-    }
-    else if( modality( ) == Modality::BW2D ) {
-      COMMENT( "Generating Grayscale view.", 2 );
-      for( size_t y = 0; y < ysize; ++y ) {
-        QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-        for( size_t x = 0; x < xsize; ++x ) { /*  */
-          int pixel = 0;
-          int xx, yy, zz;
-          transf( x, y, slice, &xx, &yy, &zz );
-          pixel = image( xx, yy );
           if( m_equalizeHistogram ) {
             pixel = equalization[ pixel ];
           }
@@ -157,24 +141,24 @@ QPixmap GuiImage::getSlice( size_t view ) {
     else if( modality( ) == Modality::RGB2D ) {
       if( needUpdate[ 0 ] ) {
         COMMENT( "Generating RGB view.", 2 );
+        size_t disp1 = image.ChannelSize( );
+        size_t disp2 = image.ChannelSize( ) * 2;
+#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor, disp1, disp2)
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            int r( 0 ), g( 0 ), b( 0 );
+          for( size_t x = 0; x < xsize; ++x ) {
             int xx, yy, zz;
             transf( x, y, slice, &xx, &yy, &zz );
-            r = image( xx, yy, 0 );
-            g = image( xx, yy, 1 );
-            b = image( xx, yy, 2 );
+            size_t pos = image.Position( xx, yy );
+            int r = image[ pos ];
+            int g = image[ pos + disp1 ];
+            int b = image[ pos + disp2 ];
             if( m_equalizeHistogram ) {
               r = equalization[ r ];
               g = equalization[ g ];
               b = equalization[ b ];
             }
-            r *= factor;
-            g *= factor;
-            b *= factor;
-            scanLine[ x ] = qRgb( r, g, b );
+            scanLine[ x ] = qRgb( r * factor, g * factor, b * factor);
           }
         }
         cachedPixmaps[ 0 ] = QPixmap::fromImage( res );
@@ -306,7 +290,7 @@ const Bial::Signal &GuiImage::getHistogram( ) const {
 int GuiImage::getPixel( int x, int y, int z ) {
   int color = 0;
   if( modality( ) == Modality::BW2D ) {
-    if( image.ValidPixel( x, y, z ) ) {
+    if( image.ValidPixel( x, y ) ) {
       color = image.at( x, y );
     }
   }
