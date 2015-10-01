@@ -1,8 +1,10 @@
 #include "gdcm.h"
 #include "guiimage.h"
 #include <NiftiHeader.hpp>
+#include <QDebug>
 #include <QPixmap>
 #include <QRgb>
+#include <QTime>
 
 GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
         fname.toStdString( ) ) ), m_fileName(
@@ -72,11 +74,12 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   }
   COMMENT( "Computing equalizaztion transform.", 2 );
   histogram = Bial::Signal::ZeroStartHistogram( image );
-  equalization = histogram;
-  equalization[ 0 ] = 0;
-  equalization.Equalize( );
-  for( size_t val = 0; val < equalization.size( ); ++val ) {
-    equalization[ val ] = std::round( equalization[ val ] );
+  Bial::Signal levi = histogram;
+  levi[ 0 ] = 0;
+  levi.Equalize( );
+  equalization.resize(levi.size());
+  for( size_t val = 0; val < levi.size( ); ++val ) {
+    equalization[ val ] = std::round( levi[ val ] );
   }
   COMMENT( "Computing equalized histogram.", 2 );
   equalized = Bial::Signal(histogram.size(),0.0,1.0);
@@ -136,7 +139,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
             pixel = image( pos.x, pos.y );
           }
           if( m_equalizeHistogram ) {
-            pixel = static_cast< int >( equalization[ equalization.Bin( pixel ) ] );
+            pixel = equalization[ pixel ];
           }
           pixel *= factor;
           scanLine[ x ] = qRgb( pixel, pixel, pixel );
@@ -156,9 +159,9 @@ QPixmap GuiImage::getSlice( size_t view ) {
               b = image( pos.x, pos.y, 2 );
             }
             if( m_equalizeHistogram ) {
-              r = static_cast< int >( equalization[ equalization.Bin( r ) ] );
-              g = static_cast< int >( equalization[ equalization.Bin( g ) ] );
-              b = static_cast< int >( equalization[ equalization.Bin( b ) ] );
+              r = equalization[ r ];
+              g = equalization[ g ];
+              b = equalization[ b ];
             }
             r *= factor;
             g *= factor;
