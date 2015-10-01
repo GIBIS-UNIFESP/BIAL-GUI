@@ -1,57 +1,100 @@
+#include "gdcm.h"
 #include "guiimage.h"
+#include <NiftiHeader.hpp>
+#include <QDebug>
 #include <QPixmap>
+#include <QRgb>
+#include <QTime>
 
-GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), m_fileName( fname ) {
-  image = Bial::Image< int >::Read( fname.toStdString( ) );
+#include <QDebug>
+#include <QTime>
+
+
+GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image( GDCM::OpenGImage(
+                                                                                   fname.toStdString( ) ) ), m_fileName(
+    fname ) {
   transform.resize( 4 );
+  m_equalizeHistogram = false;
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
-  m_currentSlice.resize( 4 );
-
+  m_currentSlice.insert( 0, 4, 0 );
   m_max = image.Maximum( );
   if( image.Dims( ) == 3 ) {
     COMMENT( "NIfTI image detected.", 2 );
-    m_modality = Modality::NIfTI;
-    {
-      COMMENT( "Generating Axial affine transform.", 2 );
-      transform[ 0 ].Rotate( 90.0, Bial::Transform3D::X ).Rotate( 90.0, Bial::Transform3D::Y );
-      Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-      transform[ 0 ]( start, &start );
-      transform[ 0 ]( end, &end );
-      bounding[ 0 ] = Bial::BBox( start, end );
-      transform[ 0 ] = transform[ 0 ].Inverse( );
-      transform[ 0 ].Translate( bounding[ 0 ].pMin.x, bounding[ 0 ].pMin.y, bounding[ 0 ].pMin.z );
-      bounding[ 0 ] = bounding[ 0 ].Normalized( );
+    m_modality = Modality::BW3D;
+    if( Bial::NiftiHeader::IsNiftiFile( fname.toStdString( ) ) ) {
+      {
+        COMMENT( "Generating Axial affine transform.", 2 );
+        transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
+        transform[ 0 ].Scale( 1, -1, -1 );
+        updateBoundings( 0 );
+      }
+      {
+        COMMENT( "Generating Coronal affine transform.", 2 );
+        transform[ 1 ].Rotate( 180.0, Bial::FastTransform::Z ).Rotate( 90.0, Bial::FastTransform::Y );
+        transform[ 1 ].Scale( -1, 1, 1 );
+        updateBoundings( 1 );
+      }
+      {
+        COMMENT( "Generating Sagittal affine transform.", 2 );
+        transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
+        updateBoundings( 2 );
+      }
     }
-    {
-      COMMENT( "Generating Coronal affine transform.", 2 );
-      transform[ 1 ].Rotate( 180.0, Bial::Transform3D::Z ).Rotate( 90.0, Bial::Transform3D::Y );
-      Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-      transform[ 1 ]( start, &start );
-      transform[ 1 ]( end, &end );
-      bounding[ 1 ] = Bial::BBox( start, end );
-      transform[ 1 ] = transform[ 1 ].Inverse( );
-      transform[ 1 ].Translate( bounding[ 1 ].pMin.x, bounding[ 1 ].pMin.y, bounding[ 1 ].pMin.z );
-      bounding[ 1 ] = bounding[ 1 ].Normalized( );
+    else {
+      {
+        COMMENT( "Generating Axial affine transform.", 2 );
+        transform[ 0 ].Rotate( 90.0, Bial::FastTransform::X ).Rotate( 90.0, Bial::FastTransform::Y );
+        updateBoundings( 0 );
+      }
+      {
+        COMMENT( "Generating Coronal affine transform.", 2 );
+        transform[ 1 ].Rotate( 90.0, Bial::FastTransform::Y );
+        updateBoundings( 1 );
+      }
+      {
+        COMMENT( "Generating Sagittal affine transform.", 2 );
+        transform[ 2 ].Rotate( 180.0, Bial::FastTransform::Z );
+        updateBoundings( 2 );
+      }
     }
-    {
-      COMMENT( "Generating Sagittal affine transform.", 2 );
-      transform[ 2 ].Rotate( 180.0, Bial::Transform3D::Z );
-      Bial::Point3D start, end( image.size( 0 ), image.size( 1 ), image.size( 2 ) );
-      transform[ 2 ]( start, &start );
-      transform[ 2 ]( end, &end );
-      bounding[ 2 ] = Bial::BBox( start, end );
-      transform[ 2 ] = transform[ 2 ].Inverse( );
-      transform[ 2 ].Translate( bounding[ 2 ].pMin.x, bounding[ 2 ].pMin.y, bounding[ 2 ].pMin.z );
-      bounding[ 2 ] = bounding[ 2 ].Normalized( );
+    cachedPixmaps.resize( 3 );
+    needUpdate.insert( 0, 3, true );
+    for( int view = 0; view < m_currentSlice.size( ); ++view ) {
+      setCurrentSlice( view, depth( view ) / 2 );
     }
-    for(int axis = 0; axis < m_currentSlice.size(); ++axis ) {
-      setCurrentSlice(axis, depth(axis)/2 );
-    }
-  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
-    m_modality = Modality::RGB;
-  } else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
-    m_modality = Modality::BW;
   }
+  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
+    COMMENT( "PPM image detected.", 2 );
+    m_modality = Modality::RGB2D;
+    Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
+    bounding[ 0 ] = box;
+    cachedPixmaps.resize( 4 );
+    needUpdate.insert( 0, 4, true );
+  }
+  else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 1 ) ) {
+    COMMENT( "Gray image detected.", 2 );
+    m_modality = Modality::BW2D;
+    Bial::BBox box( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) );
+    bounding[ 0 ] = box;
+    cachedPixmaps.resize( 1 );
+    needUpdate.push_back( true );
+  }
+  COMMENT( "Computing equalizaztion transform.", 2 );
+  histogram = Bial::Signal::ZeroStartHistogram( image );
+  Bial::Signal levi = histogram;
+  levi[ 0 ] = 0;
+  levi.Equalize( );
+  equalization.resize( levi.size( ) );
+  for( size_t val = 0; val < levi.size( ); ++val ) {
+    equalization[ val ] = std::round( levi[ val ] );
+  }
+  COMMENT( "Computing equalized histogram.", 2 );
+  equalized = Bial::Signal( histogram.size( ), 0.0, 1.0 );
+  for( size_t val = 0; val < equalized.size( ); ++val ) {
+    equalized[ equalization[ val ] ] = histogram[ val ];
+  }
+  COMMENT( "Image " << fileName( ).toStdString( ) << " size = (" << width( 0 ) << ", " << heigth( 0 ) << ", " <<
+           depth( 0 ) << ")", 0 );
 }
 
 Modality GuiImage::modality( ) {
@@ -62,113 +105,216 @@ QString GuiImage::fileName( ) {
   return( m_fileName );
 }
 
-QPixmap GuiImage::getSlice( size_t axis, size_t slice ) {
-  COMMENT( "GET SLICE: axis = " << axis << ", slice = " << slice, 2 );
-  if( slice >= depth( axis ) ) {
-    throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( axis ) ).
-                                          toStdString( ) ) ) );
-  }
-  try {
-    const size_t xsize = width( axis );
-    const size_t ysize = heigth( axis );
-    COMMENT( "Xsize = " << xsize << ", Ysize = " << ysize, 2 );
-    if( modality( ) == Modality::NIfTI ) {
-      const Bial::Transform3D &transf = transform[ axis ];
-      QImage res( xsize, ysize, QImage::Format_ARGB32 );
-      if( m_max == 1 ) {
-        COMMENT( "MAX = 1", 2 );
+QPixmap GuiImage::getSlice( size_t view ) {
+  size_t slice = currentSlice( view );
+  COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << view << ", slice = " << slice, 0 );
+  if( needUpdate[ view ] ) {
+//    QTime timer;
+//    timer.start( );
+    if( slice >= depth( view ) ) {
+      throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( view ) ).
+                                            toStdString( ) ) ) );
+    }
+    const size_t xsize = width( view );
+    const size_t ysize = heigth( view );
+    QImage res( xsize, ysize, QImage::Format_ARGB32 );
+    double factor = 255.0 / ( double ) m_max;
+    const Bial::FastTransform &transf = transform[ view ];
+    if( modality( ) == Modality::BW3D || modality() == Modality::BW2D) {
+      COMMENT( "Generating BW view.", 2 );
+#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor)
+      for( size_t y = 0; y < ysize; ++y ) {
+        QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+        for( size_t x = 0; x < xsize; ++x ) {
+          int pixel = 0;
+          int xx, yy, zz;
+          transf( x, y, slice, &xx, &yy, &zz );
+          pixel = image( xx, yy, zz );
+          if( m_equalizeHistogram ) {
+            pixel = equalization[ pixel ];
+          }
+          pixel *= factor;
+          scanLine[ x ] = qRgb( pixel, pixel, pixel );
+        }
+      }
+    }
+    else if( modality( ) == Modality::RGB2D ) {
+      if( needUpdate[ 0 ] ) {
+        COMMENT( "Generating RGB view.", 2 );
+        size_t disp1 = image.ChannelSize( );
+        size_t disp2 = image.ChannelSize( ) * 2;
+#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor, disp1, disp2)
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            Bial::Point3D pos = transf( x, y, slice );
-            int pixel = 0;
-            if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
-              pixel = image( pos.x, pos.y, pos.z );
-              if( pixel != 0 ) {
-                pixel = 255;
-              }
+          for( size_t x = 0; x < xsize; ++x ) {
+            int xx, yy, zz;
+            transf( x, y, slice, &xx, &yy, &zz );
+            size_t pos = image.Position( xx, yy );
+            int r = image[ pos ];
+            int g = image[ pos + disp1 ];
+            int b = image[ pos + disp2 ];
+            if( m_equalizeHistogram ) {
+              r = equalization[ r ];
+              g = equalization[ g ];
+              b = equalization[ b ];
             }
-            scanLine[ x ] = qRgb( pixel, pixel, pixel );
+            scanLine[ x ] = qRgb( r * factor, g * factor, b * factor);
           }
         }
-      } else if( m_max < 256 ) {
-        COMMENT( "MAX < 256", 2 );
+        cachedPixmaps[ 0 ] = QPixmap::fromImage( res );
+        needUpdate[ 0 ] = false;
+      }
+      if( view > 0 ) {
+        res = cachedPixmaps[ 0 ].toImage( );
+        int r( view == 1 ), g( view == 2 ), b( view == 3 );
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            Bial::Point3D pos = transf( x, y, slice );
-            int pixel = 0;
-            if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
-              pixel = image( pos.x, pos.y, pos.z );
-            }
-            scanLine[ x ] = qRgb( pixel, pixel, pixel );
-          }
-        }
-      } else {
-        COMMENT( "MAX >= 256", 2 );
-        double factor = ( double ) m_max / 255.0;
-        for( size_t y = 0; y < ysize; ++y ) {
-          QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-          for( size_t x = 0; x < xsize; ++x ) { /*  */
-            Bial::Point3D pos = transf( Bial::Point3D( x, y, slice ) );
-            int pixel = 0;
-            if( image.ValidPixel( pos.x, pos.y, pos.z ) ) {
-              pixel = static_cast< int >( image( pos.x, pos.y, pos.z ) / factor );
-            }
-            scanLine[ x ] = qRgb( pixel, pixel, pixel );
+          for( size_t x = 0; x < xsize; ++x ) {
+            QRgb clr = scanLine[ x ];
+            scanLine[ x ] = qRgb( qRed( clr ) * r, qGreen( clr ) * g, qBlue( clr ) * b );
           }
         }
       }
-      return( QPixmap::fromImage( res ) );
-    } else if( modality( ) == Modality::RGB ) {
-
-    } else if( modality( ) == Modality::BW ) {
-
     }
-    return( QPixmap( ) );
-  } catch( std::bad_alloc &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Memory allocation error." ) );
-    throw( std::runtime_error( msg ) );
-  } catch( std::runtime_error &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Runtime error." ) );
-    throw( std::runtime_error( msg ) );
-  } catch( const std::out_of_range &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Out of range exception." ) );
-    throw( std::out_of_range( msg ) );
-  } catch( const std::logic_error &e ) {
-    std::string msg( e.what( ) + std::string( "\n" ) + BIAL_ERROR( "Logic Error." ) );
-    throw( std::logic_error( msg ) );
+    if( needUpdate[ view ] ) {
+      cachedPixmaps[ view ] = QPixmap::fromImage( res );
+      needUpdate[ view ] = false;
+    }
+//    qDebug( ) << "Elapsed: " << timer.elapsed( );
+
   }
+  return( cachedPixmaps[ view ] );
 }
 
-size_t GuiImage::width( size_t axis = 0 ) {
-  return( abs( round( bounding.at( axis ).pMax.x ) ) );
+size_t GuiImage::width( size_t view = 0 ) {
+  return( abs( round( bounding.at( view ).pMax.x ) ) );
 }
 
-size_t GuiImage::heigth( size_t axis = 0 ) {
-  return( abs( round( bounding.at( axis ).pMax.y ) ) );
+size_t GuiImage::heigth( size_t view = 0 ) {
+  return( abs( round( bounding.at( view ).pMax.y ) ) );
 }
 
-size_t GuiImage::depth( size_t axis = 0 ) {
-  return( abs( round( bounding.at( axis ).pMax.z ) ) );
+size_t GuiImage::depth( size_t view = 0 ) {
+  return( abs( round( bounding.at( view ).pMax.z ) ) );
 }
 
-bool GuiImage::hasLabels( ) {
-  return( false );
-}
-
-void GuiImage::setCurrentSlice( size_t axis, size_t slice ) {
-  if( m_currentSlice[ axis ] != slice ) {
-    if( axis < ( size_t ) m_currentSlice.size( ) ) {
-      m_currentSlice[ axis ] = slice;
+void GuiImage::setCurrentSlice( size_t view, size_t slice ) {
+  size_t sz = m_currentSlice.size( );
+  if( view < sz ) {
+    if( ( m_currentSlice[ view ] != slice ) && ( slice < depth( view ) ) ) {
+      m_currentSlice[ view ] = slice;
+      needUpdate[ view ] = true;
       emit imageUpdated( );
-    } else {
-      throw std::out_of_range(BIAL_ERROR("Axis out of range."));
     }
+  }
+  else {
+    throw std::out_of_range( BIAL_ERROR( "Axis out of range." ) );
   }
 }
 
+Bial::Point3D GuiImage::getPosition( QPointF pos, size_t view ) {
+  Bial::Point3D point( pos.x( ), pos.y( ), ( double ) m_currentSlice[ view ] );
+  transform[ view ]( point, &point );
+  return( point );
+}
 
-size_t GuiImage::currentSlice( size_t axis ) {
-  return( m_currentSlice[ axis ] );
+Bial::FastTransform GuiImage::getTransform( size_t axis ) {
+  return( transform.at( axis ) );
+}
+
+const Bial::Image< int > &GuiImage::getImage( ) const {
+  return( image );
+}
+
+void GuiImage::rotate90( size_t view ) {
+  Bial::FastTransform transf;
+  transf.Rotate( -90.0, Bial::FastTransform::Z );
+  transform[ view ] = transf * transform[ view ].Inverse( );
+  updateBoundings( view );
+  needUpdate[ view ] = true;
+  emit imageUpdated( );
+}
+
+void GuiImage::flipH( size_t view ) {
+  Bial::FastTransform transf;
+  transf.Scale( -1, 1, 1 );
+  transform[ view ] = transf * transform[ view ].Inverse( );
+  updateBoundings( view );
+  needUpdate[ view ] = true;
+  emit imageUpdated( );
+}
+
+void GuiImage::flipV( size_t view ) {
+  Bial::FastTransform transf;
+  transf.Scale( 1, -1, 1 );
+  transform[ view ] = transf * transform[ view ].Inverse( );
+  updateBoundings( view );
+  needUpdate[ view ] = true;
+  emit imageUpdated( );
+}
+
+void GuiImage::rotateAll90( ) {
+  for( int axis = 0; axis < needUpdate.size( ); ++axis ) {
+    rotate90( axis );
+  }
+}
+
+int GuiImage::max( ) {
+  return( m_max );
+}
+
+size_t GuiImage::currentSlice( size_t view ) {
+  return( m_currentSlice[ view ] );
+}
+
+bool GuiImage::getEqualizeHistogram( ) const {
+  return( m_equalizeHistogram );
+}
+
+void GuiImage::setEqualizeHistogram( bool equalizeHistogram ) {
+  m_equalizeHistogram = equalizeHistogram;
+  for( int axis = 0; axis < needUpdate.size( ); ++axis ) {
+    needUpdate[ axis ] = true;
+  }
+  emit imageUpdated( );
+}
+
+
+const Bial::Signal &GuiImage::getHistogram( ) const {
+  if( m_equalizeHistogram ) {
+    return( equalized );
+  }
+  return( histogram );
+}
+
+int GuiImage::getPixel( int x, int y, int z ) {
+  int color = 0;
+  if( modality( ) == Modality::BW2D ) {
+    if( image.ValidPixel( x, y ) ) {
+      color = image.at( x, y );
+    }
+  }
+  else {
+    if( image.ValidPixel( x, y, z ) ) {
+      color = image.at( x, y, z );
+    }
+  }
+  if( m_equalizeHistogram ) {
+    return( equalization[ color ] );
+  }
+  return( color );
+}
+
+void GuiImage::updateBoundings( size_t axis ) {
+  Bial::Point3D start;
+  Bial::Point3D end( image.size( 0 ) - 1, image.size( 1 ) - 1, 1 );
+  if( image.Dims( ) > 2 ) {
+    end = Bial::Point3D( image.size( 0 ) - 1, image.size( 1 ) - 1, image.size( 2 ) - 1 );
+  }
+  transform[ axis ]( start, &start );
+  transform[ axis ]( end, &end );
+  bounding[ axis ] = Bial::BBox( start, end );
+  transform[ axis ] = transform[ axis ].Inverse( );
+  transform[ axis ].Translate( bounding[ axis ].pMin.x, bounding[ axis ].pMin.y, bounding[ axis ].pMin.z );
+  bounding[ axis ] = bounding[ axis ].Normalized( );
 }

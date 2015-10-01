@@ -1,8 +1,10 @@
 #include "controller.h"
+#include "dicomdir.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
+#include <QFileInfoList>
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
 #include <QProgressDialog>
@@ -16,57 +18,45 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
   controller->setThumbsWidget( ui->thumbsWidget );
 
   ui->controlsWidget->setController( controller );
-
-  ui->controlsWidget->installImageViewer( ui->imageViewer );
-
-  ui->imageViewer->setController(controller);
-
-  for( size_t axis = 0; axis < 4; ++axis) {
-    ui->imageViewer->getScene(axis)->addItem(controller->getPixmapItem(axis));
-  }
-
+  ui->controlsDock->hide( );
+  ui->imageViewer->setController( controller );
   ui->actionPrint->setEnabled( false );
 
   setupLogoview( );
-
   createConnections( );
-
-  updateMenus( );
-
+  currentImageChanged( );
   readSettings( );
-
   createActions( );
-
   loadQss( );
+  containerUpdated( );
+
+#ifndef LIBGDCM
+  ui->actionOpen_DicomDir->setVisible( false );
+#endif
 }
 
 void MainWindow::createConnections( ) {
-  /* Layout */
-  connect( ui->actionGrid, &QAction::triggered, ui->imageViewer, &ImageViewer::setGridLayout );
-  connect( ui->actionHorizontal, &QAction::triggered, ui->imageViewer, &ImageViewer::setHorizontalLayout );
-  connect( ui->actionVertical, &QAction::triggered, ui->imageViewer, &ImageViewer::setVerticalLayout );
-  connect( ui->actionAxial, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
-  connect( ui->actionCoronal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
-  connect( ui->actionSagittal, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
-
-  /* PPM */
-  connect( ui->actionAll_channels, &QAction::triggered, ui->imageViewer, &ImageViewer::setView0 );
-  connect( ui->actionRed_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView1 );
-  connect( ui->actionGreen_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView2 );
-  connect( ui->actionBlue_channel, &QAction::triggered, ui->imageViewer, &ImageViewer::setView3 );
-  connect( ui->action3_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::setViews123 );
-  connect( ui->action4_Views, &QAction::triggered, ui->imageViewer, &ImageViewer::set0123Views );
-
   /* Show/Hide docks. */
   connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );
+  connect( ui->actionHistogram_dock, &QAction::toggled, ui->dockWidgetHistogram, &QDockWidget::setVisible );
   connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible );
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
   connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
+  connect( ui->dockWidgetHistogram, &QDockWidget::visibilityChanged , ui->actionHistogram_dock, &QAction::setChecked);
 
-  /* Dynamic functions. */
-  connect( ui->imageViewer, &ImageViewer::updateStatus, ui->statusBar, &QStatusBar::showMessage );
-  connect( controller, &Controller::imageChanged, this, &MainWindow::updateMenus );
-  connect( controller, &Controller::recentFilesUpdated,this,&MainWindow::updateRecentFileActions);
+  /* Controller. */
+  connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
+  connect( controller, &Controller::imageUpdated, this, &MainWindow::imageUpdated );
+  connect( controller, &Controller::containerUpdated, this, &MainWindow::containerUpdated );
+  connect( controller, &Controller::recentFilesUpdated, this, &MainWindow::updateRecentFileActions );
+
+  /* ImageViewer */
+  connect( ui->imageViewer, &ImageViewer::mouseClicked, this, &MainWindow::updateIntensity );
+  connect( ui->imageViewer, &ImageViewer::mouseReleased, this, &MainWindow::updateIntensity );
+  connect( ui->imageViewer, &ImageViewer::mouseDragged, this, &MainWindow::updateIntensity );
+
+  /* Overlay */
+  connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay );
 }
 
 void MainWindow::setupLogoview( ) {
@@ -82,43 +72,98 @@ MainWindow::~MainWindow( ) {
 }
 
 void MainWindow::on_actionRed_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::red );
+  ui->imageViewer->setViewBgColor( Qt::red );
 }
 
 void MainWindow::on_actionGreen_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::green );
+  ui->imageViewer->setViewBgColor( Qt::green );
 }
 
 void MainWindow::on_actionBlue_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::blue );
+  ui->imageViewer->setViewBgColor( Qt::blue );
 }
 
 void MainWindow::on_actionBlack_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::black );
+  ui->imageViewer->setViewBgColor( Qt::black );
 }
 
 void MainWindow::on_actionWhite_background_triggered( ) {
-  ui->imageViewer->setBackgroundColor( Qt::white );
+  ui->imageViewer->setViewBgColor( Qt::white );
 }
 
-void MainWindow::updateMenus( ) {
-  COMMENT( "Updating menus, current image = " << controller->currentImagePos( ), 0 );
+void MainWindow::currentImageChanged( ) {
+  if( controller->currentImage( ) ) {
+    DisplayFormat *format = controller->currentFormat( );
 
-  /* Verifying if an Image is present. */
+    ui->menuLayout->setEnabled( format->modality( ) != Modality::BW2D );
+    ui->menuOverlay->setEnabled( format->hasOverlay( ) );
+
+    ui->actionGrid->setVisible( format->showOrientation( ) );
+    ui->actionHorizontal->setVisible( format->showOrientation( ) );
+    ui->actionVertical->setVisible( format->showOrientation( ) );
+
+    ui->actionAxial->setVisible( format->modality( ) == Modality::BW3D );
+    ui->actionCoronal->setVisible( format->modality( ) == Modality::BW3D );
+    ui->actionSagittal->setVisible( format->modality( ) == Modality::BW3D );
+
+    ui->actionRed_channel->setVisible( format->modality( ) == Modality::RGB2D );
+    ui->actionGreen_channel->setVisible( format->modality( ) == Modality::RGB2D );
+    ui->actionBlue_channel->setVisible( format->modality( ) == Modality::RGB2D );
+    ui->actionAll_channels->setVisible( format->modality( ) == Modality::RGB2D );
+
+    ui->action3_Views->setVisible( format->has3Views( ) );
+    ui->action4_Views->setVisible( format->has4Views( ) );
+  }
+}
+
+void MainWindow::imageUpdated( ) {
+  const Bial::Signal &hist = controller->currentImage( )->getHistogram( );
+  QCustomPlot *plot = ui->histogramWidget;
+  QVector< double > x( hist.size( ) ), y( hist.size( ) );
+  for( size_t bin = 0; bin < hist.size( ); ++bin ) {
+    x[ bin ] = hist.Data( bin );
+    y[ bin ] = hist[ bin ];
+  }
+  plot->addGraph( );
+  plot->setInteraction(QCP::iRangeDrag, true);
+  plot->setInteraction(QCP::iRangeZoom, true);
+  plot->graph(0)->clearData();
+  plot->graph( 0 )->setData( x, y );
+  plot->axisRect(0)->setRangeDrag(Qt::Vertical);
+  plot->axisRect(0)->setRangeZoom(Qt::Vertical);
+  plot->axisRect(0)->setRangeZoomAxes(plot->xAxis,plot->yAxis);
+  plot->graph(0)->setLineStyle(QCPGraph::lsImpulse);
+  plot->xAxis->setLabel( "Intensity" );
+  plot->yAxis->setLabel( "Frequency" );
+  plot->rescaleAxes( true );
+  plot->replot( );
+}
+
+void MainWindow::containerUpdated( ) {
+  COMMENT( "MainWindow::containerUpdated( )", 0 );
+  if( controller->size( ) <= 1 ) {
+    ui->thumbsDock->hide( );
+  }
+  else {
+    ui->thumbsDock->show( );
+  }
   bool hasImage = ( controller->currentImage( ) != nullptr );
-
+  COMMENT( "Has Image = " << hasImage, 0 );
+  ui->menuWindow->setEnabled( hasImage );
+  ui->controlsDock->setVisible( hasImage );
   ui->logoView->setVisible( !hasImage );
   ui->imageViewer->setVisible( hasImage );
-  ui->controlsDock->setVisible( hasImage );
-  ui->thumbsDock->setVisible( hasImage );
   ui->menuLayout->setEnabled( hasImage );
   ui->menuOverlay->setEnabled( hasImage );
   ui->actionRemove_current_image->setEnabled( hasImage );
   ui->actionAddLabel->setEnabled( hasImage );
   if( !hasImage ) {
     ui->actionRemove_current_label->setEnabled( false );
+    ui->dockWidgetHistogram->hide( );
   }
-  /* TODO : Verify image type and update layout menu. */
+  ui->actionShow_controls_dock->setEnabled( hasImage );
+  ui->actionShow_images_dock->setEnabled( hasImage );
+  currentImageChanged( );
 }
 
 void MainWindow::on_actionOpen_image_triggered( ) {
@@ -141,9 +186,9 @@ void MainWindow::on_actionOpen_image_triggered( ) {
 QString MainWindow::getFileDialog( ) {
   return( QFileDialog::getOpenFileName( this, tr( "Open" ), defaultFolder,
                                         tr( "All images (*.pbm *.pbm.gz *.pgm *.pgm.gz *.ppm *.ppm.gz *.dcm "
-                                            "*.dcm.gz *.nii *.nii.gz);; PBM images (*.pbm *.pbm.gz);; PGM images "
+                                            "*.dcm.gz *.nii *.nii.gz *.scn *.scn.gz);; PBM images (*.pbm *.pbm.gz);; PGM images "
                                             "(*.pgm *.pgm.gz);; PPM images (*.ppm *.ppm.gz);; DICOM images "
-                                            "(*.dcm *.dcm.gz);; NIfTI images (*.nii *.nii.gz);; All files (*)" ) ) );
+                                            "(*.dcm *.dcm.gz);; NIfTI images (*.nii *.nii.gz);; SCN Files (*.scn *.scn.gz);; All files (*)" ) ) );
 }
 
 bool MainWindow::loadFile( QString filename ) {
@@ -158,10 +203,12 @@ bool MainWindow::loadFolder( QString dirname ) {
   QFileInfoList list = folder.entryInfoList( QDir::NoDotAndDotDot | QDir::Files, QDir::DirsFirst | QDir::Name );
   bool value = false;
   /*  qDebug() << "list size: " << list.size(); */
+  CursorChanger c( Qt::WaitCursor );
 
   QProgressDialog progress( "Reading files...", "Abort", 0, list.size( ), this );
   progress.setWindowModality( Qt::WindowModal );
-  for( int i = 0, size = list.size( ); i < size; ++i ) {
+  int size = list.size( );
+  for( int i = 0; i < size; ++i ) {
     progress.setValue( i );
     if( progress.wasCanceled( ) ) {
       break;
@@ -171,7 +218,8 @@ bool MainWindow::loadFolder( QString dirname ) {
       QString fileName = fileInfo.absoluteFilePath( );
       if( controller->addImage( fileName ) ) {
         value = true;
-      } else {
+      }
+      else {
         BIAL_WARNING( std::string( "Could not open file!" ) );
         statusBar( )->showMessage( tr( "Could not open file!" ), 2000 );
         continue;
@@ -179,22 +227,8 @@ bool MainWindow::loadFolder( QString dirname ) {
     }
   }
   progress.setValue( list.size( ) );
-  return( value );
-}
 
-void MainWindow::setDefaultFolder( ) {
-  QDir dir;
-  if( !dir.exists( QDir::homePath( ) + "/.bial/" ) ) {
-    dir.mkdir( QDir::homePath( ) + "/.bial/" );
-  }
-  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ) );
-  if( !temp.isEmpty( ) ) {
-    defaultFolder = temp;
-    QSettings settings;
-    settings.beginGroup( "MainWindow" );
-    settings.setValue( "defaultFolder", defaultFolder );
-    settings.endGroup( );
-  }
+  return( value );
 }
 
 void MainWindow::readSettings( ) {
@@ -211,8 +245,9 @@ void MainWindow::readSettings( ) {
 void MainWindow::commandLineOpen( int argc, char *argv[] ) {
   COMMENT( "Command Line Open with " << argc << " arguments:", 0 );
   if( ( argc == 3 ) && ( QString( argv[ 1 ] ) == "-d" ) ) {
-    /*    LoadDicomdir(QString(argv[2])); */
-  } else {
+    loadDicomdir( QString( argv[ 2 ] ) );
+  }
+  else {
     QFileInfo file;
     for( int img = 1; img < argc; ++img ) {
       QString fileName( argv[ img ] );
@@ -221,10 +256,12 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
       if( file.exists( ) ) {
         if( file.isFile( ) ) {
           controller->addImage( file.absoluteFilePath( ) );
-        } else if( file.isDir( ) ) {
+        }
+        else if( file.isDir( ) ) {
           loadFolder( file.absoluteFilePath( ) );
         }
-      } else {
+      }
+      else {
         BIAL_WARNING( "FILE DOES NOT EXISTS! : " << file.absolutePath( ).toStdString( ) );
       }
     }
@@ -281,4 +318,171 @@ void MainWindow::loadQss( ) {
   file.open( QFile::ReadOnly );
   QString StyleSheet = QLatin1String( file.readAll( ) );
   setStyleSheet( StyleSheet );
+}
+
+bool MainWindow::loadDicomdir( QString dicomFName ) {
+  COMMENT( "Loading DicomDir file", 1 );
+  CursorChanger c( Qt::WaitCursor );
+  DicomDir dicomdir;
+  if( !dicomdir.open( dicomFName ) ) {
+    statusBar( )->showMessage( tr( "Could not open dicomdir" ), 2000 );
+    return( false );
+  }
+  const QStringList files = dicomdir.getImages( );
+  if( files.size( ) > 0 ) {
+    controller->clear( );
+    QProgressDialog progress( tr( "Reading dicomdir files..." ), tr( "Abort" ), 0, files.size( ), this );
+    progress.setWindowModality( Qt::WindowModal );
+    for( int i = 0, size = files.size( ); i < size; ++i ) {
+      progress.setValue( i );
+      if( progress.wasCanceled( ) ) {
+        break;
+      }
+      controller->addImage( files[ i ].trimmed( ) );
+    }
+    progress.setValue( files.size( ) );
+    if( controller->size( ) < 1 ) {
+      statusBar( )->showMessage( tr( "Could not load any dicomdir images" ), 2000 );
+      return( false );
+    }
+    return( true );
+  }
+  statusBar( )->showMessage( tr( "Empty dicomdir!" ), 2000 );
+  BIAL_WARNING( "Empty dicomdir!" );
+
+  return( false );
+}
+
+void MainWindow::on_actionAddLabel_triggered( ) {
+  controller->addLabel( getFileDialog( ) );
+}
+
+void MainWindow::on_actionOpen_folder_triggered( ) {
+  QString folderString = QFileDialog::getExistingDirectory( this, tr( "Open folder" ), defaultFolder );
+  COMMENT( "Opening folder: \"" << folderString.toStdString( ) << "\"", 1 )
+  if( !folderString.isEmpty( ) ) {
+    controller->clear( );
+    if( !loadFolder( folderString ) ) {
+      BIAL_WARNING( "Could not read folder!" )
+      QMessageBox::warning( this, "Warning", tr( "Could not read folder!" ) );
+    }
+  }
+}
+
+void MainWindow::on_actionOpen_DicomDir_triggered( ) {
+  QString fileName = QFileDialog::getOpenFileName( this, tr( "Open" ), defaultFolder,
+                                                   tr( "*" ) );
+  loadDicomdir( fileName );
+}
+
+void MainWindow::on_actionAdd_image_triggered( ) {
+  controller->addImage( getFileDialog( ) );
+}
+
+void MainWindow::on_actionRemove_current_image_triggered( ) {
+  controller->removeCurrentImage( );
+}
+
+void MainWindow::on_actionSelect_default_folder_triggered( ) {
+  QString temp = QFileDialog::getExistingDirectory( this, tr( "Select default folder" ), QDir::homePath( ) );
+  if( !temp.isEmpty( ) ) {
+    defaultFolder = temp;
+    QSettings settings;
+    settings.beginGroup( "MainWindow" );
+    settings.setValue( "defaultFolder", defaultFolder );
+    settings.endGroup( );
+  }
+}
+
+void MainWindow::on_actionRemove_current_label_triggered( ) {
+  controller->removeCurrentLabel( );
+}
+
+void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size_t axis ) {
+  Q_UNUSED(buttons)
+  GuiImage *img = controller->currentImage( );
+  if( img != nullptr ) {
+    Bial::Point3D pt = img->getPosition( scnPos, axis );
+    QString msg;
+    int max = img->max( );
+    if( img->modality( ) == Modality::BW3D ) {
+      if( img->getImage( ).ValidPixel( pt.x, pt.y, pt.z ) ) {
+        int color = img->getPixel( pt.x, pt.y, pt.z );
+        msg = QString( "Axis %1 : (%2, %3, %4) = %5/%6" ).arg( axis ).arg( ( int ) pt.x ).arg(
+          ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max );
+      }
+    }
+    else if( img->modality( ) == Modality::BW2D ) {
+      if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
+        int color = img->getPixel( pt.x, pt.y );
+        msg = QString( "(%1, %2) = %3/%4" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( color ).arg( max );
+      }
+    }
+    else if( img->modality( ) == Modality::RGB2D ) {
+      if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
+        int r = img->getPixel( pt.x, pt.y, 0 );
+        int g = img->getPixel( pt.x, pt.y, 1 );
+        int b = img->getPixel( pt.x, pt.y, 2 );
+        msg =
+          QString( "(%1, %2) = (%3, %4, %5)/%6" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( r ).arg( g ).arg( b ).arg(
+            max );
+      }
+    }
+    ui->statusBar->showMessage( msg, 10000 );
+  }
+}
+
+void MainWindow::on_actionAxial_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 1 );
+  controller->currentFormat( )->setCurrentViews( Views::SHOW0 );
+}
+
+void MainWindow::on_actionCoronal_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 1 );
+  controller->currentFormat( )->setCurrentViews( Views::SHOW1 );
+}
+
+void MainWindow::on_actionSagittal_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 1 );
+  controller->currentFormat( )->setCurrentViews( Views::SHOW2 );
+}
+
+void MainWindow::on_action3_Views_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 3 );
+}
+
+void MainWindow::on_action4_Views_triggered( ) {
+  controller->currentFormat( )->setNumberOfViews( 4 );
+}
+
+void MainWindow::on_actionVertical_triggered( ) {
+  controller->currentFormat( )->setCurrentLayout( Layout::VERTICAL );
+}
+
+void MainWindow::on_actionHorizontal_triggered( ) {
+  controller->currentFormat( )->setCurrentLayout( Layout::HORIZONTAL );
+}
+
+void MainWindow::on_actionGrid_triggered( ) {
+  controller->currentFormat( )->setCurrentLayout( Layout::GRID );
+}
+
+void MainWindow::on_actionWhitePen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::white );
+}
+
+void MainWindow::on_actionRedPen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::red );
+}
+
+void MainWindow::on_actionBluePen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::blue );
+}
+
+void MainWindow::on_actionGreenPen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::green );
+}
+
+void MainWindow::on_actionBlackPen_triggered( ) {
+  controller->currentFormat( )->setOverlayColor( Qt::black );
 }

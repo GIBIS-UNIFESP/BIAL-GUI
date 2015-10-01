@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
+    <width>300</width>
     <height>734</height>
    </rect>
   </property>
@@ -42,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>318</width>
-        <height>1018</height>
+        <width>268</width>
+        <height>945</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_11">
@@ -436,133 +436,6 @@
          </layout>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="QGroupBox" name="groupBoxEditor">
-         <property name="title">
-          <string>Image editor</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="histogramNormalization">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Histogram normalization</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="interpolation">
-            <property name="text">
-             <string>Interpolation</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <layout class="QGridLayout" name="gridLayout_8">
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelContrast">
-              <property name="text">
-               <string>Contrast:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QSlider" name="horizontalSliderContrast">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::TicksAbove</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QSlider" name="horizontalSliderBrightness">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::TicksAbove</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="labelBrightness_2">
-              <property name="text">
-               <string>Zoom</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QSlider" name="horizontalSliderZoom">
-              <property name="tracking">
-               <bool>true</bool>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="invertedAppearance">
-               <bool>false</bool>
-              </property>
-              <property name="invertedControls">
-               <bool>false</bool>
-              </property>
-              <property name="tickPosition">
-               <enum>QSlider::TicksAbove</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="labelBrightness">
-              <property name="text">
-               <string>Brightness:</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="3" column="0">
-           <widget class="QPushButton" name="pushButtonFitInView">
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Fit in view</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QPushButton" name="rotate">
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="qrs/resources.qrc">
-              <normaloff>:/icons/rotate.png</normaloff>:/icons/rotate.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QPushButton" name="rotateAll">
-            <property name="text">
-             <string>Rotate All</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
        <item row="19" column="0">
         <spacer name="vSpacer">
          <property name="orientation">
@@ -797,14 +670,38 @@
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="0">
            <layout class="QGridLayout" name="gridLayout_14">
-            <item row="0" column="0">
+            <item row="0" column="2">
+             <widget class="QSpinBox" name="spinBoxSpeed">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>Speed</string>
+              </property>
+              <property name="minimum">
+               <number>10</number>
+              </property>
+              <property name="maximum">
+               <number>500</number>
+              </property>
+              <property name="singleStep">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
              <widget class="QPushButton" name="buttonPlay">
               <property name="text">
                <string/>
               </property>
               <property name="icon">
                <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
+                <normaloff>:/icons/icons/play.svg</normaloff>
+                <normalon>:/icons/icons/stop.svg</normalon>
+                <activeon>:/icons/icons/stop.svg</activeon>:/icons/icons/play.svg</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -812,56 +709,8 @@
                 <height>12</height>
                </size>
               </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="buttonSpeedPlus">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/plus.svg</normaloff>:/icons/icons/plus.svg</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>12</width>
-                <height>12</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="buttonStop">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/stop.svg</normaloff>:/icons/icons/stop.svg</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>12</width>
-                <height>12</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QPushButton" name="buttonSpeedLess">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="qrs/resources.qrc">
-                <normaloff>:/icons/icons/minus.svg</normaloff>:/icons/icons/minus.svg</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>12</width>
-                <height>12</height>
-               </size>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -892,6 +741,147 @@
               </property>
               <property name="tickPosition">
                <enum>QSlider::TicksAbove</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QGroupBox" name="groupBoxEditor">
+         <property name="title">
+          <string>Image editor</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="rotate">
+              <property name="toolTip">
+               <string>Rotate</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="qrs/resources.qrc">
+                <normaloff>:/icons/rotate.png</normaloff>:/icons/rotate.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonFitInView">
+              <property name="toolTip">
+               <string>Fit in view</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="qrs/resources.qrc">
+                <normaloff>:/icons/icons/arrows.png</normaloff>:/icons/icons/arrows.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="pushButtonInterpolation">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Smooth Interpolation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Smooth</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButtonHistogramNormalization">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Histogram Equalization&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Equalize</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="2" column="1">
+             <widget class="QSlider" name="horizontalSliderBrightness">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksAbove</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSlider" name="horizontalSliderContrast">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksAbove</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSlider" name="horizontalSliderZoom">
+              <property name="tracking">
+               <bool>true</bool>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="invertedAppearance">
+               <bool>false</bool>
+              </property>
+              <property name="invertedControls">
+               <bool>false</bool>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksAbove</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelBrightness">
+              <property name="text">
+               <string>B</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="labelContrast">
+              <property name="text">
+               <string>C</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="labelBrightness_2">
+              <property name="text">
+               <string>Z</string>
               </property>
              </widget>
             </item>

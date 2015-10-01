@@ -2,7 +2,9 @@
 #define IMAGEVIEWER_H
 
 #include "viewerinterface.h"
-
+#include "displayformat.h"
+#include "graphicsscene.h"
+#include <QTime>
 #include <QWidget>
 #include <array>
 
@@ -16,23 +18,33 @@ class ImageViewer : public QWidget, public ViewerInterface {
   std::array< ImageWidget*, 4 > views;
   QGridLayout *layout;
   Controller * controller;
+  bool dragging;
+  QTime timer;
 
+  void getNewLayout();
 public:
   explicit ImageViewer( QWidget *parent = 0 );
   ~ImageViewer( );
 
-  void setBackgroundColor( const QColor &color );
+  void setViewBgColor( const QColor &color );
   bool eventFilter(QObject *obj, QEvent *evt);
-  QGraphicsScene * getScene(size_t axis);
+  GraphicsScene * getScene(size_t axis);
   void setController(Controller * value);
 
 signals:
-  void updateStatus(QString text, int timeout = 0 );
+  void mouseReleased(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseDragged(QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseMoved(QPointF pt, size_t axis );
 
 private slots:
-  void updateImage();
+  void updateViews();
+  void changeImage();
 
-public slots:
+  void setLayoutType(Layout layout);
+  void updateOverlay(QPointF pt, size_t axis );
+  void setViewMode(Views view);
+
   void setGridLayout( );
   void setHorizontalLayout( );
   void setVerticalLayout( );
@@ -40,15 +52,16 @@ public slots:
   void hideViews( );
   void showViews( );
 
-  void setView0( );
-  void setView1( );
-  void setView2( );
-  void setView3( );
-  void setViews012( );
-  void setViews123( );
-  void set0123Views( );
+  void sliceChanged(size_t axis, size_t slice);
+
+public slots:
+
+  void toggleOverlay();
 
 
+  // QWidget interface
+protected:
+  void resizeEvent(QResizeEvent *);
 };
 
 #endif /* IMAGEVIEWER_H */

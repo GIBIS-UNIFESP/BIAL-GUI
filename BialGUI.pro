@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,38 +12,53 @@ TARGET = BialGUI
 TEMPLATE = app
 
 include(../bial/bial.pri)
+include(gdcm.pri)
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    controlswidget.cpp \
-    imageviewer.cpp \
-    thumbswidget.cpp \
-    imagewidget.cpp \
+SOURCES += \
+    thirdParty/qcustomplot.cpp \
+
+SOURCES += \
     controller.cpp \
-    guiimage.cpp \
-    pixmaplabelitem.cpp \
-    thumbnail.cpp \
+    controlswidget.cpp \
+    dicomdir.cpp \
     displayformat.cpp \
-    segmentationwidget.cpp
+    gdcm.cpp \
+    graphicsscene.cpp \
+    guiimage.cpp \
+    imageviewer.cpp \
+    imagewidget.cpp \
+    main.cpp\
+    mainwindow.cpp \
+    segmentationwidget.cpp \
+    thumbnail.cpp \
+    thumbswidget.cpp \
 
-HEADERS  += mainwindow.h \
-    controlswidget.h \
-    imageviewer.h \
-    thumbswidget.h \
-    imagewidget.h \
-    viewerinterface.h \
+HEADERS += \
+    thirdParty/qcustomplot.h \
+
+HEADERS  += \
     controller.h \
-    guiimage.h \
-    pixmaplabelitem.h \
-    thumbnail.hpp \
+    controlswidget.h \
+    dicomdir.h \
     displayformat.h \
-    segmentationwidget.h
+    gdcm.h \
+    graphicsscene.h \
+    guiimage.h \
+    imageviewer.h \
+    imagewidget.h \
+    mainwindow.h \
+    segmentationwidget.h \
+    thumbnail.hpp \
+    thumbswidget.h \
+    viewerinterface.h \
 
-FORMS    += mainwindow.ui \
+
+FORMS    += \
     controlswidget.ui \
-    thumbswidget.ui \
     imagewidget.ui \
-    segmentationwidget.ui
+    mainwindow.ui \
+    segmentationwidget.ui \
+    thumbswidget.ui \
 
 RESOURCES += \
     qrs/resources.qrc

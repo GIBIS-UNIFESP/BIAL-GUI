@@ -1,14 +1,22 @@
 #include "controller.h"
 #include "thumbswidget.h"
 
+#include <QDebug>
 #include <QFile>
 #include <qsettings.h>
 
-Controller::Controller( int views, QObject *parent ) : QObject( parent ) {
+Controller::Controller( int views, QObject *parent ) : QObject( parent ), bw2dFormat(
+    new BW2DFormat( this ) ), rgb2dFormat( new RGB2DFormat( this ) ), bw3dFormat( new BW3DFormat( this ) ) {
   for( int item = 0; item < views; ++item ) {
-    m_pixmapItems.append( new PixmapLabelItem( ) );
+    m_pixmapItems.append( new QGraphicsPixmapItem( ) );
   }
   m_currentImagePos = -1;
+  connect( rgb2dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( bw3dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( bw2dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
+  connect( rgb2dFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( bw3dFormat, &DisplayFormat::updated, this, &Controller::update );
+  connect( bw2dFormat, &DisplayFormat::updated, this, &Controller::update );
 }
 
 GuiImage* Controller::currentImage( ) {
@@ -31,51 +39,60 @@ bool Controller::addImage( QString fname ) {
   GuiImage *img = nullptr;
   try {
     img = new GuiImage( fname, this );
-  } catch( std::bad_alloc e ) {
+  }
+  catch( std::bad_alloc e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( std::runtime_error e ) {
+  }
+  catch( std::runtime_error e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( std::out_of_range e ) {
+  }
+  catch( std::out_of_range e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( std::logic_error e ) {
+  }
+  catch( std::logic_error e ) {
     BIAL_WARNING( e.what( ) );
-  } catch( ... ) {
+  }
+  catch( ... ) {
 
   }
   if( img == nullptr ) {
+    emit containerUpdated( );
     return( false );
   }
   m_images.append( img );
 
-  emit containerUpdated( );
 
   m_thumbsWidget->addThumbnail( img );
   if( currentImagePos( ) == -1 ) {
     setCurrentImagePos( 0 );
   }
+  setRecentFile( fname );
 
-  setRecentFile(fname);
+  emit containerUpdated( );
 
   return( true );
 }
 
 bool Controller::addLabel( QString label ) {
-
+  /* TODO Controller::addLabel( QString label ) */
+  return( false );
 }
 
 bool Controller::removeCurrentLabel( ) {
-
+  /* TODO Controller::removeCurrentLabel( ) */
+  return( false );
 }
 
 void Controller::removeCurrentImage( ) {
   m_images.removeAt( currentImagePos( ) );
   m_thumbsWidget->removeAt( currentImagePos( ) );
-  emit containerUpdated( );
   if( currentImagePos( ) == 0 ) {
     setCurrentImagePos( 0 );
-  } else {
+  }
+  else {
     setCurrentImagePos( currentImagePos( ) - 1 );
   }
+  emit containerUpdated( );
 }
 
 bool Controller::isEmpty( ) {
@@ -96,84 +113,129 @@ int Controller::size( ) {
 }
 
 void Controller::update( ) {
-  COMMENT("UPDATING IMAGE!", 0);
+  COMMENT( "UPDATING IMAGE!", 0 );
 
   GuiImage *img = currentImage( );
   if( img ) {
-    int items = 1;
-    if( img->modality( ) == Modality::NIfTI ) {
-      items = 3;
-    } else if( img->modality( ) == Modality::RGB ) {
-      items = 4;
-    }
-    for( int axis = 0; axis < items; ++axis ) {
-      m_pixmapItems.at( axis )->setImage( img->getSlice( axis, img->currentSlice( axis ) ) );
-      /*
-       *      if( img->currentLabel( ) != NULL ) {
-       *        m_pixmapItems[ axis ]->setLabel( img->currentLabel( )->getLabel( axis,
-       *                                                                         img->currentSlice(
-       *                                                                           axis ) ) );
-       *      }
-       *      else {
-       *        m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
-       *      }
-       */
-    }
-  } else {
-    for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
-      m_pixmapItems[ axis ]->setImage( QPixmap( ) );
-//      m_pixmapItems[ axis ]->setLabel( QPixmap( ) );
+    std::array< bool, 4 > showItens = currentFormat( )->getViews( );
+    for( int axis = 0; axis < 4; ++axis ) {
+      if( showItens[ axis ] ) {
+        const QPixmap &pix = img->getSlice( axis );
+        m_pixmapItems.at( axis )->setPixmap( pix );
+      }
     }
   }
-  emit imageChanged( );
+  else {
+    for( int axis = 0; axis < m_pixmapItems.size( ); ++axis ) {
+      m_pixmapItems[ axis ]->setPixmap( QPixmap( ) );
+    }
+  }
+  emit imageUpdated( );
 }
 
 void Controller::setCurrentImagePos( int position ) {
   m_currentImagePos = position;
-  if( currentImage( ) ) {
+  if( currentImage( ) != nullptr ) {
     disconnect( currentImage( ), &GuiImage::imageUpdated, this, &Controller::update );
   }
-  m_currentImagePos = position;
-  update( );
-  if( currentImage( ) ) {
+  if( currentImage( ) != nullptr ) {
+    emit currentImageChanged( );
+    update( );
     connect( currentImage( ), &GuiImage::imageUpdated, this, &Controller::update );
   }
-  emit imageChanged( );
 }
 
 void Controller::loadNextImage( ) {
   if( currentImagePos( ) == ( m_images.count( ) - 1 ) ) {
     setCurrentImagePos( 0 );
-  } else {
+  }
+  else {
     setCurrentImagePos( currentImagePos( ) + 1 );
   }
 }
 
-void Controller::changeOthersSlices( QPointF posF, int axis ) {
-
-}
-
-void Controller::setCurrentSlice( size_t axis, size_t slice ) {
-  currentImage()->setCurrentSlice(axis, slice);
-}
-
-void Controller::setRecentFile(QString fname) {
-  COMMENT("Setting recent file to : \"" << fname.toStdString() << "\"", 1);
-  if (!QFile(fname).exists())
-    return;
-  QSettings settings;
-  QStringList files = settings.value("recentFileList").toStringList();
-
-  files.removeAll(fname);
-
-  files.prepend(fname);
-  while (files.size() > MaxRecentFiles) {
-    files.removeLast();
+void Controller::changeOthersSlices( QPointF posF, size_t view ) {
+  COMMENT( "Changing slice position of other frames based on image position.", 2 );
+  if( currentImage( ) ) {
+    if( ( currentImage( )->modality( ) == Modality::BW3D ) ) {
+      Bial::FastTransform transform = currentImage( )->getTransform( view );
+      Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
+                                    ( double ) currentImage( )->currentSlice( view ) );
+      for( size_t other = 0; other < 3; ++other ) {
+        if( other != view ) {
+          Bial::FastTransform otherTransf = currentImage( )->getTransform( other ).Inverse( );
+          Bial::Point3D otherPt = otherTransf( pt );
+          size_t pos = static_cast< size_t >( round( otherPt.z ) );
+          if( pos < currentImage( )->depth( other ) ) {
+            currentImage( )->setCurrentSlice( other, pos );
+          }
+        }
+      }
+    }
   }
-  settings.setValue("recentFileList", files);
+  else {
+    BIAL_WARNING( "CURRENT IMAGE NOT FOUND!" );
+  }
+}
 
-  emit recentFilesUpdated();
+void Controller::setCurrentSlice( size_t view, size_t slice ) {
+  currentImage( )->setCurrentSlice( view, slice );
+}
 
+void Controller::setZoom( int value ) {
+  /* FIXME Zoom doesn't work yet. */
+  scale = 1.0 + value / 100.0;
+  update( );
+}
+
+void Controller::setInterpolation( bool isSmooth ) {
+  for( int view = 0; view < m_pixmapItems.size( ); ++view ) {
+    if( isSmooth ) {
+      m_pixmapItems[ view ]->setTransformationMode( Qt::SmoothTransformation );
+    }
+    else {
+      m_pixmapItems[ view ]->setTransformationMode( Qt::FastTransformation );
+    }
+  }
+}
+
+void Controller::rotateAll90( ) {
+  currentImage( )->rotateAll90( );
+  emit currentImageChanged( );
+}
+
+void Controller::rotate90( size_t view ) {
+  currentImage( )->rotate90( view );
+  emit currentImageChanged( );
+}
+
+void Controller::flipH( size_t view ) {
+  currentImage( )->flipH( view );
+  emit currentImageChanged( );
+}
+
+void Controller::flipV( size_t view ) {
+  currentImage( )->flipV( view );
+  emit currentImageChanged( );
+}
+
+void Controller::setRecentFile( QString fname ) {
+  COMMENT( "Setting recent file to : \"" << fname.toStdString( ) << "\"", 1 );
+  if( !QFile( fname ).exists( ) ) {
+    return;
+  }
+  QSettings settings;
+  QStringList files = settings.value( "recentFileList" ).toStringList( );
+
+  files.removeAll( fname );
+
+  files.prepend( fname );
+  while( files.size( ) > MaxRecentFiles ) {
+    files.removeLast( );
+  }
+  settings.setValue( "recentFileList", files );
+
+  emit recentFilesUpdated( );
 }
 
 void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
@@ -181,6 +243,19 @@ void Controller::setThumbsWidget( ThumbsWidget *thumbsWidget ) {
   m_thumbsWidget->setController( this );
 }
 
-PixmapLabelItem* Controller::getPixmapItem( size_t axis ) {
-  return( m_pixmapItems.at( axis ) );
+DisplayFormat* Controller::currentFormat( ) {
+  Modality mod = currentImage( )->modality( );
+  if( mod == Modality::RGB2D ) {
+    return( rgb2dFormat );
+  }
+  else if( mod == Modality::BW3D ) {
+    return( bw3dFormat );
+  }
+  else {
+    return( bw2dFormat );
+  }
+}
+
+QGraphicsPixmapItem* Controller::getPixmapItem( size_t view ) {
+  return( m_pixmapItems.at( view ) );
 }

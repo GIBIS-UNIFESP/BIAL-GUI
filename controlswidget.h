@@ -17,17 +17,61 @@ public:
   explicit ControlsWidget( QWidget *parent = 0 );
   ~ControlsWidget( );
 
-  void installImageViewer( ImageViewer *viewer );
-
   void setController( Controller *value );
 
-protected slots:
+private slots:
   void imageChanged( );
+  void imageUpdated( );
   void updateRange( );
+
+  void on_spinBoxSpeed_valueChanged(int arg1);
+
+  void on_buttonPlay_clicked(bool checked);
+
+  void on_pushButton1View_clicked();
+
+  void on_pushButton3Views_clicked();
+
+  void on_pushButton4Views_clicked();
+
+  void on_pushButton_1RGB_clicked();
+
+  void on_pushButton_3RGB_clicked();
+
+  void on_pushButton_4RGB_clicked();
+
+  void on_pushButtonGrid_clicked();
+
+  void on_pushButtonHorizontal_clicked();
+
+  void on_pushButtonVertical_clicked();
+
+  void on_pushButtonAxial_clicked();
+
+  void on_pushButtonCoronal_clicked();
+
+  void on_pushButtonSagittal_clicked();
+
+  void on_pushButton_RGB_clicked();
+
+  void on_pushButton_R_clicked();
+
+  void on_pushButton_G_clicked();
+
+  void on_pushButton_B_clicked();
+
+  void on_pushButtonInterpolation_clicked();
+
+  void on_rotate_clicked();
+
+  void on_pushButtonHistogramNormalization_clicked();
+
+  void on_pushButtonFitInView_clicked();
 
 private:
   Ui::ControlsWidget *ui;
   Controller *controller;
+  QTimer * timer;
 };
 
 #endif /* CONTROLSWIDGET_H */

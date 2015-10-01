@@ -2,8 +2,8 @@
 #define CONTROLLER_H
 
 #include "guiimage.h"
-#include "pixmaplabelitem.h"
 
+#include <QGraphicsPixmapItem>
 #include <QObject>
 #include <QVector>
 
@@ -15,6 +15,10 @@ class ThumbsWidget;
  */
 class Controller : public QObject {
   Q_OBJECT
+
+  DisplayFormat * bw2dFormat;
+  DisplayFormat * rgb2dFormat;
+  DisplayFormat * bw3dFormat;
   /**
    *
    * @brief m_images holds all opened images.
@@ -28,7 +32,7 @@ class Controller : public QObject {
    *        and one for the label.
    *
    */
-  QVector< PixmapLabelItem* > m_pixmapItems;
+  QVector< QGraphicsPixmapItem * > m_pixmapItems;
   /**
    *
    * @brief m_currentImagePos holds the current image position.
@@ -38,8 +42,11 @@ class Controller : public QObject {
   /**
    * @brief m_thumbsWidget is a pointer to the thumbnails dock.
    */
-  ThumbsWidget * m_thumbsWidget;
-
+  ThumbsWidget *m_thumbsWidget;
+  /**
+   * @brief scale
+   */
+  double scale;
 public:
   enum { MaxRecentFiles = 10 };
   /**
@@ -122,14 +129,27 @@ public:
    * @brief setThumbsWidget setThumbsWidget sets the pointer to the thumbnails dock.
    * @param thumbsWidget
    */
-  void setThumbsWidget(ThumbsWidget * thumbsWidget);
+  void setThumbsWidget( ThumbsWidget *thumbsWidget );
+  /**
+   * @brief currentFormat
+   */
+  DisplayFormat * currentFormat( );
+  /**
+   * @brief getPixmapItem returns the PixmapItem of the view.
+   * @param view is the number of the view;
+   * @return
+   */
+  QGraphicsPixmapItem* getPixmapItem( size_t view );
 
-  PixmapLabelItem * getPixmapItem( size_t axis );
 signals:
   /**
    * @brief This signal is emmited every time the current image changes.
    */
-  void imageChanged( );
+  void currentImageChanged( );
+  /**
+   * @brief This signal is emmited every time the current image is updated.
+   */
+  void imageUpdated( );
   /**
    * @brief This signal is emmited avery time the m_images vector is updated.
    */
@@ -137,7 +157,7 @@ signals:
   /**
    * @brief recentFilesUpdated
    */
-  void recentFilesUpdated();
+  void recentFilesUpdated( );
 public slots:
   /**
    *
@@ -164,23 +184,53 @@ public slots:
    * @brief changeOthersSlices is called when the mouse is clicked over
    *  an 3d image view (axial, sagittal and coronal).
    * @param posF is the mouse pointer position in the scene.
-   * @param axis is the number of the view's axis.
+   * @param view is the number of the view's axis.
    *
    */
-  void changeOthersSlices( QPointF posF, int axis );
+  void changeOthersSlices(QPointF posF, size_t view );
   /**
    * @brief setCurrentSlice is called by the imageViewer when the slider or
    *  the spinbox have theis values updated.
-   * @param axis
+   * @param view
    * @param slice
    */
-  void setCurrentSlice( size_t axis, size_t slice );
+  void setCurrentSlice( size_t view, size_t slice );
+  /**
+   * @brief setZoom updates the zoom factor.
+   * @param value
+   */
+  void setZoom( int value );
+  /**
+   * @brief setInterpolation switches between smoot and fast interpolation.
+   * @param isSmooth
+   */
+  void setInterpolation(bool isSmooth);
+  /**
+   * @brief rotateAll90 rotates all views in 90 degrees.
+   */
+  void rotateAll90();
+  /**
+   * @brief rotate90 rotates a view in 90 degrees.
+   * @param view View number
+   */
+  void rotate90(size_t view);
+  /**
+   * @brief flipH mirrors the current view on X axis.
+   * @param view View number
+   */
+  void flipH(size_t view);
+  /**
+   * @brief flipV mirrors the current view on Y axis.
+   * @param view View number
+   */
+  void flipV(size_t view);
+
 private:
   /**
    * @brief setRecentFile
    * @param file
    */
-  void setRecentFile(QString fname);
+  void setRecentFile( QString fname );
 };
 
 #endif /** CONTROLLER_H */
