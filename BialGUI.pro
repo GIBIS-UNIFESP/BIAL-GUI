@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     guiimage.cpp \
     pixmaplabelitem.cpp \
     thumbnail.cpp \
-    displayformat.cpp
+    displayformat.cpp \
+    segmentationwidget.cpp
 
 HEADERS  += mainwindow.h \
     controlswidget.h \
@@ -35,12 +36,14 @@ HEADERS  += mainwindow.h \
     guiimage.h \
     pixmaplabelitem.h \
     thumbnail.hpp \
-    displayformat.h
+    displayformat.h \
+    segmentationwidget.h
 
 FORMS    += mainwindow.ui \
     controlswidget.ui \
     thumbswidget.ui \
-    imagewidget.ui
+    imagewidget.ui \
+    segmentationwidget.ui
 
 RESOURCES += \
     qrs/resources.qrc
