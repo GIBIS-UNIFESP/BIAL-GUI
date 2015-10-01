@@ -39,7 +39,7 @@ class GuiImage : public QObject {
   /**
    * @brief equalization is the equalization transform.
    */
-  Bial::Signal equalization;
+  QVector<int> equalization;
   /**
    * @brief histogram is the input image histogram.
    */
