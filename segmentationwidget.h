@@ -7,22 +7,21 @@ namespace Ui {
   class Segmentationwidget;
 }
 
-class Segmentationwidget : public QWidget
-{
-    Q_OBJECT
+class Segmentationwidget : public QWidget {
+  Q_OBJECT
 
-  public:
-    explicit Segmentationwidget(QWidget *parent = 0);
-    ~Segmentationwidget();
+public:
+  explicit Segmentationwidget(QWidget *parent = 0);
+  ~Segmentationwidget();
 
-  private slots:
+private slots:
 
 
-    void on_SegmentationButton_clicked();
-    void iftOgs();
-  private:
-    Ui::Segmentationwidget *ui;
-    Bial::Image seeds;
+  void on_SegmentationButton_clicked();
+
+private:
+  Ui::Segmentationwidget *ui;
+
 
 };
 

@@ -3,17 +3,14 @@
 
 Segmentationwidget::Segmentationwidget(QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::Segmentationwidget)
-{
+  ui(new Ui::Segmentationwidget) {
   ui->setupUi(this);
 }
 
-Segmentationwidget::~Segmentationwidget()
-{
+Segmentationwidget::~Segmentationwidget() {
   delete ui;
 }
 
-void Segmentationwidget::on_SegmentationButton_clicked()
-{
+void Segmentationwidget::on_SegmentationButton_clicked() {
 
 }

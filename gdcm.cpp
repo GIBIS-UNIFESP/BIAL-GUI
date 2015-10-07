@@ -95,7 +95,7 @@ Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
 #else
 
 Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
-  return( Bial::Image< int >( filename ) );
+  return( Bial::Image< int >( Bial::File::Read< int >( filename ) ) );
 }
 
 #endif
