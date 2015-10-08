@@ -20,7 +20,7 @@ Bial::Image< int > Convert2D( const gdcm::Image &gimage ) {
       throw std::runtime_error( BIAL_ERROR( "Unhandled pixel format!" ) );
     }
     Bial::Image< int > res( spc_dim, pixel_size, 3 );
-    const size_t channelSz = res.ChannelSize( );
+    const size_t channelSz = res.size(0) * res.size(1);
     for( size_t pxl = 0; pxl < channelSz; ++pxl ) {
       res[ pxl ] = static_cast< int >( *buffer++ );
       res[ pxl + channelSz ] = static_cast< int >( *buffer++ );
@@ -68,28 +68,38 @@ Bial::Image< int > Convert2D( const gdcm::Image &gimage ) {
 Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
   gdcm::ImageReader ir;
   ir.SetFileName( filename.c_str( ) );
+  try{
+    return Bial::File::Read<int>(filename);
+  }
+  catch( std::bad_alloc e ) {
+    BIAL_WARNING( e.what( ) );
+  }
+  catch( std::runtime_error e ) {
+    BIAL_WARNING( e.what( ) );
+  }
+  catch( std::out_of_range e ) {
+    BIAL_WARNING( e.what( ) );
+  }
+  catch( std::logic_error e ) {
+    BIAL_WARNING( e.what( ) );
+  }
   if( !ir.Read( ) ) {
     BIAL_WARNING( "Could not read " << filename << " with gdcm.");
-    return( Bial::Image< int >::Read( filename ) );
+    throw std::runtime_error(BIAL_ERROR("GDCM CAN'T READ THIS IMAGE"));
   }
   COMMENT( "Getting image from GDCM ImageReader.", 1 );
   gdcm::Image gimage = ir.GetImage( );
   if( gimage.IsEmpty( ) ) {
     BIAL_WARNING( "GDCM GImage is empty!" );
-    return( Bial::Image< int >::Read( filename ) );
+    throw std::runtime_error(BIAL_ERROR("GDCM CAN'T READ THIS IMAGE"));
   }
-  try {
-    if( gimage.GetNumberOfDimensions( ) == 2 ) {
-      return( Convert2D( gimage ) );
-    }
+  if( gimage.GetNumberOfDimensions( ) == 2 ) {
+    return( Convert2D( gimage ) );
+  }else{
+    BIAL_WARNING( "3D image conversion not implemented yet." );
+    throw std::runtime_error(BIAL_ERROR("3D image conversion not implemented yet."));
   }
-  catch( std::runtime_error e ) {
-    BIAL_WARNING( "GDCM Error: " << e.what( ) );
-    return( Bial::Image< int >::Read( filename ) );
-  }
-
-  BIAL_WARNING( "3D image conversion not implemented yet." );
-  return( Bial::Image< int >::Read( filename ) );
+  return Bial::Image<int>();
 }
 
 #else
