@@ -78,7 +78,7 @@
      <x>0</x>
      <y>0</y>
      <width>863</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -144,6 +144,7 @@
     <addaction name="actionShow_controls_dock"/>
     <addaction name="actionHistogram_dock"/>
     <addaction name="actionShow_images_dock"/>
+    <addaction name="actionSegmentation_dock"/>
     <addaction name="separator"/>
     <addaction name="menuBackground_color"/>
    </widget>
@@ -302,6 +303,21 @@
     <layout class="QGridLayout" name="gridLayout_11">
      <item row="0" column="0">
       <widget class="ControlsWidget" name="controlsWidget" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetSegmentation">
+   <property name="windowTitle">
+    <string>Segmentation</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="SegmentationWidget" name="segmentationWidget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -555,6 +571,17 @@
     <string>Ctrl+2</string>
    </property>
   </action>
+  <action name="actionSegmentation_dock">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Segmentation dock</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -580,6 +607,12 @@
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
    <header>thirdParty/qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SegmentationWidget</class>
+   <extends>QWidget</extends>
+   <header>segmentationwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

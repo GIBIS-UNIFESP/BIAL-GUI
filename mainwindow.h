@@ -73,8 +73,7 @@ private slots:
   void on_actionGreenPen_triggered( );
   void on_actionBlackPen_triggered( );
 
-
-private:
+  private:
   Ui::MainWindow *ui;
   Controller *controller;
   QString defaultFolder;

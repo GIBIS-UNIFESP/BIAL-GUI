@@ -7,19 +7,27 @@ namespace Ui {
   class Segmentationwidget;
 }
 
-class Segmentationwidget : public QWidget {
+class SegmentationWidget : public QWidget {
   Q_OBJECT
 
 public:
-  explicit Segmentationwidget(QWidget *parent = 0);
-  ~Segmentationwidget();
+  explicit SegmentationWidget(QWidget *parent = 0);
+  ~SegmentationWidget();
 
 private slots:
 
 
   void on_SegmentationButton_clicked();
 
-private:
+  void on_eraserButton_clicked();
+
+  void on_drawButton_clicked();
+
+  void on_mouseButton_clicked();
+
+  void on_ClearButton_clicked();
+
+  private:
   Ui::Segmentationwidget *ui;
 
 

@@ -40,9 +40,11 @@ void MainWindow::createConnections( ) {
   connect( ui->actionShow_controls_dock, &QAction::toggled, ui->controlsDock, &QDockWidget::setVisible );
   connect( ui->actionHistogram_dock, &QAction::toggled, ui->dockWidgetHistogram, &QDockWidget::setVisible );
   connect( ui->actionShow_images_dock, &QAction::toggled, ui->thumbsDock, &QDockWidget::setVisible );
+  connect( ui->actionSegmentation_dock, &QAction::toggled, ui->dockWidgetSegmentation, &QDockWidget::setVisible );
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
   connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
   connect( ui->dockWidgetHistogram, &QDockWidget::visibilityChanged , ui->actionHistogram_dock, &QAction::setChecked);
+  connect( ui->dockWidgetSegmentation, &QDockWidget::visibilityChanged, ui->actionSegmentation_dock, &QAction::setChecked );
 
   /* Controller. */
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
