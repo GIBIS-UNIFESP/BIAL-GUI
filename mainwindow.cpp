@@ -19,8 +19,10 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->setController( controller );
   ui->controlsDock->hide( );
+  ui->dockWidgetSegmentation->hide();
   ui->imageViewer->setController( controller );
   ui->actionPrint->setEnabled( false );
+
 
   setupLogoview( );
   createConnections( );
