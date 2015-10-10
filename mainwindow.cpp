@@ -99,7 +99,7 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 void MainWindow::currentImageChanged( ) {
   if( controller->currentImage( ) ) {
     DisplayFormat *format = controller->currentFormat( );
-    ui->actionDefaultTool->setVisible(DefaultTool::supportedFormats & (int) format->modality());
+    ui->actionDefaultTool->setVisible( DefaultTool::supportedFormats & ( int ) format->modality( ) );
 
     ui->menuLayout->setEnabled( format->modality( ) != Modality::BW2D );
     ui->menuOverlay->setEnabled( format->hasOverlay( ) );
@@ -154,6 +154,7 @@ void MainWindow::containerUpdated( ) {
     ui->thumbsDock->show( );
   }
   bool hasImage = ( controller->currentImage( ) != nullptr );
+  ui->toolBar->setVisible( hasImage );
   COMMENT( "Has Image = " << hasImage, 0 );
   ui->menuWindow->setEnabled( hasImage );
   ui->controlsDock->setVisible( hasImage );
