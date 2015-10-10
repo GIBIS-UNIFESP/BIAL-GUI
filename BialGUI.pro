@@ -16,6 +16,8 @@ include(gdcm.pri)
 
 SOURCES += \
     thirdParty/qcustomplot.cpp \
+    tool.cpp \
+    defaulttool.cpp
 
 SOURCES += \
     controller.cpp \
@@ -35,6 +37,8 @@ SOURCES += \
 
 HEADERS += \
     thirdParty/qcustomplot.h \
+    tool.h \
+    defaulttool.h
 
 HEADERS  += \
     controller.h \
