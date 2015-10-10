@@ -12,6 +12,7 @@ class Tool : public QObject {
 protected:
   GuiImage * guiImage;
   ImageViewer *viewer;
+  bool visible;
 public:
   enum { DEFAULT };
   Tool( GuiImage *guiImage, ImageViewer *viewer );
@@ -24,6 +25,9 @@ public:
   virtual void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseMoved( QPointF pt, size_t axis ) = 0;
   virtual void sliceChanged( size_t axis, size_t slice ) = 0;
+  virtual void setVisible( bool value );
+
+  bool isVisible();
 
 public slots:
   virtual void imageUpdated( ) = 0;
