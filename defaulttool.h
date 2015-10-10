@@ -8,7 +8,7 @@ class DefaultTool : public Tool {
 
 public:
   DefaultTool( GuiImage *guiImage, ImageViewer *viewer );
-
+  enum{Type = 0};
   /* Tool interface */
 public:
   int type( );

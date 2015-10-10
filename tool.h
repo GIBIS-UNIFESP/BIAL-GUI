@@ -14,7 +14,7 @@ protected:
   ImageViewer *viewer;
   bool visible;
 public:
-  enum { DEFAULT };
+
   Tool( GuiImage *guiImage, ImageViewer *viewer );
 
   virtual int type( ) = 0;

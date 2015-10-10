@@ -501,5 +501,17 @@ void MainWindow::on_actionToggle_overlay_triggered( ) {
 }
 
 void MainWindow::on_actionDefaultTool_triggered( ) {
-
+  GuiImage *img = controller->currentImage( );
+  if( img ) {
+    bool found;
+    for( size_t tool = 0; tool < img->tools.size( ); ++tool ) {
+      if( img->tools[tool]->type() == DefaultTool::Type ){
+        found = true;
+        img->setCurrentToolPos(tool);
+      }
+    }
+    if(!found){
+      img->tools.push_back(new DefaultTool(img, ui->imageViewer));
+    }
+  }
 }

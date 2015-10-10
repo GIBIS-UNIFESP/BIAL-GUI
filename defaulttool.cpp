@@ -6,7 +6,7 @@ DefaultTool::DefaultTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiI
 }
 
 int DefaultTool::type( ) {
-  return( DEFAULT );
+  return( DefaultTool::Type );
 }
 
 void DefaultTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
