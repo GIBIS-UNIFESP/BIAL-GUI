@@ -335,6 +335,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionDefaultTool"/>
   </widget>
   <action name="actionOpen_image">
    <property name="text">
@@ -594,6 +595,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+3</string>
+   </property>
+  </action>
+  <action name="actionDefaultTool">
+   <property name="text">
+    <string>Default Tool</string>
    </property>
   </action>
  </widget>

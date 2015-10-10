@@ -1,4 +1,5 @@
 #include "controller.h"
+#include "defaulttool.h"
 #include "dicomdir.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -98,6 +99,7 @@ void MainWindow::on_actionWhite_background_triggered( ) {
 void MainWindow::currentImageChanged( ) {
   if( controller->currentImage( ) ) {
     DisplayFormat *format = controller->currentFormat( );
+    ui->actionDefaultTool->setVisible(DefaultTool::supportedFormats & (int) format->modality());
 
     ui->menuLayout->setEnabled( format->modality( ) != Modality::BW2D );
     ui->menuOverlay->setEnabled( format->hasOverlay( ) );
@@ -492,7 +494,11 @@ void MainWindow::on_actionBlackPen_triggered( ) {
 }
 
 void MainWindow::on_actionToggle_overlay_triggered( ) {
-  if( controller->currentFormat() ) {
+  if( controller->currentFormat( ) ) {
     controller->currentFormat( )->toggleOverlay( );
   }
+}
+
+void MainWindow::on_actionDefaultTool_triggered( ) {
+
 }

@@ -12,7 +12,6 @@ public:
   /* Tool interface */
 public:
   int type( );
-  Modality supportedFormats( );
 
   void mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis );

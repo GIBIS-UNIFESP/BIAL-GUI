@@ -18,7 +18,8 @@ public:
   Tool( GuiImage *guiImage, ImageViewer *viewer );
 
   virtual int type( ) = 0;
-  virtual Modality supportedFormats( ) = 0;
+  static const int supportedFormats =
+    ( ( int ) Modality::BW2D | ( int ) Modality::BW3D | ( int ) Modality::RGB2D );
 
   virtual void mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
@@ -27,7 +28,7 @@ public:
   virtual void sliceChanged( size_t axis, size_t slice ) = 0;
   virtual void setVisible( bool value );
 
-  bool isVisible();
+  bool isVisible( );
 
 public slots:
   virtual void imageUpdated( ) = 0;

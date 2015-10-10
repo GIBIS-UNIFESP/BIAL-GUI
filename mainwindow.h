@@ -75,6 +75,8 @@ private slots:
 
   void on_actionToggle_overlay_triggered();
 
+  void on_actionDefaultTool_triggered();
+
 private:
   Ui::MainWindow *ui;
   Controller *controller;

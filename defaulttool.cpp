@@ -9,10 +9,6 @@ int DefaultTool::type( ) {
   return( DEFAULT );
 }
 
-Modality DefaultTool::supportedFormats( ) {
-  return( ( Modality ) ( ( int ) Modality::BW2D | ( int ) Modality::BW3D | ( int ) Modality::RGB2D ) );
-}
-
 void DefaultTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
   COMMENT( "Mouse released.", 2 );
   if( buttons & Qt::LeftButton ) {
