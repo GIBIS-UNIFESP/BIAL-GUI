@@ -1,12 +1,12 @@
 #ifndef GUIIMAGE_H
 #define GUIIMAGE_H
+#include "displayformat.h"
 #include <Geometrics.hpp>
 #include <Image.hpp>
 #include <QObject>
 #include <QPixmap>
 #include <QVector>
 #include <Signal.hpp>
-#include "displayformat.h"
 
 class Tool;
 
@@ -33,15 +33,15 @@ class GuiImage : public QObject {
   /**
    * @brief cachedPixmaps holds a copy of the last generated pixmap at each view.
    */
-  QVector<QPixmap>cachedPixmaps;
+  QVector< QPixmap > cachedPixmaps;
   /**
    * @brief needUpdate is a flag that determines if a pixmap needs to be updated.
    */
-  QVector<bool>needUpdate;
+  QVector< bool > needUpdate;
   /**
    * @brief equalization is the equalization transform.
    */
-  QVector<int> equalization;
+  QVector< int > equalization;
   /**
    * @brief histogram is the input image histogram.
    */
@@ -71,10 +71,6 @@ class GuiImage : public QObject {
    */
   int m_max;
   /**
-   * @brief m_tools is a vector containing the image tools.
-   */
-  QVector< Tool *> m_tools;
-  /**
    * @brief currentToolPos is the current Tool number.
    */
   size_t m_currentToolPos;
@@ -85,9 +81,13 @@ private:
    * negative positions.
    * @param view
    */
-  void updateBoundings(size_t axis);
+  void updateBoundings( size_t axis );
 
 public:
+  /**
+   * @brief tools is a vector containing the image tools.
+   */
+  QVector< Tool* > tools;
   /**
    * @brief GuiImage is the GuiImage class constructor.
    * @param fName is the absolute path to the input image.
@@ -95,14 +95,14 @@ public:
    */
   explicit GuiImage( QString fName, QObject *parent = 0 );
   /**
-    * @brief Destructor
-    */
-  virtual ~GuiImage();
+   * @brief Destructor
+   */
+  virtual ~GuiImage( );
   /**
    * @brief currentTool returns the current Tool.
    * @return
    */
-  Tool * currentTool();
+  Tool* currentTool( );
   /**
    * @brief modality is the image modality getter.
    * @return
@@ -119,25 +119,25 @@ public:
    * @param view
    * @return
    */
-  QPixmap getSlice(size_t view );
+  QPixmap getSlice( size_t view );
   /**
    * @brief width is the view width.
    * @param view
    * @return
    */
-  size_t width(size_t view );
+  size_t width( size_t view );
   /**
    * @brief heigth is the view heigth.
    * @param view
    * @return
    */
-  size_t heigth(size_t view );
+  size_t heigth( size_t view );
   /**
    * @brief depth is the number of slices of the view.
    * @param view
    * @return
    */
-  size_t depth(size_t view );
+  size_t depth( size_t view );
   /**
    * @brief currentSlice is the view's current slice.
    * @param view
@@ -150,14 +150,14 @@ public:
    * @param slice
    * @return
    */
-  void setCurrentSlice(size_t view, size_t slice );
+  void setCurrentSlice( size_t view, size_t slice );
   /**
    * @brief getPosition transforms the scene position to the input image coordinates.
    * @param pos is the graphicsscene position.
    * @param view is the view number.
    * @return The input image coordinates.
    */
-  Bial::Point3D getPosition(QPointF pos, size_t view );
+  Bial::Point3D getPosition( QPointF pos, size_t view );
   /**
    * @brief getTransform returns the transform matrix of the views.
    * @param view
@@ -172,22 +172,22 @@ public:
   /**
    * @brief rotateAll90 rotates all views in 90 degrees.
    */
-  void rotateAll90();
+  void rotateAll90( );
   /**
    * @brief rotate90 rotates a view in 90 degrees.
    * @param view View number
    */
-  void rotate90(size_t view);
+  void rotate90( size_t view );
   /**
    * @brief flipH mirrors the current view on X axis.
    * @param view View number
    */
-  void flipH(size_t view);
+  void flipH( size_t view );
   /**
    * @brief flipV mirrors the current view on Y axis.
    * @param view View number
    */
-  void flipV(size_t view);
+  void flipV( size_t view );
   /**
    * @brief max is the maximum intensity of the input image.
    * @return
@@ -197,17 +197,17 @@ public:
    * @brief getEqualizeHistogram returns a boolean value that says if the image must be equalized or not.
    * @return
    */
-  bool getEqualizeHistogram() const;
+  bool getEqualizeHistogram( ) const;
   /**
    * @brief setEqualizeHistogram updates a boolean value that says if the image must be equalized or not.
    * @param equalizeHistogram
    */
-  void setEqualizeHistogram(bool equalizeHistogram);
+  void setEqualizeHistogram( bool equalizeHistogram );
   /**
    * @brief getHistogram returns the image histogram.
    * @return
    */
-  const Bial::Signal &getHistogram() const;
+  const Bial::Signal &getHistogram( ) const;
 
   /**
    * @brief getPixel returns the pixel intensity of the image at the given position.
@@ -216,16 +216,9 @@ public:
    * @param z
    * @return
    */
-  int getPixel(int x, int y, int z = 0);
-  /**
-   * @brief tools returns a vector with the image tools.
-   * @return
-   */
-  QVector<Tool *> tools() const;
-
-
-  size_t currentToolPos() const;
-  void setCurrentToolPos(const size_t & currentToolPos);
+  int getPixel( int x, int y, int z = 0 );
+  size_t currentToolPos( ) const;
+  void setCurrentToolPos( const size_t &currentToolPos );
 
 signals:
   /**

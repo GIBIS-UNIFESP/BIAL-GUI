@@ -3,10 +3,10 @@
 #include "tool.h"
 #include <NiftiHeader.hpp>
 #include <QDebug>
+#include <QDebug>
 #include <QPixmap>
 #include <QRgb>
 #include <QTime>
-#include <QDebug>
 #include <QTime>
 
 
@@ -99,11 +99,17 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
 }
 
 GuiImage::~GuiImage( ) {
-  qDeleteAll( m_tools );
+  qDeleteAll( tools );
 }
 
 Tool* GuiImage::currentTool( ) {
-  return( m_tools.at( m_currentToolPos ) );
+  if( tools.isEmpty( ) ) {
+    return( nullptr );
+  }
+  if( m_currentToolPos >= ( size_t ) tools.size( ) ) {
+    m_currentToolPos = 0;
+  }
+  return( tools.at( m_currentToolPos ) );
 }
 
 Modality GuiImage::modality( ) {
@@ -316,18 +322,14 @@ int GuiImage::getPixel( int x, int y, int z ) {
   return( color );
 }
 
-
-QVector< Tool* > GuiImage::tools( ) const {
-  return( m_tools );
-}
-
 size_t GuiImage::currentToolPos( ) const {
   return( m_currentToolPos );
 }
 
 void GuiImage::setCurrentToolPos( const size_t &currentToolPos ) {
-  if(currentToolPos < m_tools.size())
+  if( currentToolPos < tools.size( ) ) {
     m_currentToolPos = currentToolPos;
+  }
 }
 
 void GuiImage::updateBoundings( size_t axis ) {

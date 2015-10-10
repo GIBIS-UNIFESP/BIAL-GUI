@@ -7,22 +7,25 @@
 #include <QPointF>
 #include <QString>
 
-class Tool {
+class Tool : public QObject {
+  Q_OBJECT
 protected:
-  GuiImage *guiImage;
-  ImageViewer * viewer;
+  GuiImage * guiImage;
+  ImageViewer *viewer;
 public:
-  enum{ DEFAULT };
-  Tool( GuiImage *guiImage, ImageViewer * viewer );
+  enum { DEFAULT };
+  Tool( GuiImage *guiImage, ImageViewer *viewer );
 
-  virtual QString name() = 0;
-  virtual int type() = 0;
-  virtual Modality supportedFormats() = 0;
+  virtual int type( ) = 0;
+  virtual Modality supportedFormats( ) = 0;
 
   virtual void mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseMoved( QPointF pt, size_t axis ) = 0;
+
+public slots:
+  virtual void imageUpdated( ) = 0;
 };
 
 #endif /* TOOL_H */

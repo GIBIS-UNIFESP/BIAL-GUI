@@ -181,15 +181,6 @@ public slots:
    */
   void loadNextImage( );
   /**
-   *
-   * @brief changeOthersSlices is called when the mouse is clicked over
-   *  an 3d image view (axial, sagittal and coronal).
-   * @param posF is the mouse pointer position in the scene.
-   * @param view is the number of the view's axis.
-   *
-   */
-  void changeOthersSlices(QPointF posF, size_t view );
-  /**
    * @brief setCurrentSlice is called by the imageViewer when the slider or
    *  the spinbox have theis values updated.
    * @param view

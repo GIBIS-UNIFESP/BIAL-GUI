@@ -7,6 +7,7 @@
 
 #include "Common.hpp"
 #include "controller.h"
+#include "defaulttool.h"
 #include "graphicsscene.h"
 #include "imageviewer.h"
 #include "imagewidget.h"
@@ -76,39 +77,40 @@ void ImageViewer::updateViews( ) {
 void ImageViewer::changeImage( ) {
   COMMENT( "ImageViewer::changeImage", 2 );
   GuiImage *img = controller->currentImage( );
-  if( !img ) {
-    return;
-  }
-  DisplayFormat *format = controller->currentFormat( );
-  for( size_t axis = 0; axis < 4; ++axis ) {
-
-    getScene( axis )->setOverlay( false );
-    getScene( axis )->setOverlayPen( format->overlayColor( ) );
-    if( format->hasViewerControls( ) ) {
-      views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
-      views[ axis ]->setSlice( img->currentSlice( axis ) );
-      views[ axis ]->showControls( );
+  if( img ) {
+    if( img->tools.empty( ) ) {
+      img->tools.append( new DefaultTool( img, this ) );
     }
-    else {
-      views[ axis ]->hideControls( );
+    DisplayFormat *format = controller->currentFormat( );
+    for( size_t axis = 0; axis < 4; ++axis ) {
+      getScene( axis )->setOverlay( false );
+      getScene( axis )->setOverlayPen( format->overlayColor( ) );
+      if( format->hasViewerControls( ) ) {
+        views[ axis ]->setRange( 0, img->depth( axis ) - 1 );
+        views[ axis ]->setSlice( img->currentSlice( axis ) );
+        views[ axis ]->showControls( );
+      }
+      else {
+        views[ axis ]->hideControls( );
+      }
     }
-  }
-  if( format->modality( ) == Modality::RGB2D ) {
-    getScene(1)->setOverlayPen( QPen( Qt::green ) );
-    getScene(2)->setOverlayPen( QPen( Qt::red ) );
-    getScene(3)->setOverlayPen( QPen( Qt::yellow ) );
-  }
-  setLayoutType( format->currentLayout( ) );
-  setViewMode( format->currentViews( ) );
-  for( size_t axis = 0; axis < 4; ++axis ) {
-    if( controller ) {
-      QRectF r = controller->getPixmapItem( axis )->boundingRect( );
-      getScene( axis )->setSceneRect( r );
-      QGraphicsView *view = views[ axis ]->graphicsView( );
-      view->fitInView( controller->getPixmapItem( axis ), Qt::KeepAspectRatio );
+    if( format->modality( ) == Modality::RGB2D ) {
+      getScene( 1 )->setOverlayPen( QPen( Qt::green ) );
+      getScene( 2 )->setOverlayPen( QPen( Qt::red ) );
+      getScene( 3 )->setOverlayPen( QPen( Qt::yellow ) );
     }
+    setLayoutType( format->currentLayout( ) );
+    setViewMode( format->currentViews( ) );
+    for( size_t axis = 0; axis < 4; ++axis ) {
+      if( controller ) {
+        QRectF r = controller->getPixmapItem( axis )->boundingRect( );
+        getScene( axis )->setSceneRect( r );
+        QGraphicsView *view = views[ axis ]->graphicsView( );
+        view->fitInView( controller->getPixmapItem( axis ), Qt::KeepAspectRatio );
+      }
+    }
+    updateViews( );
   }
-  updateViews( );
 }
 
 void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
@@ -239,13 +241,16 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
     }
   }
   if( mouseEvt ) {
+    Tool *tool = controller->currentImage( )->currentTool( );
     QPointF scnPos = mouseEvt->scenePos( );
     if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseMove ) {
       if( dragging && ( timer.elapsed( ) > 25 ) ) {
         timer.restart( );
-        controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
         emit mouseDragged( scnPos, mouseEvt->buttons( ), axis );
+        if( tool ) {
+          tool->mouseDragged( scnPos, mouseEvt->buttons( ), axis );
+        }
       }
       emit mouseMoved( scnPos, axis );
     }
@@ -253,18 +258,22 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
       if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = true;
         timer.restart( );
-        controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
       }
       emit mouseClicked( scnPos, mouseEvt->buttons( ), axis );
+      if( tool ) {
+        tool->mouseClicked( scnPos, mouseEvt->buttons( ), axis );
+      }
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
       if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = false;
-        controller->changeOthersSlices( scnPos, axis );
         updateOverlay( scnPos, axis );
       }
       emit mouseReleased( scnPos, mouseEvt->buttons( ), axis );
+      if( tool ) {
+        tool->mouseReleased( scnPos, mouseEvt->buttons( ), axis );
+      }
     }
   }
   return( QWidget::eventFilter( obj, evt ) );

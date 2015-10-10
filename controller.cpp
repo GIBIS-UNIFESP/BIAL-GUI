@@ -154,30 +154,6 @@ void Controller::loadNextImage( ) {
   }
 }
 
-void Controller::changeOthersSlices( QPointF posF, size_t view ) {
-  COMMENT( "Changing slice position of other frames based on image position.", 2 );
-  if( currentImage( ) ) {
-    if( ( currentImage( )->modality( ) == Modality::BW3D ) ) {
-      Bial::FastTransform transform = currentImage( )->getTransform( view );
-      Bial::Point3D pt = transform( ( double ) posF.x( ), ( double ) posF.y( ),
-                                    ( double ) currentImage( )->currentSlice( view ) );
-      for( size_t other = 0; other < 3; ++other ) {
-        if( other != view ) {
-          Bial::FastTransform otherTransf = currentImage( )->getTransform( other ).Inverse( );
-          Bial::Point3D otherPt = otherTransf( pt );
-          size_t pos = static_cast< size_t >( round( otherPt.z ) );
-          if( pos < currentImage( )->depth( other ) ) {
-            currentImage( )->setCurrentSlice( other, pos );
-          }
-        }
-      }
-    }
-  }
-  else {
-    BIAL_WARNING( "CURRENT IMAGE NOT FOUND!" );
-  }
-}
-
 void Controller::setCurrentSlice( size_t view, size_t slice ) {
   currentImage( )->setCurrentSlice( view, slice );
 }
