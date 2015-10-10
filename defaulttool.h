@@ -7,7 +7,7 @@
 class DefaultTool : public Tool {
 
 public:
-  DefaultTool( GuiImage *guiImage, ImageViewer * viewer );
+  DefaultTool( GuiImage *guiImage, ImageViewer *viewer );
 
   /* Tool interface */
 public:
@@ -18,6 +18,10 @@ public:
   void mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseMoved( QPointF pt, size_t axis );
+  void sliceChanged( size_t axis, size_t slice );
+
+public slots:
+  void imageUpdated( );
 
 private:
   /**
@@ -29,7 +33,8 @@ private:
    *
    */
   void changeOtherSlices( QPointF posF, size_t view );
-  void imageUpdated();
+  void updateOverlay( QPointF pt, size_t axis );
+
 };
 
 #endif /* DEFAULTTOOL_H */

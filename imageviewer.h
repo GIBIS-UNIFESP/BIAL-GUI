@@ -17,7 +17,7 @@ class ImageViewer : public QWidget, public ViewerInterface {
   Q_OBJECT
   std::array< ImageWidget*, 4 > views;
   QGridLayout *layout;
-  Controller * controller;
+  Controller * m_controller;
   bool dragging;
   QTime timer;
 
@@ -30,6 +30,7 @@ public:
   bool eventFilter(QObject *obj, QEvent *evt);
   GraphicsScene * getScene(size_t axis);
   void setController(Controller * value);
+  Controller * controller() const;
 
 signals:
   void mouseReleased(QPointF pt, Qt::MouseButtons buttons, size_t axis );
@@ -42,7 +43,6 @@ private slots:
   void changeImage();
 
   void setLayoutType(Layout layout);
-  void updateOverlay(QPointF pt, size_t axis );
   void setViewMode(Views view);
 
   void setGridLayout( );
@@ -53,11 +53,6 @@ private slots:
   void showViews( );
 
   void sliceChanged(size_t axis, size_t slice);
-
-public slots:
-
-  void toggleOverlay();
-
 
   // QWidget interface
 protected:

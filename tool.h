@@ -23,6 +23,7 @@ public:
   virtual void mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseMoved( QPointF pt, size_t axis ) = 0;
+  virtual void sliceChanged( size_t axis, size_t slice ) = 0;
 
 public slots:
   virtual void imageUpdated( ) = 0;

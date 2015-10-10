@@ -19,7 +19,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
   ui->controlsWidget->setController( controller );
   ui->controlsDock->hide( );
-  ui->dockWidgetSegmentation->hide();
+  ui->dockWidgetSegmentation->hide( );
   ui->imageViewer->setController( controller );
   ui->actionPrint->setEnabled( false );
 
@@ -45,8 +45,11 @@ void MainWindow::createConnections( ) {
   connect( ui->actionSegmentation_dock, &QAction::toggled, ui->dockWidgetSegmentation, &QDockWidget::setVisible );
   connect( ui->controlsDock, &QDockWidget::visibilityChanged, ui->actionShow_controls_dock, &QAction::setChecked );
   connect( ui->thumbsDock, &QDockWidget::visibilityChanged, ui->actionShow_images_dock, &QAction::setChecked );
-  connect( ui->dockWidgetHistogram, &QDockWidget::visibilityChanged , ui->actionHistogram_dock, &QAction::setChecked);
-  connect( ui->dockWidgetSegmentation, &QDockWidget::visibilityChanged, ui->actionSegmentation_dock, &QAction::setChecked );
+  connect( ui->dockWidgetHistogram, &QDockWidget::visibilityChanged, ui->actionHistogram_dock, &QAction::setChecked );
+  connect( ui->dockWidgetSegmentation,
+           &QDockWidget::visibilityChanged,
+           ui->actionSegmentation_dock,
+           &QAction::setChecked );
 
   /* Controller. */
   connect( controller, &Controller::currentImageChanged, this, &MainWindow::currentImageChanged );
@@ -58,9 +61,6 @@ void MainWindow::createConnections( ) {
   connect( ui->imageViewer, &ImageViewer::mouseClicked, this, &MainWindow::updateIntensity );
   connect( ui->imageViewer, &ImageViewer::mouseReleased, this, &MainWindow::updateIntensity );
   connect( ui->imageViewer, &ImageViewer::mouseDragged, this, &MainWindow::updateIntensity );
-
-  /* Overlay */
-  connect( ui->actionToggle_overlay, &QAction::triggered, ui->imageViewer, &ImageViewer::toggleOverlay );
 }
 
 void MainWindow::setupLogoview( ) {
@@ -129,14 +129,14 @@ void MainWindow::imageUpdated( ) {
     y[ bin ] = hist[ bin ];
   }
   plot->addGraph( );
-  plot->setInteraction(QCP::iRangeDrag, true);
-  plot->setInteraction(QCP::iRangeZoom, true);
-  plot->graph(0)->clearData();
+  plot->setInteraction( QCP::iRangeDrag, true );
+  plot->setInteraction( QCP::iRangeZoom, true );
+  plot->graph( 0 )->clearData( );
   plot->graph( 0 )->setData( x, y );
-  plot->axisRect(0)->setRangeDrag(Qt::Vertical);
-  plot->axisRect(0)->setRangeZoom(Qt::Vertical);
-  plot->axisRect(0)->setRangeZoomAxes(plot->xAxis,plot->yAxis);
-  plot->graph(0)->setLineStyle(QCPGraph::lsImpulse);
+  plot->axisRect( 0 )->setRangeDrag( Qt::Vertical );
+  plot->axisRect( 0 )->setRangeZoom( Qt::Vertical );
+  plot->axisRect( 0 )->setRangeZoomAxes( plot->xAxis, plot->yAxis );
+  plot->graph( 0 )->setLineStyle( QCPGraph::lsImpulse );
   plot->xAxis->setLabel( "Intensity" );
   plot->yAxis->setLabel( "Frequency" );
   plot->rescaleAxes( true );
@@ -403,8 +403,8 @@ void MainWindow::on_actionRemove_current_label_triggered( ) {
 }
 
 void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size_t axis ) {
-  Q_UNUSED(buttons)
-  GuiImage *img = controller->currentImage( );
+  Q_UNUSED( buttons )
+  GuiImage * img = controller->currentImage( );
   if( img != nullptr ) {
     Bial::Point3D pt = img->getPosition( scnPos, axis );
     QString msg;
@@ -489,4 +489,10 @@ void MainWindow::on_actionGreenPen_triggered( ) {
 
 void MainWindow::on_actionBlackPen_triggered( ) {
   controller->currentFormat( )->setOverlayColor( Qt::black );
+}
+
+void MainWindow::on_actionToggle_overlay_triggered( ) {
+  if( controller->currentFormat() ) {
+    controller->currentFormat( )->toggleOverlay( );
+  }
 }

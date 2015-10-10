@@ -13,7 +13,7 @@
 #include "imagewidget.h"
 
 ImageViewer::ImageViewer( QWidget *parent ) : QWidget( parent ) {
-  controller = nullptr;
+  m_controller = nullptr;
   for( size_t i = 0; i < views.size( ); ++i ) {
     views[ i ] = new ImageWidget( this );
     views[ i ]->hideControls( );
@@ -43,45 +43,49 @@ void ImageViewer::setViewBgColor( const QColor &color ) {
 }
 
 void ImageViewer::setController( Controller *value ) {
-  controller = value;
-  connect( controller, &Controller::currentImageChanged, this, &ImageViewer::changeImage );
-  connect( controller, &Controller::imageUpdated, this, &ImageViewer::updateViews );
+  m_controller = value;
+  connect( m_controller, &Controller::currentImageChanged, this, &ImageViewer::changeImage );
+  connect( m_controller, &Controller::imageUpdated, this, &ImageViewer::updateViews );
   /*  connect( this, &ImageViewer::mouseClicked, controller, &Controller::changeOthersSlices ); */
   for( ImageWidget *view : views ) {
-    connect( view, &ImageWidget::sliceChanged, controller, &Controller::setCurrentSlice );
+    connect( view, &ImageWidget::sliceChanged, m_controller, &Controller::setCurrentSlice );
     connect( view, &ImageWidget::sliceChanged, this, &ImageViewer::sliceChanged );
-    connect( view, &ImageWidget::rotate, controller, &Controller::rotate90 );
-    connect( view, &ImageWidget::fliph, controller, &Controller::flipH );
-    connect( view, &ImageWidget::flipv, controller, &Controller::flipV );
+    connect( view, &ImageWidget::rotate, m_controller, &Controller::rotate90 );
+    connect( view, &ImageWidget::fliph, m_controller, &Controller::flipH );
+    connect( view, &ImageWidget::flipv, m_controller, &Controller::flipV );
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
-    getScene( axis )->addItem( controller->getPixmapItem( axis ) );
+    getScene( axis )->addItem( m_controller->getPixmapItem( axis ) );
   }
+}
+
+Controller* ImageViewer::controller( ) const {
+  return( m_controller );
 }
 
 void ImageViewer::updateViews( ) {
   COMMENT( "ImageViewer::updateViews", 2 );
-  if( !controller ) {
+  if( !m_controller ) {
     return;
   }
-  GuiImage *img = controller->currentImage( );
+  GuiImage *img = m_controller->currentImage( );
   if( !img ) {
     return;
   }
   for( size_t axis = 0; axis < 4; ++axis ) {
     views[ axis ]->setSlice( img->currentSlice( axis ) );
-    getScene( axis )->setOverlay( controller->currentFormat( )->overlay( ) );
+    getScene( axis )->setOverlay( m_controller->currentFormat( )->overlay( ) );
   }
 }
 
 void ImageViewer::changeImage( ) {
   COMMENT( "ImageViewer::changeImage", 2 );
-  GuiImage *img = controller->currentImage( );
+  GuiImage *img = m_controller->currentImage( );
   if( img ) {
     if( img->tools.empty( ) ) {
       img->tools.append( new DefaultTool( img, this ) );
     }
-    DisplayFormat *format = controller->currentFormat( );
+    DisplayFormat *format = m_controller->currentFormat( );
     for( size_t axis = 0; axis < 4; ++axis ) {
       getScene( axis )->setOverlay( false );
       getScene( axis )->setOverlayPen( format->overlayColor( ) );
@@ -102,37 +106,14 @@ void ImageViewer::changeImage( ) {
     setLayoutType( format->currentLayout( ) );
     setViewMode( format->currentViews( ) );
     for( size_t axis = 0; axis < 4; ++axis ) {
-      if( controller ) {
-        QRectF r = controller->getPixmapItem( axis )->boundingRect( );
+      if( m_controller ) {
+        QRectF r = m_controller->getPixmapItem( axis )->boundingRect( );
         getScene( axis )->setSceneRect( r );
         QGraphicsView *view = views[ axis ]->graphicsView( );
-        view->fitInView( controller->getPixmapItem( axis ), Qt::KeepAspectRatio );
+        view->fitInView( m_controller->getPixmapItem( axis ), Qt::KeepAspectRatio );
       }
     }
     updateViews( );
-  }
-}
-
-void ImageViewer::updateOverlay( QPointF pt, size_t axis ) {
-  COMMENT( "ImageViewer::updateOverlay", 2 );
-  GuiImage *img = controller->currentImage( );
-  pt.setX( qMin( qMax( pt.x( ), 0.0 ), ( double ) img->width( axis ) ) );
-  pt.setY( qMin( qMax( pt.y( ), 0.0 ), ( double ) img->heigth( axis ) ) );
-  getScene( axis )->setOverlayPos( pt );
-  Bial::FastTransform transform = img->getTransform( axis );
-  Bial::Point3D pt3d = transform( ( double ) pt.x( ),
-                                  ( double ) pt.y( ),
-                                  ( double ) img->currentSlice( axis ) );
-  size_t size = controller->currentFormat( )->getMaximumNumberOfViews( );
-  for( size_t other = 0; other < size; ++other ) {
-    if( controller->currentFormat( )->overlay( ) ) {
-      views[ other ]->scene( )->setOverlay( true );
-      if( other != axis ) {
-        Bial::FastTransform otherTransf = img->getTransform( other ).Inverse( );
-        Bial::Point3D otherPt = otherTransf( pt3d );
-        views[ other ]->scene( )->setOverlayPos( QPointF( otherPt.x, otherPt.y ) );
-      }
-    }
   }
 }
 
@@ -218,13 +199,11 @@ void ImageViewer::setViewMode( Views view ) {
 }
 
 void ImageViewer::sliceChanged( size_t axis, size_t slice ) {
-  Q_UNUSED( slice )
-  updateOverlay( getScene( axis )->overlayPos( ), axis );
-}
-
-void ImageViewer::toggleOverlay( ) {
-  if( controller->currentImage( ) ) {
-    controller->currentFormat( )->toggleOverlay( );
+  if( m_controller->currentImage( ) ) {
+    Tool *tool = m_controller->currentImage( )->currentTool( );
+    if( tool ) {
+      tool->sliceChanged( axis, slice );
+    }
   }
 }
 
@@ -241,12 +220,11 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
     }
   }
   if( mouseEvt ) {
-    Tool *tool = controller->currentImage( )->currentTool( );
+    Tool *tool = m_controller->currentImage( )->currentTool( );
     QPointF scnPos = mouseEvt->scenePos( );
     if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseMove ) {
       if( dragging && ( timer.elapsed( ) > 25 ) ) {
         timer.restart( );
-        updateOverlay( scnPos, axis );
         emit mouseDragged( scnPos, mouseEvt->buttons( ), axis );
         if( tool ) {
           tool->mouseDragged( scnPos, mouseEvt->buttons( ), axis );
@@ -258,7 +236,6 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
       if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = true;
         timer.restart( );
-        updateOverlay( scnPos, axis );
       }
       emit mouseClicked( scnPos, mouseEvt->buttons( ), axis );
       if( tool ) {
@@ -268,7 +245,6 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseRelease ) {
       if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = false;
-        updateOverlay( scnPos, axis );
       }
       emit mouseReleased( scnPos, mouseEvt->buttons( ), axis );
       if( tool ) {
