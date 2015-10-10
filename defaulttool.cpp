@@ -84,11 +84,6 @@ void DefaultTool::updateOverlay( QPointF pt, size_t axis ) {
 }
 
 
-void DefaultTool::imageUpdated( ) {
-
-}
-
-
 void DefaultTool::sliceChanged( size_t axis, size_t slice ) {
   Q_UNUSED( slice )
   updateOverlay( viewer->getScene( axis )->overlayPos( ), axis );

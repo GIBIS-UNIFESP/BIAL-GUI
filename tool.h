@@ -29,9 +29,6 @@ public:
   virtual void setVisible( bool value );
 
   bool isVisible( );
-
-public slots:
-  virtual void imageUpdated( ) = 0;
 };
 
 #endif /* TOOL_H */

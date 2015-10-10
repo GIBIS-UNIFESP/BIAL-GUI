@@ -19,9 +19,6 @@ public:
   void mouseMoved( QPointF pt, size_t axis );
   void sliceChanged( size_t axis, size_t slice );
 
-public slots:
-  void imageUpdated( );
-
 private:
   /**
    *
