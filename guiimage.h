@@ -8,6 +8,8 @@
 #include <Signal.hpp>
 #include "displayformat.h"
 
+class Tool;
+
 /**
  * @brief The GuiImage class is a bridge to the Bial::Image data structure to the QImage data structure. <br>
  * It have many important functions, such as the views spatial transforms, histogram equalization and others.
@@ -68,6 +70,14 @@ class GuiImage : public QObject {
    * @brief m_max is the maximum value at the input image.
    */
   int m_max;
+  /**
+   * @brief m_tools is a vector containing the image tools.
+   */
+  QVector< Tool *> m_tools;
+  /**
+   * @brief currentToolPos is the current Tool number.
+   */
+  size_t m_currentToolPos;
 private:
   /**
    * @brief updateBoundings is called each time the transformation matrix is updated. <br>
@@ -84,6 +94,15 @@ public:
    * @param parent is the QObject parent.
    */
   explicit GuiImage( QString fName, QObject *parent = 0 );
+  /**
+    * @brief Destructor
+    */
+  virtual ~GuiImage();
+  /**
+   * @brief currentTool returns the current Tool.
+   * @return
+   */
+  Tool * currentTool();
   /**
    * @brief modality is the image modality getter.
    * @return
@@ -198,6 +217,16 @@ public:
    * @return
    */
   int getPixel(int x, int y, int z = 0);
+  /**
+   * @brief tools returns a vector with the image tools.
+   * @return
+   */
+  QVector<Tool *> tools() const;
+
+
+  size_t currentToolPos() const;
+  void setCurrentToolPos(const size_t & currentToolPos);
+
 signals:
   /**
    * @brief imageUpdated is called each time a internal property is updated,

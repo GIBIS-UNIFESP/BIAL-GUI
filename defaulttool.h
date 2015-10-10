@@ -6,7 +6,7 @@
 
 class DefaultTool : public Tool {
 public:
-  DefaultTool( GuiImage * guiImage );
+  DefaultTool( GuiImage * guiImage, ImageViewer * viewer );
 
   // Tool interface
 public:

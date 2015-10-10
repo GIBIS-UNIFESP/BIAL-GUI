@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include "guiimage.h"
+#include "tool.h"
 
 #include <QGraphicsPixmapItem>
 #include <QObject>

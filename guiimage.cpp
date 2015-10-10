@@ -1,11 +1,11 @@
 #include "gdcm.h"
 #include "guiimage.h"
+#include "tool.h"
 #include <NiftiHeader.hpp>
 #include <QDebug>
 #include <QPixmap>
 #include <QRgb>
 #include <QTime>
-
 #include <QDebug>
 #include <QTime>
 
@@ -62,6 +62,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
     for( int view = 0; view < m_currentSlice.size( ); ++view ) {
       setCurrentSlice( view, depth( view ) / 2 );
     }
+    m_currentToolPos = -1;
   }
   else if( ( image.Dims( ) == 2 ) && ( image.Channels( ) == 3 ) ) {
     COMMENT( "PPM image detected.", 2 );
@@ -97,6 +98,14 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
            depth( 0 ) << ")", 0 );
 }
 
+GuiImage::~GuiImage( ) {
+  qDeleteAll( m_tools );
+}
+
+Tool* GuiImage::currentTool( ) {
+  return( m_tools.at( m_currentToolPos ) );
+}
+
 Modality GuiImage::modality( ) {
   return( m_modality );
 }
@@ -109,8 +118,10 @@ QPixmap GuiImage::getSlice( size_t view ) {
   size_t slice = currentSlice( view );
   COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << view << ", slice = " << slice, 0 );
   if( needUpdate[ view ] ) {
-//    QTime timer;
-//    timer.start( );
+/*
+ *    QTime timer;
+ *    timer.start( );
+ */
     if( slice >= depth( view ) ) {
       throw( std::out_of_range( BIAL_ERROR( QString( "Slice is out of range. Expected < %1" ).arg( depth( view ) ).
                                             toStdString( ) ) ) );
@@ -120,7 +131,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
     double factor = 255.0 / ( double ) m_max;
     const Bial::FastTransform &transf = transform[ view ];
-    if( modality( ) == Modality::BW3D || modality() == Modality::BW2D) {
+    if( ( modality( ) == Modality::BW3D ) || ( modality( ) == Modality::BW2D ) ) {
       COMMENT( "Generating BW view.", 2 );
 #pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor)
       for( size_t y = 0; y < ysize; ++y ) {
@@ -141,7 +152,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
     else if( modality( ) == Modality::RGB2D ) {
       if( needUpdate[ 0 ] ) {
         COMMENT( "Generating RGB view.", 2 );
-        size_t disp1 = image.size(0) * image.size(1);
+        size_t disp1 = image.size( 0 ) * image.size( 1 );
         size_t disp2 = disp1 * 2;
 #pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor, disp1, disp2)
         for( size_t y = 0; y < ysize; ++y ) {
@@ -158,7 +169,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
               g = equalization[ g ];
               b = equalization[ b ];
             }
-            scanLine[ x ] = qRgb( r * factor, g * factor, b * factor);
+            scanLine[ x ] = qRgb( r * factor, g * factor, b * factor );
           }
         }
         cachedPixmaps[ 0 ] = QPixmap::fromImage( res );
@@ -180,7 +191,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
       cachedPixmaps[ view ] = QPixmap::fromImage( res );
       needUpdate[ view ] = false;
     }
-//    qDebug( ) << "Elapsed: " << timer.elapsed( );
+/*    qDebug( ) << "Elapsed: " << timer.elapsed( ); */
 
   }
   return( cachedPixmaps[ view ] );
@@ -303,6 +314,20 @@ int GuiImage::getPixel( int x, int y, int z ) {
     return( equalization[ color ] );
   }
   return( color );
+}
+
+
+QVector< Tool* > GuiImage::tools( ) const {
+  return( m_tools );
+}
+
+size_t GuiImage::currentToolPos( ) const {
+  return( m_currentToolPos );
+}
+
+void GuiImage::setCurrentToolPos( const size_t &currentToolPos ) {
+  if(currentToolPos < m_tools.size())
+    m_currentToolPos = currentToolPos;
 }
 
 void GuiImage::updateBoundings( size_t axis ) {
