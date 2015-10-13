@@ -25,7 +25,7 @@ BW2DFormat::BW2DFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has4Views = false;
   m_overlay = false;
   m_maximumNumberOfViews = 1;
-  loadSettings();
+  loadSettings( );
 }
 
 BW3DFormat::BW3DFormat( QObject *parent ) : DisplayFormat( parent ) {
@@ -49,7 +49,7 @@ BW3DFormat::BW3DFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has4Views = false;
   m_overlay = false;
   m_maximumNumberOfViews = 3;
-  loadSettings();
+  loadSettings( );
 }
 
 RGB2DFormat::RGB2DFormat( QObject *parent ) : DisplayFormat( parent ) {
@@ -73,7 +73,7 @@ RGB2DFormat::RGB2DFormat( QObject *parent ) : DisplayFormat( parent ) {
   m_has4Views = true;
   m_overlay = false;
   m_maximumNumberOfViews = 4;
-  loadSettings();
+  loadSettings( );
 }
 
 DisplayFormat::DisplayFormat( QObject *parent ) : QObject( parent ) {
@@ -84,7 +84,7 @@ DisplayFormat::~DisplayFormat( ) {
   QSettings settings;
   settings.beginGroup( "DisplayFormat" );
   settings.beginGroup( QString( "Type%1" ).arg( ( int ) modality( ) ) );
-  settings.setValue( "numberOfViews", m_numberOfViews);
+  settings.setValue( "numberOfViews", m_numberOfViews );
   settings.setValue( "currentLayout", ( int ) m_currentLayout );
   settings.setValue( "currentViews", ( int ) m_currentViews );
   settings.setValue( "defaultViews", ( int ) defaultViews );
@@ -94,22 +94,36 @@ void DisplayFormat::loadSettings( ) {
   QSettings settings;
   settings.beginGroup( "DisplayFormat" );
   settings.beginGroup( QString( "Type%1" ).arg( ( int ) modality( ) ) );
-  if(settings.contains("numberOfViews")){
-    setNumberOfViews( settings.value("numberOfViews").toInt() );
+  if( settings.contains( "numberOfViews" ) ) {
+    try {
+      setNumberOfViews( settings.value( "numberOfViews" ).toInt( ) );
+    }
+    catch( std::invalid_argument e ) {
+      return;
+    }
   }
-  if(settings.contains("currentLayout")){
-    m_currentLayout = (Layout) settings.value("currentLayout").toInt();
+  if( settings.contains( "currentLayout" ) ) {
+    try {
+      setCurrentLayout( ( Layout ) settings.value( "currentLayout" ).toInt( ) );
+    }
+    catch( std::invalid_argument e ) {
+      return;
+    }
   }
-  if(settings.contains("currentViews")){
-    m_currentViews = (Views) settings.value("currentViews").toInt();
+  if( settings.contains( "currentViews" ) ) {
+    try {
+      setCurrentViews( ( Views ) settings.value( "currentViews" ).toInt( ) );
+    }
+    catch( std::invalid_argument e ) {
+      return;
+    }
   }
-  if(settings.contains("defaultViews")){
-    defaultViews = (Views) settings.value("defaultViews").toInt();
+  if( settings.contains( "defaultViews" ) ) {
+    defaultViews = ( Views ) settings.value( "defaultViews" ).toInt( );
   }
 }
-size_t DisplayFormat::getMaximumNumberOfViews() const
-{
-  return m_maximumNumberOfViews;
+size_t DisplayFormat::getMaximumNumberOfViews( ) const {
+  return( m_maximumNumberOfViews );
 }
 
 
