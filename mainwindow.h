@@ -77,7 +77,9 @@ private slots:
 
   void on_actionDefaultTool_triggered();
 
-private:
+  void on_actionSegmentation_Tool_triggered();
+
+  private:
   Ui::MainWindow *ui;
   Controller *controller;
   QString defaultFolder;

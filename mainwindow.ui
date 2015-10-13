@@ -81,7 +81,7 @@
      <x>0</x>
      <y>0</y>
      <width>863</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -336,6 +336,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionDefaultTool"/>
+   <addaction name="actionSegmentation_Tool"/>
   </widget>
   <action name="actionOpen_image">
    <property name="text">
@@ -600,6 +601,14 @@
   <action name="actionDefaultTool">
    <property name="text">
     <string>Default Tool</string>
+   </property>
+  </action>
+  <action name="actionSegmentation_Tool">
+   <property name="text">
+    <string>Segmentation Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Segmentation Tool</string>
    </property>
   </action>
  </widget>

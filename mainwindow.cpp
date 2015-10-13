@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "segmentationtool.h"
 #include <QFileDialog>
 #include <QFileInfoList>
 #include <QGraphicsPixmapItem>
@@ -100,6 +101,7 @@ void MainWindow::currentImageChanged( ) {
   if( controller->currentImage( ) ) {
     DisplayFormat *format = controller->currentFormat( );
     ui->actionDefaultTool->setVisible( DefaultTool::supportedFormats & ( int ) format->modality( ) );
+    ui->actionSegmentation_Tool->setVisible( SegmentationTool::supportedFormats & ( int ) format->modality( ) );
 
     ui->menuLayout->setEnabled( format->modality( ) != Modality::BW2D );
     ui->menuOverlay->setEnabled( format->hasOverlay( ) );
@@ -431,7 +433,8 @@ void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size
         int g = img->getPixel( pt.x, pt.y, 1 );
         int b = img->getPixel( pt.x, pt.y, 2 );
         msg =
-          QString( "(%1, %2) = (%3, %4, %5)/%6" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( r ).arg( g ).arg( b ).arg(
+          QString( "(%1, %2) = (%3, %4, %5)/%6" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( r ).arg( g ).arg( b ).
+          arg(
             max );
       }
     }
@@ -505,13 +508,31 @@ void MainWindow::on_actionDefaultTool_triggered( ) {
   if( img ) {
     bool found;
     for( size_t tool = 0; tool < img->tools.size( ); ++tool ) {
-      if( img->tools[tool]->type() == DefaultTool::Type ){
+      if( img->tools[ tool ]->type( ) == DefaultTool::Type ) {
         found = true;
-        img->setCurrentToolPos(tool);
+        img->setCurrentToolPos( tool );
       }
     }
-    if(!found){
-      img->tools.push_back(new DefaultTool(img, ui->imageViewer));
+    if( !found ) {
+      img->tools.push_back( new DefaultTool( img, ui->imageViewer ) );
+      img->setCurrentToolPos( img->tools.size() - 1);
+    }
+  }
+}
+
+void MainWindow::on_actionSegmentation_Tool_triggered( ) {
+  GuiImage *img = controller->currentImage( );
+  if( img ) {
+    bool found;
+    for( size_t tool = 0; tool < img->tools.size( ); ++tool ) {
+      if( img->tools[ tool ]->type( ) == SegmentationTool::Type ) {
+        found = true;
+        img->setCurrentToolPos( tool );
+      }
+    }
+    if( !found ) {
+      img->tools.push_back( new SegmentationTool( img, ui->imageViewer ) );
+      img->setCurrentToolPos( img->tools.size() - 1);
     }
   }
 }

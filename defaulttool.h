@@ -9,6 +9,9 @@ class DefaultTool : public Tool {
 public:
   DefaultTool( GuiImage *guiImage, ImageViewer *viewer );
   enum{Type = 0};
+  static const int supportedFormats =
+    ( ( int ) Modality::BW2D | ( int ) Modality::BW3D | ( int ) Modality::RGB2D );
+
   /* Tool interface */
 public:
   int type( );
