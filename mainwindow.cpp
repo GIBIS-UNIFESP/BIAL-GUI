@@ -121,6 +121,9 @@ void MainWindow::currentImageChanged( ) {
 
     ui->action3_Views->setVisible( format->has3Views( ) );
     ui->action4_Views->setVisible( format->has4Views( ) );
+    if(controller->currentImage()->tools.empty()){
+      on_actionDefaultTool_triggered();
+    }
   }
 }
 
@@ -506,11 +509,12 @@ void MainWindow::on_actionToggle_overlay_triggered( ) {
 void MainWindow::on_actionDefaultTool_triggered( ) {
   GuiImage *img = controller->currentImage( );
   if( img ) {
-    bool found;
-    for( size_t tool = 0; tool < img->tools.size( ); ++tool ) {
+    bool found = false;
+    for( int tool = 0; tool < img->tools.size( ); ++tool ) {
       if( img->tools[ tool ]->type( ) == DefaultTool::Type ) {
         found = true;
         img->setCurrentToolPos( tool );
+        break;
       }
     }
     if( !found ) {
@@ -524,7 +528,7 @@ void MainWindow::on_actionSegmentation_Tool_triggered( ) {
   GuiImage *img = controller->currentImage( );
   if( img ) {
     bool found;
-    for( size_t tool = 0; tool < img->tools.size( ); ++tool ) {
+    for( int tool = 0; tool < img->tools.size( ); ++tool ) {
       if( img->tools[ tool ]->type( ) == SegmentationTool::Type ) {
         found = true;
         img->setCurrentToolPos( tool );

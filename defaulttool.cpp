@@ -1,5 +1,7 @@
 #include "controller.h"
 #include "defaulttool.h"
+#include <QPointF>
+#include <QDebug>
 
 DefaultTool::DefaultTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage, viewer ) {
 
@@ -60,7 +62,8 @@ void DefaultTool::changeOtherSlices( QPointF posF, size_t view ) {
 }
 
 void DefaultTool::updateOverlay( QPointF pt, size_t axis ) {
-  COMMENT( "ImageViewer::updateOverlay", 2 );
+  qDebug() << "Overlaypos = " << pt;
+  COMMENT( "ImageViewer::updateOverlay", 0 );
   pt.setX( qMin( qMax( pt.x( ), 0.0 ), ( double ) guiImage->width( axis ) ) );
   pt.setY( qMin( qMax( pt.y( ), 0.0 ), ( double ) guiImage->heigth( axis ) ) );
   viewer->getScene( axis )->setOverlayPos( pt );
