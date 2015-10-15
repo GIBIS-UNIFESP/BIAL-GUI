@@ -4,7 +4,7 @@
 #include <QDebug>
 
 DefaultTool::DefaultTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage, viewer ) {
-
+  setObjectName("DefaultTool");
 }
 
 int DefaultTool::type( ) {

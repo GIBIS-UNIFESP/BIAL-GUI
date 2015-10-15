@@ -10,7 +10,7 @@ SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : 
   seeds( guiImage->getImage( ).Dim( ) ) {
 
   drawing = false;
-
+  setObjectName("SegmentationTool");
 
 }
 

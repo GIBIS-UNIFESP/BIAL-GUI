@@ -527,7 +527,7 @@ void MainWindow::on_actionDefaultTool_triggered( ) {
 void MainWindow::on_actionSegmentation_Tool_triggered( ) {
   GuiImage *img = controller->currentImage( );
   if( img ) {
-    bool found;
+    bool found = false;
     for( int tool = 0; tool < img->tools.size( ); ++tool ) {
       if( img->tools[ tool ]->type( ) == SegmentationTool::Type ) {
         found = true;
