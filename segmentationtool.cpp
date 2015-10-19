@@ -1,51 +1,156 @@
 #include "Draw.hpp"
+#include "File.hpp"
 #include "Geometrics.hpp"
+#include "Segmentation.hpp"
 #include "guiimage.h"
 #include "segmentationtool.h"
 #include <QDebug>
+#include <QMessageBox>
 #include <QPointF>
+
+
+double SegmentationTool::getAlpha( ) const {
+  return( alpha );
+}
+
+void SegmentationTool::setAlpha( double value ) {
+  alpha = value;
+}
+
+double SegmentationTool::getBeta( ) const {
+  return( beta );
+}
+
+void SegmentationTool::setBeta( double value ) {
+  beta = value;
+}
+
+int SegmentationTool::getDrawType( ) const {
+  return( drawType );
+}
 
 SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage,
                                                                                       viewer ), seeds(
     guiImage->getImage( ).Dim( ) ) {
-
+  drawType = 1;
   drawing = false;
   setObjectName( "SegmentationTool" );
-  setHasLabel(true);
+  setHasLabel( true );
+
 }
 
 int SegmentationTool::type( ) {
   return( SegmentationTool::Type );
 }
 
-void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
-
-}
-
 void SegmentationTool::mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
   drawing = true;
+  if( ( drawType == 1 ) || ( drawType == 2 ) ) {
+    switch( buttons ) {
+        case Qt::LeftButton:
+        drawType = 1;
+        break;
+        case Qt::RightButton:
+        drawType = 2;
+        break;
+
+    }
+  }
   const Bial::FastTransform &transf = guiImage->getTransform( axis );
   lastPoint = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
   qDebug( ) << "Mouse clicked at " << pt;
 }
 
+
+void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
+  if( ( drawing ) ) {
+    const Bial::FastTransform &transf = guiImage->getTransform( axis );
+    Bial::Point3D actual = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
+
+    drawSeed( lastPoint, actual );
+    lastPoint = actual;
+  }
+}
+
+void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
+  drawing = false;
+
+
+  Bial::File::Write( seeds, "C:/image.nii.gz", guiImage->fileName( ).toStdString( ) );
+
+  Q_UNUSED( buttons );
+  Q_UNUSED( axis );
+  Q_UNUSED( pt );
+}
+
 void SegmentationTool::mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
   Q_UNUSED( buttons );
+  Q_UNUSED( axis );
+  Q_UNUSED( pt );
+  /* nothing happens */
+}
+
+void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
+  Q_UNUSED( slice );
   Q_UNUSED( axis );
   /* nothing happens */
 }
 
-void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
+void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
+  Bial::Vector< float > vLast( 3 );
+  vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
+  Bial::Vector< float > vActual;
+  vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ], ( float ) actual[ 2 ] } };
 
+
+  Bial::Line imgLine( vLast, vActual );
+  imgLine.Draw( seeds, drawType );
 }
 
-void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
 
+void SegmentationTool::setDrawType( int type ) {
+  drawType = type;
+}
+
+void SegmentationTool::clearSeeds( ) {
+  for( size_t i = 0; i < seeds.Size( ); ++i ) {
+    seeds[ i ] = 0;
+  }
+}
+
+Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta ) {
+  Bial::Vector< size_t > img;
+  Bial::Vector< size_t > bkg;
+  for( size_t i = 0; i < seeds.size( ); ++i ) {
+    if( seeds[ i ] == 1 ) {
+      img.push_back( i );
+    }
+    else if( seeds[ i ] == 2 ) {
+      bkg.push_back( i );
+    }
+  }
+  if( ( !img.empty( ) ) || ( !bkg.empty( ) ) ) {
+    return( Bial::Segmentation::OrientedGeodesicStar( guiImage->getImage( ), img, bkg, alpha, beta ) );
+  }
+  else {
+    throw std::runtime_error( "Seeds Missing" );
+
+  }
 }
 
 
 QPixmap SegmentationTool::getLabel( size_t axis ) {
-  QPixmap pix( guiImage->width(axis), guiImage->heigth(axis));
-  pix.fill(Qt::white);
-  return pix;
+  size_t x = guiImage->width( axis );
+  size_t y = guiImage->heigth( axis );
+
+  QImage res( x, y, QImage::Format_ARGB32 );
+  for( size_t i = 0; i < y; ++i ) {
+    for( size_t j = 0; j < x; ++j ) {
+      const Bial::FastTransform &transf = guiImage->getTransform( axis );
+      Bial::Point3D pixel = transf( j, i, guiImage->currentSlice( axis ) );
+      res.setPixel( j, i, seeds( pixel.x, pixel.y, pixel.z ) );
+
+    }
+  }
+  return( QPixmap::fromImage(res) );
 }

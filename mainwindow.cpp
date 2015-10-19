@@ -124,6 +124,7 @@ void MainWindow::currentImageChanged( ) {
     if(controller->currentImage()->tools.empty()){
       on_actionDefaultTool_triggered();
     }
+    ui->segmentationWidget->setTool(controller->currentImage()->currentTool());
   }
 }
 
@@ -521,6 +522,7 @@ void MainWindow::on_actionDefaultTool_triggered( ) {
       img->tools.push_back( new DefaultTool( img, ui->imageViewer ) );
       img->setCurrentToolPos( img->tools.size() - 1);
     }
+    ui->segmentationWidget->setTool(img->currentTool());
   }
 }
 
@@ -538,5 +540,7 @@ void MainWindow::on_actionSegmentation_Tool_triggered( ) {
       img->tools.push_back( new SegmentationTool( img, ui->imageViewer ) );
       img->setCurrentToolPos( img->tools.size() - 1);
     }
+    ui->segmentationWidget->setTool(img->currentTool());
+    ui->dockWidgetSegmentation->show();
   }
 }

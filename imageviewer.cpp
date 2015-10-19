@@ -223,7 +223,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
     Tool *tool = m_controller->currentImage( )->currentTool( );
     QPointF scnPos = mouseEvt->scenePos( );
     if( mouseEvt->type( ) == QEvent::GraphicsSceneMouseMove ) {
-      qDebug() << "MouseEvt = " << scnPos;
+//      qDebug() << "MouseEvt = " << scnPos;
       if( dragging && ( timer.elapsed( ) > 25 ) ) {
         timer.restart( );
         emit mouseDragged( scnPos, mouseEvt->buttons( ), axis );
@@ -234,7 +234,7 @@ bool ImageViewer::eventFilter( QObject *obj, QEvent *evt ) {
       emit mouseMoved( scnPos, axis );
     }
     else if( mouseEvt->type( ) == QEvent::GraphicsSceneMousePress ) {
-      qDebug() << "MouseEvt = " << scnPos;
+//      qDebug() << "MouseEvt = " << scnPos;
       if( mouseEvt->button( ) == Qt::LeftButton ) {
         dragging = true;
         timer.restart( );
