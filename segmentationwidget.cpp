@@ -8,7 +8,30 @@ SegmentationWidget::SegmentationWidget(QWidget *parent) :
 }
 
 SegmentationWidget::~SegmentationWidget() {
-  delete ui;
+    delete ui;
+}
+
+void SegmentationWidget::setTool(Tool *sTool)
+{
+    tool = dynamic_cast<SegmentationTool*>(sTool);
+    if(tool){
+
+        setEnabled(true);
+        //atualiza os dados da interface
+        //ui->AlphaSpinBox->setValue(tool->getAlpha());
+//        switch ( tool->getMode() ) {
+//        case 0:
+//            ui->Button->setChecked(true);
+//            break;
+//        case 1:
+//        case 2:
+//            ui->drawButton->setChecked(true);
+//            break;
+//        }
+    }
+    else
+        setEnabled(false);
+
 }
 
 void SegmentationWidget::on_SegmentationButton_clicked() {
@@ -18,13 +41,13 @@ void SegmentationWidget::on_SegmentationButton_clicked() {
 
 void SegmentationWidget::on_eraserButton_clicked()
 {
-//    ui->drawButton->setChecked(false);
-//    ui->mouseButton->setChecked(false);
+
+
 }
 
 void SegmentationWidget::on_drawButton_clicked()
 {
-
+    tool->setDrawType(255);
 }
 
 void SegmentationWidget::on_mouseButton_clicked()

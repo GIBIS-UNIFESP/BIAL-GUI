@@ -21,7 +21,7 @@
      </property>
      <widget class="QPushButton" name="eraserButton">
       <property name="text">
-       <string/>
+       <string>Erase</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -32,18 +32,7 @@
      </widget>
      <widget class="QPushButton" name="drawButton">
       <property name="text">
-       <string/>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="autoExclusive">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="mouseButton">
-      <property name="text">
-       <string/>
+       <string>Draw</string>
       </property>
       <property name="checkable">
        <bool>true</bool>

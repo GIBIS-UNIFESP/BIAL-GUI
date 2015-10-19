@@ -9,6 +9,7 @@ private:
   Bial::Image< char > seeds;
   Bial::Point3D lastPoint;
   bool drawing;
+  int drawType;
 
 public:
   enum { Type = 1 };
@@ -24,6 +25,10 @@ public:
   void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseMoved( QPointF pt, size_t axis );
   void sliceChanged( size_t axis, size_t slice );
+  void drawSeed(Bial::Point3D last, Bial::Point3D actual);
+  void setDrawType(int type);
+  void clearSeeds();
+
 };
 
 #endif /* SEGMENTATIONTOOL_H */
