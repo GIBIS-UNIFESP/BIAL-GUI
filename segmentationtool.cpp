@@ -138,10 +138,7 @@ Bial::Image<char> SegmentationTool::segmentationOGS(double alpha, double beta)
     if((!img.empty())||(!bkg.empty()))
         return Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
     else{
-        QMessageBox msg;
-        msg.setText("Seeds missing");
-        msg.exec();
-
+        throw std::runtime_error("Seeds Missing");
     }
 
 }
