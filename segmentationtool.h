@@ -24,6 +24,7 @@ public:
   void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis );
   void mouseMoved( QPointF pt, size_t axis );
   void sliceChanged( size_t axis, size_t slice );
+  QPixmap getLabel( size_t axis );
 };
 
 #endif /* SEGMENTATIONTOOL_H */

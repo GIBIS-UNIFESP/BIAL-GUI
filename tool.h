@@ -12,7 +12,8 @@ class Tool : public QObject {
 protected:
   GuiImage * guiImage;
   ImageViewer *viewer;
-  bool visible;
+  bool m_visible;
+  bool m_hasLabel = false;
 public:
 
   Tool( GuiImage *guiImage, ImageViewer *viewer );
@@ -23,9 +24,14 @@ public:
   virtual void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) = 0;
   virtual void mouseMoved( QPointF pt, size_t axis ) = 0;
   virtual void sliceChanged( size_t axis, size_t slice ) = 0;
-  virtual void setVisible( bool value );
+  void setVisible( bool value );
+  virtual QPixmap getLabel( size_t axis );
 
-  bool isVisible( );
+  bool visible( ) const;
+  bool hasLabel( ) const;
+
+protected:
+  void setHasLabel( bool sHasLabel );
 };
 
 #endif /* TOOL_H */

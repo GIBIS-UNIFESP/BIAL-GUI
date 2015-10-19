@@ -6,12 +6,12 @@
 #include <QPointF>
 
 SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage,
-                                                                                      viewer ),
-  seeds( guiImage->getImage( ).Dim( ) ) {
+                                                                                      viewer ), seeds(
+    guiImage->getImage( ).Dim( ) ) {
 
   drawing = false;
-  setObjectName("SegmentationTool");
-
+  setObjectName( "SegmentationTool" );
+  setHasLabel(true);
 }
 
 int SegmentationTool::type( ) {
@@ -26,7 +26,7 @@ void SegmentationTool::mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_
   drawing = true;
   const Bial::FastTransform &transf = guiImage->getTransform( axis );
   lastPoint = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
-  qDebug() << "Mouse clicked at " << pt;
+  qDebug( ) << "Mouse clicked at " << pt;
 }
 
 void SegmentationTool::mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
@@ -41,4 +41,11 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
 
 void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
 
+}
+
+
+QPixmap SegmentationTool::getLabel( size_t axis ) {
+  QPixmap pix( guiImage->width(axis), guiImage->heigth(axis));
+  pix.fill(Qt::white);
+  return pix;
 }
