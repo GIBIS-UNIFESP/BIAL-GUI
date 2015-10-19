@@ -8,39 +8,40 @@
 
 SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage,
                                                                                       viewer ),
-  seeds( guiImage->getImage( ).Dim( ) ) {
-  drawType = 0;
-  drawing = false;
-  setObjectName("SegmentationTool");
+    seeds( guiImage->getImage( ).Dim( ) ) {
+    drawType = 0;
+    drawing = false;
+    setObjectName("SegmentationTool");
 
 }
 
 int SegmentationTool::type( ) {
-  return( SegmentationTool::Type );
+    return( SegmentationTool::Type );
 }
 
 void SegmentationTool::mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
-  drawing = true;
+    drawing = true;
+
+    if( (drawType == 1) || (drawType == 2) ){
+
+        switch (buttons) {
+        case Qt::LeftButton:
+            drawType = 255;
+            break;
+        case Qt::RightButton:
+            drawType = 2;
+            break;
+        default:
+            drawType = 0;
+            break;
+        }
+    }
 
 
 
-      switch (buttons) {
-      case Qt::LeftButton:
-          drawType = 255;
-          break;
-      case Qt::RightButton:
-          drawType = 2;
-          break;
-      default:
-          drawType = 3;
-          break;
-      }
-
-
-
-  const Bial::FastTransform &transf = guiImage->getTransform( axis );
-  lastPoint = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
-  qDebug() << "Mouse clicked at " << pt;
+    const Bial::FastTransform &transf = guiImage->getTransform( axis );
+    lastPoint = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
+    qDebug() << "Mouse clicked at " << pt;
 }
 
 
@@ -56,7 +57,7 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
 
 void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
     drawing = false;
-    File::Write(seeds,"C:/image.pgm");
+    Bial::File::Write(seeds,"C:/image.nii.gz",guiImage->fileName().toStdString());
 
     Q_UNUSED( buttons );
     Q_UNUSED( axis );
@@ -64,10 +65,10 @@ void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size
 }
 
 void SegmentationTool::mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
-  Q_UNUSED( buttons );
-  Q_UNUSED( axis );
-  Q_UNUSED( pt );
-  /* nothing happens */
+    Q_UNUSED( buttons );
+    Q_UNUSED( axis );
+    Q_UNUSED( pt );
+    /* nothing happens */
 }
 
 void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
@@ -96,7 +97,7 @@ void SegmentationTool::setDrawType(int type)
 
 void SegmentationTool::clearSeeds()
 {
-    for(int i = 0; i < seeds.Size() ; i++)
+    for(unsigned int i = 0; i < seeds.Size() ; i++)
         seeds[i] = 0;
 }
 
