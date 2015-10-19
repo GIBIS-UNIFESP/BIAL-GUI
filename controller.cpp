@@ -122,6 +122,10 @@ void Controller::update( ) {
       if( showItens[ axis ] ) {
         const QPixmap &pix = img->getSlice( axis );
         m_pixmapItems.at( axis )->setPixmap( pix );
+        Tool *tool = img->currentTool( );
+        if( tool && tool->hasLabel( ) ) {
+          m_pixmapItems.at( axis )->setPixmap( tool->getLabel( axis ) );
+        }
       }
     }
   }

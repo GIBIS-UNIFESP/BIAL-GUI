@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QPointF>
 
+
 double SegmentationTool::getAlpha( ) const {
   return( alpha );
 }
@@ -34,6 +35,7 @@ SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : 
   drawType = 1;
   drawing = false;
   setObjectName( "SegmentationTool" );
+  setHasLabel( true );
 
 }
 
@@ -137,20 +139,18 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
 }
 
 
-QImage SegmentationTool::getLabel(size_t axis)
-{
-    size_t x = guiImage->width( axis );
-    size_t y = guiImage->heigth( axis );
+QPixmap SegmentationTool::getLabel( size_t axis ) {
+  size_t x = guiImage->width( axis );
+  size_t y = guiImage->heigth( axis );
 
-    QImage res( x , y , QImage::Format_ARGB32 );
-    for( size_t i = 0; i < y ; ++i ){
-        for (size_t j = 0; j < x; ++j) {
-            const Bial::FastTransform &transf = guiImage->getTransform( axis );
-            Bial::Point3D pixel = transf( j, i, guiImage->currentSlice( axis ) );
-            res.setPixel( j , i , seeds( pixel.x , pixel.y , pixel.z ) );
+  QImage res( x, y, QImage::Format_ARGB32 );
+  for( size_t i = 0; i < y; ++i ) {
+    for( size_t j = 0; j < x; ++j ) {
+      const Bial::FastTransform &transf = guiImage->getTransform( axis );
+      Bial::Point3D pixel = transf( j, i, guiImage->currentSlice( axis ) );
+      res.setPixel( j, i, seeds( pixel.x, pixel.y, pixel.z ) );
 
-        }
     }
-    return res;
+  }
+  return( QPixmap::fromImage(res) );
 }
-
