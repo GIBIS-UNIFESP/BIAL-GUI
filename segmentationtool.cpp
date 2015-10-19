@@ -1,10 +1,36 @@
 #include "Draw.hpp"
 #include "Geometrics.hpp"
 #include "guiimage.h"
+#include "Segmentation.hpp"
 #include "segmentationtool.h"
 #include "File.hpp"
 #include <QDebug>
 #include <QPointF>
+
+double SegmentationTool::getAlpha() const
+{
+    return alpha;
+}
+
+void SegmentationTool::setAlpha(double value)
+{
+    alpha = value;
+}
+
+double SegmentationTool::getBeta() const
+{
+    return beta;
+}
+
+void SegmentationTool::setBeta(double value)
+{
+    beta = value;
+}
+
+int SegmentationTool::getDrawType() const
+{
+    return drawType;
+}
 
 SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage,
                                                                                       viewer ),
@@ -31,13 +57,10 @@ void SegmentationTool::mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_
         case Qt::RightButton:
             drawType = 2;
             break;
-        default:
-            drawType = 0;
-            break;
+
         }
+
     }
-
-
 
     const Bial::FastTransform &transf = guiImage->getTransform( axis );
     lastPoint = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
@@ -99,5 +122,19 @@ void SegmentationTool::clearSeeds()
 {
     for(unsigned int i = 0; i < seeds.Size() ; i++)
         seeds[i] = 0;
+}
+
+Bial::Image SegmentationTool::segmentationOGS(double alpha, double beta)
+{
+    Bial::Vector< size_t > img;
+    Bial::Vector< size_t > bkg;
+    for( size_t i; i < seeds.size() ; ++i){
+        if(seeds[i] == 1)
+            img.push_back(i);
+        else if(seeds[i] == 2)
+            bkg.push_back(i);
+    }
+
+    return Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
 }
 

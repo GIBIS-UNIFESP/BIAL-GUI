@@ -18,21 +18,20 @@ public:
   ~SegmentationWidget();
   void setTool(Tool* sTool);
 
-//signals:
-//    void mouseSelected(short mode);
-//    void drawSelected(short mode);
-//    void eraserSelected(short mode);
-//    void clearSelected();
+
 
 private slots:
 
   void on_SegmentationButton_clicked();
   void on_eraserButton_clicked();
   void on_drawButton_clicked();
-  void on_mouseButton_clicked();
   void on_ClearButton_clicked();
 
-  private:
+  void on_AlphaSpinBox_valueChanged(double arg1);
+
+  void on_BetaSpinBox_valueChanged(double arg1);
+
+private:
   Ui::Segmentationwidget *ui;
   SegmentationTool* tool;
 
