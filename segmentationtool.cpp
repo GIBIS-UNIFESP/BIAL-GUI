@@ -124,7 +124,7 @@ void SegmentationTool::clearSeeds()
         seeds[i] = 0;
 }
 
-Bial::Image SegmentationTool::segmentationOGS(double alpha, double beta)
+Bial::Image<char> SegmentationTool::segmentationOGS(double alpha, double beta)
 {
     Bial::Vector< size_t > img;
     Bial::Vector< size_t > bkg;
