@@ -4,6 +4,7 @@
 #include "Segmentation.hpp"
 #include "segmentationtool.h"
 #include "File.hpp"
+#include <QMessageBox>
 #include <QDebug>
 #include <QPointF>
 
@@ -134,7 +135,14 @@ Bial::Image<char> SegmentationTool::segmentationOGS(double alpha, double beta)
         else if(seeds[i] == 2)
             bkg.push_back(i);
     }
+    if((!img.empty())||(!bkg.empty()))
+        return Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
+    else{
+        QMessageBox msg;
+        msg.setText("Seeds missing");
+        msg.exec();
 
-    return Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
+    }
+
 }
 
