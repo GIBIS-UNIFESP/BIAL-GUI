@@ -81,6 +81,8 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
 
 void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
     drawing = false;
+
+
     Bial::File::Write(seeds,"C:/image.nii.gz",guiImage->fileName().toStdString());
 
     Q_UNUSED( buttons );
@@ -138,10 +140,8 @@ Bial::Image<char> SegmentationTool::segmentationOGS(double alpha, double beta)
     if((!img.empty())||(!bkg.empty()))
         return Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
     else{
-        QMessageBox msg;
-        msg.setText("Seeds missing");
-        msg.exec();
 
+        QMessageBox(QMessageBox::Warning, tr("Segmentation Error"), tr("Seeds missing"),QMessageBox::Ok).exec();
     }
 
 }
