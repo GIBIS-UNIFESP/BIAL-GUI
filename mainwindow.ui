@@ -81,7 +81,7 @@
      <x>0</x>
      <y>0</y>
      <width>863</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -595,7 +595,7 @@
     <string>Segmentation dock</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+3</string>
+    <string>Ctrl+4</string>
    </property>
   </action>
   <action name="actionDefaultTool">
