@@ -124,7 +124,7 @@ void SegmentationTool::clearSeeds()
         seeds[i] = 0;
 }
 
-Bial::Image SegmentationTool::segmentationOGS(double alpha, double beta)
+void SegmentationTool::segmentationOGS(double alpha, double beta)
 {
     Bial::Vector< size_t > img;
     Bial::Vector< size_t > bkg;
@@ -135,6 +135,6 @@ Bial::Image SegmentationTool::segmentationOGS(double alpha, double beta)
             bkg.push_back(i);
     }
 
-    return Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
+    Bial::Segmentation::OrientedGeodesicStar(guiImage->getImage(), img, bkg, alpha, beta);
 }
 

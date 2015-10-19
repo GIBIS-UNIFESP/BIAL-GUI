@@ -30,7 +30,7 @@ public:
     void drawSeed(Bial::Point3D last, Bial::Point3D actual);
     void setDrawType(int type);
     void clearSeeds();
-    Bial::Image segmentationOGS(double alpha, double beta);
+    void segmentationOGS(double alpha, double beta);
 
 
     double getAlpha() const;
