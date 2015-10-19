@@ -1,6 +1,8 @@
 #include "segmentationwidget.h"
 #include "ui_segmentationwidget.h"
 
+#include <QMessageBox>
+
 SegmentationWidget::SegmentationWidget(QWidget *parent) :
   QWidget(parent),
   ui(new Ui::Segmentationwidget) {
@@ -38,7 +40,11 @@ void SegmentationWidget::setTool(Tool *sTool)
 void SegmentationWidget::on_SegmentationButton_clicked() {
   double alpha = ui->AlphaSpinBox->value();
   double beta = ui->BetaSpinBox->value();
+  try{
   tool->segmentationOGS(alpha,beta);
+  }catch(std::runtime_error err){
+    QMessageBox::warning(this, "ERROR", err.what());
+  }
 }
 
 void SegmentationWidget::on_eraserButton_clicked()

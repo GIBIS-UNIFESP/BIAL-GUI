@@ -541,6 +541,6 @@ void MainWindow::on_actionSegmentation_Tool_triggered( ) {
       img->setCurrentToolPos( img->tools.size() - 1);
     }
     ui->segmentationWidget->setTool(img->currentTool());
-
+    ui->dockWidgetSegmentation->show();
   }
 }
