@@ -111,7 +111,7 @@ void SegmentationTool::setDrawType( int type ) {
 }
 
 void SegmentationTool::clearSeeds( ) {
-  for( unsigned int i = 0; i < seeds.Size( ); i++ ) {
+  for( size_t i = 0; i < seeds.Size( ); ++i ) {
     seeds[ i ] = 0;
   }
 }
@@ -119,7 +119,7 @@ void SegmentationTool::clearSeeds( ) {
 Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta ) {
   Bial::Vector< size_t > img;
   Bial::Vector< size_t > bkg;
-  for( size_t i; i < seeds.size( ); ++i ) {
+  for( size_t i = 0; i < seeds.size( ); ++i ) {
     if( seeds[ i ] == 1 ) {
       img.push_back( i );
     }
