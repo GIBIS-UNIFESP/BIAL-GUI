@@ -32,7 +32,7 @@ public:
   void setDrawType( int type );
   void clearSeeds( );
   Bial::Image< char > segmentationOGS( double alpha, double beta );
-
+  QImage getLabel( size_t axis );
 
   double getAlpha( ) const;
   void setAlpha( double value );
