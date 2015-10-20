@@ -66,7 +66,9 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
   if( drawing ) {
     const Bial::FastTransform &transf = guiImage->getTransform( axis );
     Bial::Point3D actual = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
-
+    if( lastPoint == actual ) {
+      return;
+    }
     drawSeed( lastPoint, actual );
     lastPoint = actual;
     emit guiImage->imageUpdated( );
