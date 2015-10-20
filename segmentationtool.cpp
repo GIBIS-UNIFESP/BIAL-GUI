@@ -161,20 +161,21 @@ QPixmap SegmentationTool::getLabel( size_t axis ) {
       QRgb *scanLine = ( QRgb* ) res.scanLine( y );
       for( size_t x = 0; x < xsz; ++x ) {
         Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
-        QRgb color = qRgba( 0, 0, 0, 0 );
         if( ( mask.size( ) == seeds.size( ) ) && mask( pos.x, pos.y, pos.z ) ) {
-          color = qRgb( 255, 0, 0 );
+          scanLine[ x ] = qRgb( 255, 0, 0 );
         }
         else {
           char pixel = seeds( pos.x, pos.y, pos.z );
           if( pixel == 1 ) {
-            color = qRgb( 255, 0, 0 );
+            scanLine[ x ] = qRgb( 255, 0, 0 );
           }
           else if( pixel == 2 ) {
-            color = qRgb( 0, 0, 255 );
+            scanLine[ x ] = qRgb( 0, 0, 255 );
+          }
+          else {
+            scanLine[ x ] = qRgba( 0, 0, 0, 0 );
           }
         }
-        scanLine[ x ] = color;
       }
     }
   }
@@ -183,20 +184,21 @@ QPixmap SegmentationTool::getLabel( size_t axis ) {
       QRgb *scanLine = ( QRgb* ) res.scanLine( y );
       for( size_t x = 0; x < xsz; ++x ) {
         Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
-        QRgb color = qRgba( 0, 0, 0, 0 );
         if( ( mask.size( ) == seeds.size( ) ) && mask( pos.x, pos.y ) ) {
-          color = qRgb( 255, 0, 0 );
+          scanLine[ x ] = qRgb( 255, 0, 0 );
         }
         else {
           char pixel = seeds( pos.x, pos.y );
           if( pixel == 1 ) {
-            color = qRgb( 0, 255, 0 );
+            scanLine[ x ] = qRgb( 0, 255, 0 );
           }
           else if( pixel == 2 ) {
-            color = qRgb( 0, 0, 255 );
+            scanLine[ x ] = qRgb( 0, 0, 255 );
+          }
+          else {
+            scanLine[ x ] = qRgba( 0, 0, 0, 0 );
           }
         }
-        scanLine[ x ] = color;
       }
     }
   }
