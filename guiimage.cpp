@@ -122,7 +122,7 @@ QString GuiImage::fileName( ) {
 
 QPixmap GuiImage::getSlice( size_t view ) {
   size_t slice = currentSlice( view );
-  COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << view << ", slice = " << slice, 0 );
+  COMMENT( "GET SLICE: image = " << m_fileName.toStdString( ) << ", axis = " << view << ", slice = " << slice, 2 );
   if( needUpdate[ view ] ) {
 /*
  *    QTime timer;

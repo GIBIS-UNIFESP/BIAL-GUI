@@ -114,7 +114,7 @@ int Controller::size( ) {
 }
 
 void Controller::update( ) {
-  COMMENT( "UPDATING IMAGE!", 0 );
+  COMMENT( "UPDATING IMAGE!", 2 );
 
   GuiImage *img = currentImage( );
   if( img ) {

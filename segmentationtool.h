@@ -7,6 +7,8 @@
 class SegmentationTool : public Tool {
 private:
   Bial::Image< char > seeds;
+  Bial::Image< char > mask;
+
   Bial::Point3D lastPoint;
   bool drawing;
   int drawType;

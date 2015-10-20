@@ -4,6 +4,7 @@
 #include "Segmentation.hpp"
 #include "guiimage.h"
 #include "segmentationtool.h"
+#include <Gradient.hpp>
 #include <QDebug>
 #include <QMessageBox>
 #include <QPointF>
@@ -76,8 +77,7 @@ void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size
   drawing = false;
 
 
-  Bial::File::Write( seeds, "C:/image.nii.gz", guiImage->fileName( ).toStdString( ) );
-
+  emit guiImage->imageUpdated( );
   Q_UNUSED( buttons );
   Q_UNUSED( axis );
   Q_UNUSED( pt );
@@ -97,15 +97,18 @@ void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
 }
 
 void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
-  Bial::Vector< float > vLast( 3 );
-  vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
+  Bial::Vector< float > vLast;
   Bial::Vector< float > vActual;
-  vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ], ( float ) actual[ 2 ] } };
-
-
+  if( guiImage->modality( ) == Modality::BW3D ) {
+    vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
+    vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ], ( float ) actual[ 2 ] } };
+  }
+  else {
+    vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ] } };
+    vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ] } };
+  }
   Bial::Line imgLine( vLast, vActual );
   imgLine.Draw( seeds, drawType );
-  emit guiImage->imageUpdated( );
 }
 
 
@@ -131,11 +134,13 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
     }
   }
   if( ( !img.empty( ) ) || ( !bkg.empty( ) ) ) {
-    return( Bial::Segmentation::OrientedGeodesicStar( guiImage->getImage( ), img, bkg, alpha, beta ) );
+    Bial::Image< char > res = Bial::Segmentation::OrientedGeodesicStar( guiImage->getImage( ), img, bkg, alpha, beta );
+    mask = Bial::Gradient::Morphological( res );
+    emit guiImage->imageUpdated( );
+    return( res );
   }
   else {
     throw std::runtime_error( "Seeds Missing" );
-
   }
 }
 
@@ -146,19 +151,48 @@ QPixmap SegmentationTool::getLabel( size_t axis ) {
 
   const Bial::FastTransform &transf = guiImage->getTransform( axis );
   QImage res( xsz, ysz, QImage::Format_ARGB32 );
-  for( size_t y = 0; y < ysz; ++y ) {
-    QRgb *scanLine = ( QRgb* ) res.scanLine( y );
-    for( size_t x = 0; x < xsz; ++x ) {
-      Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
-      char pixel = seeds( pos.x, pos.y, pos.z );
-      QRgb color = qRgba( 0, 0, 0, 0 );
-      if( pixel == 1 ) {
-        color = qRgb( 255, 0, 0 );
+  if( guiImage->modality( ) == Modality::BW3D ) {
+    for( size_t y = 0; y < ysz; ++y ) {
+      QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+      for( size_t x = 0; x < xsz; ++x ) {
+        Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
+        QRgb color = qRgba( 0, 0, 0, 0 );
+        if( ( mask.size( ) == seeds.size( ) ) && mask( pos.x, pos.y, pos.z ) ) {
+          color = qRgb( 255, 0, 0 );
+        }
+        else {
+          char pixel = seeds( pos.x, pos.y, pos.z );
+          if( pixel == 1 ) {
+            color = qRgb( 255, 0, 0 );
+          }
+          else if( pixel == 2 ) {
+            color = qRgb( 0, 0, 255 );
+          }
+        }
+        scanLine[ x ] = color;
       }
-      else if( pixel == 2 ) {
-        color = qRgb( 0, 0, 255 );
+    }
+  }
+  else {
+    for( size_t y = 0; y < ysz; ++y ) {
+      QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+      for( size_t x = 0; x < xsz; ++x ) {
+        Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
+        QRgb color = qRgba( 0, 0, 0, 0 );
+        if( ( mask.size( ) == seeds.size( ) ) && mask( pos.x, pos.y ) ) {
+          color = qRgb( 255, 0, 0 );
+        }
+        else {
+          char pixel = seeds( pos.x, pos.y );
+          if( pixel == 1 ) {
+            color = qRgb( 0, 255, 0 );
+          }
+          else if( pixel == 2 ) {
+            color = qRgb( 0, 0, 255 );
+          }
+        }
+        scanLine[ x ] = color;
       }
-      scanLine[ x ] = color;
     }
   }
   return( QPixmap::fromImage( res ) );
