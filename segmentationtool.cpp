@@ -125,7 +125,7 @@ void SegmentationTool::clearSeeds( ) {
   for( size_t i = 0; i < seeds.Size( ); ++i ) {
     seeds[ i ] = 0;
   }
-  emit guiImage->imageUpdated();
+  emit guiImage->imageUpdated( );
 }
 
 Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta ) {
@@ -139,7 +139,7 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
       bkg.push_back( i );
     }
   }
-  if( ( !img.empty( ) ) || ( !bkg.empty( ) ) ) {
+  if( ( !img.empty( ) ) && ( !bkg.empty( ) ) ) {
     Bial::Image< char > res = Bial::Segmentation::OrientedGeodesicStar( guiImage->getImage( ), img, bkg, alpha, beta );
     mask = Bial::Gradient::Morphological( res );
     emit guiImage->imageUpdated( );
