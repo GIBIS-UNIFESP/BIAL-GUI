@@ -123,6 +123,7 @@ void SegmentationTool::clearSeeds( ) {
   for( size_t i = 0; i < seeds.Size( ); ++i ) {
     seeds[ i ] = 0;
   }
+  emit guiImage->imageUpdated();
 }
 
 Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta ) {
