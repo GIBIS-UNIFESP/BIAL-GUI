@@ -69,15 +69,18 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
 
     drawSeed( lastPoint, actual );
     lastPoint = actual;
-
+    emit guiImage->imageUpdated( );
   }
 }
 
 void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
   drawing = false;
-
-
-  emit guiImage->imageUpdated( );
+  if( drawing ) {
+    const Bial::FastTransform &transf = guiImage->getTransform( axis );
+    Bial::Point3D actual = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
+    drawSeed( lastPoint, actual );
+    emit guiImage->imageUpdated( );
+  }
   Q_UNUSED( buttons );
   Q_UNUSED( axis );
   Q_UNUSED( pt );
