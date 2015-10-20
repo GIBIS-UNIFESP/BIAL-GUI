@@ -58,17 +58,17 @@ void SegmentationTool::mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_
   }
   const Bial::FastTransform &transf = guiImage->getTransform( axis );
   lastPoint = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
-  qDebug( ) << "Mouse clicked at " << pt;
 }
 
 
 void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
-  if( ( drawing ) ) {
+  if( drawing ) {
     const Bial::FastTransform &transf = guiImage->getTransform( axis );
     Bial::Point3D actual = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
 
     drawSeed( lastPoint, actual );
     lastPoint = actual;
+
   }
 }
 
@@ -105,6 +105,7 @@ void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
 
   Bial::Line imgLine( vLast, vActual );
   imgLine.Draw( seeds, drawType );
+  emit guiImage->imageUpdated( );
 }
 
 
@@ -140,17 +141,25 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
 
 
 QPixmap SegmentationTool::getLabel( size_t axis ) {
-  size_t x = guiImage->width( axis );
-  size_t y = guiImage->heigth( axis );
+  size_t xsz = guiImage->width( axis );
+  size_t ysz = guiImage->heigth( axis );
 
-  QImage res( x, y, QImage::Format_ARGB32 );
-  for( size_t i = 0; i < y; ++i ) {
-    for( size_t j = 0; j < x; ++j ) {
-      const Bial::FastTransform &transf = guiImage->getTransform( axis );
-      Bial::Point3D pixel = transf( j, i, guiImage->currentSlice( axis ) );
-      res.setPixel( j, i, seeds( pixel.x, pixel.y, pixel.z ) );
-
+  const Bial::FastTransform &transf = guiImage->getTransform( axis );
+  QImage res( xsz, ysz, QImage::Format_ARGB32 );
+  for( size_t y = 0; y < ysz; ++y ) {
+    QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+    for( size_t x = 0; x < xsz; ++x ) {
+      Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
+      char pixel = seeds( pos.x, pos.y, pos.z );
+      QRgb color = qRgba( 0, 0, 0, 0 );
+      if( pixel == 1 ) {
+        color = qRgb( 255, 0, 0 );
+      }
+      else if( pixel == 2 ) {
+        color = qRgb( 0, 0, 255 );
+      }
+      scanLine[ x ] = color;
     }
   }
-  return( QPixmap::fromImage(res) );
+  return( QPixmap::fromImage( res ) );
 }

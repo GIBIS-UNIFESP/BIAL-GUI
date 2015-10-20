@@ -62,7 +62,7 @@ void DefaultTool::changeOtherSlices( QPointF posF, size_t view ) {
 }
 
 void DefaultTool::updateOverlay( QPointF pt, size_t axis ) {
-  qDebug() << "Overlaypos = " << pt;
+//  qDebug() << "Overlaypos = " << pt;
   COMMENT( "ImageViewer::updateOverlay", 0 );
   pt.setX( qMin( qMax( pt.x( ), 0.0 ), ( double ) guiImage->width( axis ) ) );
   pt.setY( qMin( qMax( pt.y( ), 0.0 ), ( double ) guiImage->heigth( axis ) ) );

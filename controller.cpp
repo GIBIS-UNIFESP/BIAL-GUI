@@ -9,6 +9,7 @@ Controller::Controller( int views, QObject *parent ) : QObject( parent ), bw2dFo
     new BW2DFormat( this ) ), rgb2dFormat( new RGB2DFormat( this ) ), bw3dFormat( new BW3DFormat( this ) ) {
   for( int item = 0; item < views; ++item ) {
     m_pixmapItems.append( new QGraphicsPixmapItem( ) );
+    m_labelItems.append( new QGraphicsPixmapItem( ) );
   }
   m_currentImagePos = -1;
   connect( rgb2dFormat, &DisplayFormat::updated, this, &Controller::currentImageChanged );
@@ -120,11 +121,12 @@ void Controller::update( ) {
     std::array< bool, 4 > showItens = currentFormat( )->getViews( );
     for( int axis = 0; axis < 4; ++axis ) {
       if( showItens[ axis ] ) {
+        m_labelItems.at( axis )->setPixmap( QPixmap() );
         const QPixmap &pix = img->getSlice( axis );
         m_pixmapItems.at( axis )->setPixmap( pix );
         Tool *tool = img->currentTool( );
         if( tool && tool->hasLabel( ) ) {
-          m_pixmapItems.at( axis )->setPixmap( tool->getLabel( axis ) );
+          m_labelItems.at( axis )->setPixmap( tool->getLabel( axis ) );
         }
       }
     }
@@ -238,4 +240,8 @@ DisplayFormat* Controller::currentFormat( ) {
 
 QGraphicsPixmapItem* Controller::getPixmapItem( size_t view ) {
   return( m_pixmapItems.at( view ) );
+}
+
+QGraphicsPixmapItem* Controller::getLabelItem( size_t view ) {
+  return( m_labelItems.at( view ) );
 }

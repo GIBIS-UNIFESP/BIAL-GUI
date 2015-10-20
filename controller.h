@@ -142,6 +142,12 @@ public:
    * @return
    */
   QGraphicsPixmapItem* getPixmapItem( size_t view );
+  /**
+   * @brief getLabelItem returns the LabelItem of the view.
+   * @param view is the number of the view;
+   * @return
+   */
+  QGraphicsPixmapItem* getLabelItem( size_t view );
 
 signals:
   /**

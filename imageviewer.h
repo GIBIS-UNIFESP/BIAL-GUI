@@ -1,9 +1,9 @@
 #ifndef IMAGEVIEWER_H
 #define IMAGEVIEWER_H
 
-#include "viewerinterface.h"
 #include "displayformat.h"
 #include "graphicsscene.h"
+#include "viewerinterface.h"
 #include <QTime>
 #include <QWidget>
 #include <array>
@@ -17,33 +17,33 @@ class ImageViewer : public QWidget, public ViewerInterface {
   Q_OBJECT
   std::array< ImageWidget*, 4 > views;
   QGridLayout *layout;
-  Controller * m_controller;
+  Controller *m_controller;
   bool dragging;
   QTime timer;
 
-  void getNewLayout();
+  void getNewLayout( );
 public:
   explicit ImageViewer( QWidget *parent = 0 );
   ~ImageViewer( );
 
   void setViewBgColor( const QColor &color );
-  bool eventFilter(QObject *obj, QEvent *evt);
-  GraphicsScene * getScene(size_t axis);
-  void setController(Controller * value);
-  Controller * controller() const;
+  bool eventFilter( QObject *obj, QEvent *evt );
+  GraphicsScene* getScene( size_t axis );
+  void setController( Controller *value );
+  Controller* controller( ) const;
 
 signals:
-  void mouseReleased(QPointF pt, Qt::MouseButtons buttons, size_t axis );
-  void mouseClicked(QPointF pt, Qt::MouseButtons buttons, size_t axis );
-  void mouseDragged(QPointF pt, Qt::MouseButtons buttons, size_t axis );
-  void mouseMoved(QPointF pt, size_t axis );
+  void mouseReleased( QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_t axis );
+  void mouseMoved( QPointF pt, size_t axis );
 
 private slots:
-  void updateViews();
-  void changeImage();
+  void updateViews( );
+  void changeImage( );
 
-  void setLayoutType(Layout layout);
-  void setViewMode(Views view);
+  void setLayoutType( Layout layout );
+  void setViewMode( Views view );
 
   void setGridLayout( );
   void setHorizontalLayout( );
@@ -52,11 +52,11 @@ private slots:
   void hideViews( );
   void showViews( );
 
-  void sliceChanged(size_t axis, size_t slice);
+  void sliceChanged( size_t axis, size_t slice );
 
-  // QWidget interface
+  /* QWidget interface */
 protected:
-  void resizeEvent(QResizeEvent *);
+  void resizeEvent( QResizeEvent* );
 };
 
 #endif /* IMAGEVIEWER_H */
