@@ -30,27 +30,27 @@ int SegmentationTool::getDrawType( ) const {
   return( drawType );
 }
 
-void SegmentationTool::setSeedsVisibility(bool vis) {
+void SegmentationTool::setSeedsVisibility( bool vis ) {
   seedsVisible = vis;
-  emit guiImage->imageUpdated();
+  emit guiImage->imageUpdated( );
 }
 
-void SegmentationTool::setMaskVisibility(bool vis) {
+void SegmentationTool::setMaskVisibility( bool vis ) {
   maskVisible = vis;
-  emit guiImage->imageUpdated();
+  emit guiImage->imageUpdated( );
 }
 
-bool SegmentationTool::getSeedsVisible() const {
-  return seedsVisible;
+bool SegmentationTool::getSeedsVisible( ) const {
+  return( seedsVisible );
 }
 
-bool SegmentationTool::getMaskVisible() const {
-  return maskVisible;
+bool SegmentationTool::getMaskVisible( ) const {
+  return( maskVisible );
 }
 
 SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage,
-      viewer ), seeds(
-        guiImage->getImage( ).Dim( ) ) {
+                                                                                      viewer ), seeds(
+    guiImage->getImage( ).Dim( ) ) {
   drawType = 1;
   drawing = false;
   setObjectName( "SegmentationTool" );
@@ -66,16 +66,17 @@ int SegmentationTool::type( ) {
 }
 
 void SegmentationTool::mouseClicked( QPointF pt, Qt::MouseButtons buttons, size_t axis ) {
+  timer.start( );
   drawing = true;
   seedsVisible = true;
   if( ( drawType == 1 ) || ( drawType == 2 ) ) {
     switch( buttons ) {
-    case Qt::LeftButton:
-      drawType = 1;
-      break;
-    case Qt::RightButton:
-      drawType = 2;
-      break;
+        case Qt::LeftButton:
+        drawType = 1;
+        break;
+        case Qt::RightButton:
+        drawType = 2;
+        break;
 
     }
   }
@@ -93,7 +94,10 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
     }
     drawSeed( lastPoint, actual );
     lastPoint = actual;
-    emit guiImage->imageUpdated( );
+    if( timer.elapsed( ) > 30 ) {
+      emit guiImage->imageUpdated( );
+      timer.start( );
+    }
   }
 }
 
@@ -103,8 +107,8 @@ void SegmentationTool::mouseReleased( QPointF pt, Qt::MouseButtons buttons, size
     const Bial::FastTransform &transf = guiImage->getTransform( axis );
     Bial::Point3D actual = transf( pt.x( ), pt.y( ), ( double ) guiImage->currentSlice( axis ) );
     drawSeed( lastPoint, actual );
-    emit guiImage->imageUpdated( );
   }
+  emit guiImage->imageUpdated( );
   Q_UNUSED( buttons );
   Q_UNUSED( axis );
   Q_UNUSED( pt );
@@ -129,7 +133,8 @@ void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
   if( guiImage->modality( ) == Modality::BW3D ) {
     vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
     vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ], ( float ) actual[ 2 ] } };
-  } else {
+  }
+  else {
     vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ] } };
     vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ] } };
   }
@@ -156,7 +161,8 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
   for( size_t i = 0; i < seeds.size( ); ++i ) {
     if( seeds[ i ] == 1 ) {
       img.push_back( i );
-    } else if( seeds[ i ] == 2 ) {
+    }
+    else if( seeds[ i ] == 2 ) {
       bkg.push_back( i );
     }
   }
@@ -165,7 +171,8 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
     mask = Bial::Gradient::Morphological( res );
     emit guiImage->imageUpdated( );
     return( res );
-  } else {
+  }
+  else {
     throw std::runtime_error( "Seeds Missing" );
   }
 }
@@ -174,54 +181,41 @@ Bial::Image< char > SegmentationTool::segmentationOGS( double alpha, double beta
 QPixmap SegmentationTool::getLabel( size_t axis ) {
   size_t xsz = guiImage->width( axis );
   size_t ysz = guiImage->heigth( axis );
-  if(!seedsVisible && !maskVisible) {
-    return QPixmap();
+  if( !seedsVisible && !maskVisible ) {
+    return( QPixmap( ) );
   }
   const Bial::FastTransform &transf = guiImage->getTransform( axis );
   QImage res( xsz, ysz, QImage::Format_ARGB32 );
-  if( guiImage->modality( ) == Modality::BW3D ) {
+  if( !seedsVisible ) {
+    res.fill( qRgba( 0, 0, 0, 0 ) );
+  }
+  else {
 #pragma omp parallel for
     for( size_t y = 0; y < ysz; ++y ) {
       QRgb *scanLine = ( QRgb* ) res.scanLine( y );
       for( size_t x = 0; x < xsz; ++x ) {
         Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
-        if( maskVisible && ( mask.size( ) == seeds.size( ) ) && mask( pos.x, pos.y, pos.z ) ) {
-          scanLine[ x ] = qRgb( 255, 0, 0 );
-        } else {
-          if(seedsVisible) {
-            char pixel = seeds( pos.x, pos.y, pos.z );
-            if( pixel == 1 ) {
-              scanLine[ x ] = qRgb( 0, 255, 0 );
-            } else if( pixel == 2 ) {
-              scanLine[ x ] = qRgb( 0, 0, 255 );
-            } else {
-              scanLine[ x ] = qRgba( 0, 0, 0, 0 );
-            }
-          }
+        char pixel = seeds( pos.x, pos.y, pos.z );
+        if( pixel == 1 ) {
+          scanLine[ x ] = qRgb( 0, 255, 0 );
+        }
+        else if( pixel == 2 ) {
+          scanLine[ x ] = qRgb( 0, 0, 255 );
+        }
+        else {
+          scanLine[ x ] = qRgba( 0, 0, 0, 0 );
         }
       }
     }
-  } else {
-    #pragma omp parallel for
+  }
+  if( maskVisible && ( mask.size( ) == seeds.size( ) ) ) {
+#pragma omp parallel for
     for( size_t y = 0; y < ysz; ++y ) {
       QRgb *scanLine = ( QRgb* ) res.scanLine( y );
       for( size_t x = 0; x < xsz; ++x ) {
         Bial::Point3D pos = transf( x, y, guiImage->currentSlice( axis ) );
-        if( maskVisible && ( mask.size( ) == seeds.size( ) ) && mask( pos.x, pos.y ) ) {
+        if( mask( pos.x, pos.y, pos.z ) ) {
           scanLine[ x ] = qRgb( 255, 0, 0 );
-        } else {
-          if(seedsVisible) {
-            char pixel = seeds( pos.x, pos.y );
-            if( pixel == 1 ) {
-              scanLine[ x ] = qRgb( 0, 255, 0 );
-            } else if( pixel == 2 ) {
-              scanLine[ x ] = qRgb( 0, 0, 255 );
-            } else {
-              scanLine[ x ] = qRgba( 0, 0, 0, 0 );
-            }
-          }else{
-            scanLine[ x ] =  qRgba( 0, 0, 0, 0 );
-          }
         }
       }
     }

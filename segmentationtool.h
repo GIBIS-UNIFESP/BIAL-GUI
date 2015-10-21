@@ -2,7 +2,7 @@
 #define SEGMENTATIONTOOL_H
 
 #include "tool.h"
-
+#include "Common.hpp"
 
 class SegmentationTool : public Tool {
 private:
@@ -16,6 +16,8 @@ private:
   double beta;
   bool seedsVisible;
   bool maskVisible;
+  QTime timer;
+  std::array<QPixmap, 4> pixmaps;
 
 public:
   enum { Type = 1 };
