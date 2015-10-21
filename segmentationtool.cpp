@@ -123,8 +123,7 @@ void SegmentationTool::mouseDragged( QPointF pt, Qt::MouseButtons buttons, size_
 
 void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
   Q_UNUSED( slice );
-  Q_UNUSED( axis );
-  /* nothing happens */
+  needUpdate[ axis ] = true;
 }
 
 void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
@@ -140,6 +139,9 @@ void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
   }
   Bial::Line imgLine( vLast, vActual );
   imgLine.Draw( seeds, drawType );
+  for( size_t i = 0; i < needUpdate.size( ); ++i ) {
+    needUpdate[ i ] = true;
+  }
 }
 
 
@@ -150,6 +152,9 @@ void SegmentationTool::setDrawType( int type ) {
 void SegmentationTool::clearSeeds( ) {
   for( size_t i = 0; i < seeds.Size( ); ++i ) {
     seeds[ i ] = 0;
+  }
+  for( size_t i = 0; i < needUpdate.size( ); ++i ) {
+    needUpdate[ i ] = true;
   }
   emit guiImage->imageUpdated( );
 }
@@ -183,6 +188,9 @@ QPixmap SegmentationTool::getLabel( size_t axis ) {
   size_t ysz = guiImage->heigth( axis );
   if( !seedsVisible && !maskVisible ) {
     return( QPixmap( ) );
+  }
+  if( !needUpdate[ axis ] ) {
+    return( pixmaps[ axis ] );
   }
   const Bial::FastTransform &transf = guiImage->getTransform( axis );
   QImage res( xsz, ysz, QImage::Format_ARGB32 );
@@ -220,5 +228,6 @@ QPixmap SegmentationTool::getLabel( size_t axis ) {
       }
     }
   }
-  return( QPixmap::fromImage( res ) );
+  pixmaps[ axis ] = QPixmap::fromImage( res );
+  return( pixmaps[ axis ] );
 }

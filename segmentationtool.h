@@ -18,6 +18,7 @@ private:
   bool maskVisible;
   QTime timer;
   std::array<QPixmap, 4> pixmaps;
+  std::array<bool, 4> needUpdate;
 
 public:
   enum { Type = 1 };
