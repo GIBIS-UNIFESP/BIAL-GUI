@@ -14,6 +14,8 @@ private:
   int drawType;
   double alpha;
   double beta;
+  bool seedsVisible;
+  bool maskVisible;
 
 public:
   enum { Type = 1 };
@@ -43,6 +45,11 @@ public:
   void setBeta( double value );
   int getDrawType( ) const;
 
+  void setSeedsVisibility(bool vis);
+  void setMaskVisibility(bool vis);
+
+  bool getSeedsVisible() const;
+  bool getMaskVisible() const;
 };
 
 #endif /* SEGMENTATIONTOOL_H */

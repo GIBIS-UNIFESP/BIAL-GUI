@@ -19,17 +19,18 @@ void SegmentationWidget::setTool( Tool *sTool ) {
     /* atualiza os dados da interface */
     ui->BetaSpinBox->setValue( tool->getBeta( ) );
     ui->AlphaSpinBox->setValue( tool->getAlpha( ) );
+    ui->pushButtonShowSeeds->setChecked(tool->getSeedsVisible());
+    ui->pushButtonShowMask->setChecked(tool->getMaskVisible());
     switch( tool->getDrawType( ) ) {
-        case 0:
-        ui->eraserButton->setChecked( true );
-        break;
-        case 1:
-        case 2:
-        ui->drawButton->setChecked( true );
-        break;
+    case 0:
+      ui->eraserButton->setChecked( true );
+      break;
+    case 1:
+    case 2:
+      ui->drawButton->setChecked( true );
+      break;
     }
-  }
-  else {
+  } else {
     setEnabled( false );
   }
 }
@@ -39,18 +40,19 @@ void SegmentationWidget::on_SegmentationButton_clicked( ) {
   double beta = ui->BetaSpinBox->value( );
   try {
     tool->segmentationOGS( alpha, beta );
-  }
-  catch( std::runtime_error err ) {
+  } catch( std::runtime_error err ) {
     QMessageBox::warning( this, "ERROR", err.what( ) );
   }
 }
 
 void SegmentationWidget::on_eraserButton_clicked( ) {
   tool->setDrawType( 0 );
+  tool->setSeedsVisibility(true);
 }
 
 void SegmentationWidget::on_drawButton_clicked( ) {
   tool->setDrawType( 1 );
+  tool->setSeedsVisibility(true);
 }
 
 void SegmentationWidget::on_ClearButton_clicked( ) {
@@ -63,4 +65,12 @@ void SegmentationWidget::on_AlphaSpinBox_valueChanged( double arg1 ) {
 
 void SegmentationWidget::on_BetaSpinBox_valueChanged( double arg1 ) {
   tool->setBeta( arg1 );
+}
+
+void SegmentationWidget::on_pushButtonShowSeeds_clicked(bool checked) {
+  tool->setSeedsVisibility(checked);
+}
+
+void SegmentationWidget::on_pushButtonShowMask_clicked(bool checked) {
+  tool->setMaskVisibility(checked);
 }

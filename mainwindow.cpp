@@ -121,7 +121,7 @@ void MainWindow::currentImageChanged( ) {
 
     ui->action3_Views->setVisible( format->has3Views( ) );
     ui->action4_Views->setVisible( format->has4Views( ) );
-    if(controller->currentImage()->tools.empty()){
+    if(controller->currentImage()->tools.empty()) {
       on_actionDefaultTool_triggered();
     }
     ui->segmentationWidget->setTool(controller->currentImage()->currentTool());
@@ -149,14 +149,16 @@ void MainWindow::imageUpdated( ) {
   plot->yAxis->setLabel( "Frequency" );
   plot->rescaleAxes( true );
   plot->replot( );
+  if( controller->currentImage( ) ) {
+    ui->segmentationWidget->setTool(controller->currentImage()->currentTool());
+  }
 }
 
 void MainWindow::containerUpdated( ) {
   COMMENT( "MainWindow::containerUpdated( )", 0 );
   if( controller->size( ) <= 1 ) {
     ui->thumbsDock->hide( );
-  }
-  else {
+  } else {
     ui->thumbsDock->show( );
   }
   bool hasImage = ( controller->currentImage( ) != nullptr );
@@ -231,8 +233,7 @@ bool MainWindow::loadFolder( QString dirname ) {
       QString fileName = fileInfo.absoluteFilePath( );
       if( controller->addImage( fileName ) ) {
         value = true;
-      }
-      else {
+      } else {
         BIAL_WARNING( std::string( "Could not open file!" ) );
         statusBar( )->showMessage( tr( "Could not open file!" ), 2000 );
         continue;
@@ -259,8 +260,7 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
   COMMENT( "Command Line Open with " << argc << " arguments:", 0 );
   if( ( argc == 3 ) && ( QString( argv[ 1 ] ) == "-d" ) ) {
     loadDicomdir( QString( argv[ 2 ] ) );
-  }
-  else {
+  } else {
     QFileInfo file;
     for( int img = 1; img < argc; ++img ) {
       QString fileName( argv[ img ] );
@@ -269,12 +269,10 @@ void MainWindow::commandLineOpen( int argc, char *argv[] ) {
       if( file.exists( ) ) {
         if( file.isFile( ) ) {
           controller->addImage( file.absoluteFilePath( ) );
-        }
-        else if( file.isDir( ) ) {
+        } else if( file.isDir( ) ) {
           loadFolder( file.absoluteFilePath( ) );
         }
-      }
-      else {
+      } else {
         BIAL_WARNING( "FILE DOES NOT EXISTS! : " << file.absolutePath( ).toStdString( ) );
       }
     }
@@ -384,7 +382,7 @@ void MainWindow::on_actionOpen_folder_triggered( ) {
 
 void MainWindow::on_actionOpen_DicomDir_triggered( ) {
   QString fileName = QFileDialog::getOpenFileName( this, tr( "Open" ), defaultFolder,
-                                                   tr( "*" ) );
+                     tr( "*" ) );
   loadDicomdir( fileName );
 }
 
@@ -422,16 +420,14 @@ void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size
       if( img->getImage( ).ValidPixel( pt.x, pt.y, pt.z ) ) {
         int color = img->getPixel( pt.x, pt.y, pt.z );
         msg = QString( "Axis %1 : (%2, %3, %4) = %5/%6" ).arg( axis ).arg( ( int ) pt.x ).arg(
-          ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max );
+                ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max );
       }
-    }
-    else if( img->modality( ) == Modality::BW2D ) {
+    } else if( img->modality( ) == Modality::BW2D ) {
       if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
         int color = img->getPixel( pt.x, pt.y );
         msg = QString( "(%1, %2) = %3/%4" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( color ).arg( max );
       }
-    }
-    else if( img->modality( ) == Modality::RGB2D ) {
+    } else if( img->modality( ) == Modality::RGB2D ) {
       if( img->getImage( ).ValidPixel( pt.x, pt.y ) ) {
         int r = img->getPixel( pt.x, pt.y, 0 );
         int g = img->getPixel( pt.x, pt.y, 1 );

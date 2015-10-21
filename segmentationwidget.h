@@ -30,6 +30,10 @@ private slots:
 
   void on_BetaSpinBox_valueChanged( double arg1 );
 
+  void on_pushButtonShowSeeds_clicked(bool checked);
+
+  void on_pushButtonShowMask_clicked(bool checked);
+
 private:
   Ui::Segmentationwidget *ui;
   SegmentationTool *tool;
