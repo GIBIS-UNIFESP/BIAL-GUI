@@ -126,18 +126,18 @@ void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
   needUpdate[ axis ] = true;
 }
 
-void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D actual ) {
+void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D current ) {
   Bial::Vector< float > vLast;
-  Bial::Vector< float > vActual;
+  Bial::Vector< float > vCurrent;
   if( guiImage->modality( ) == Modality::BW3D ) {
     vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
-    vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ], ( float ) actual[ 2 ] } };
+    vCurrent = { { ( float ) current[ 0 ], ( float ) current[ 1 ], ( float ) current[ 2 ] } };
   }
   else {
     vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ] } };
-    vActual = { { ( float ) actual[ 0 ], ( float ) actual[ 1 ] } };
+    vCurrent = { { ( float ) current[ 0 ], ( float ) current[ 1 ] } };
   }
-  Bial::Line imgLine( vLast, vActual );
+  Bial::Line imgLine( vLast, vCurrent );
   imgLine.Draw( seeds, drawType );
   for( size_t i = 0; i < needUpdate.size( ); ++i ) {
     needUpdate[ i ] = true;
