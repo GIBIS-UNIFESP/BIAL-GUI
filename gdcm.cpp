@@ -1,5 +1,6 @@
 #include "gdcm.h"
 #include <Common.hpp>
+#include "FileBasics.hpp"
 
 #ifdef LIBGDCM
 #include <gdcmImageReader.h>
@@ -105,7 +106,7 @@ Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
 #else
 
 Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
-  return( Bial::Image< int >( Bial::File::Read< int >( filename ) ) );
+  return( Bial::Image< int >( Bial::Read< int >( filename ) ) );
 }
 
 #endif

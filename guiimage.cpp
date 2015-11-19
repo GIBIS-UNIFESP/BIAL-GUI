@@ -17,7 +17,7 @@ GuiImage::GuiImage( QString fname, QObject *parent ) : QObject( parent ), image(
   m_equalizeHistogram = false;
   bounding.insert( 0, 4, Bial::BBox( Bial::Point3D( 0, 0, 0 ), Bial::Point3D( image.size( 0 ), image.size( 1 ), 1 ) ) );
   m_currentSlice.insert( 0, 4, 0 );
-  m_max = image.Maximum( );
+  m_max = Maximum( image );
   if( image.Dims( ) == 3 ) {
     COMMENT( "NIfTI image detected.", 2 );
     m_modality = Modality::BW3D;
@@ -307,12 +307,12 @@ const Bial::Signal &GuiImage::getHistogram( ) const {
 int GuiImage::getPixel( int x, int y, int z ) {
   int color = 0;
   if( modality( ) == Modality::BW2D ) {
-    if( image.ValidPixel( x, y ) ) {
+    if( image.ValidCoordinate( (size_t)x, (size_t)y ) ) {
       color = image.at( x, y );
     }
   }
   else {
-    if( image.ValidPixel( x, y, z ) ) {
+    if( image.ValidCoordinate( (size_t)x, (size_t)y, (size_t)z ) ) {
       color = image.at( x, y, z );
     }
   }

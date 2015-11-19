@@ -1,5 +1,7 @@
+#include "Color.hpp"
 #include "Draw.hpp"
 #include "File.hpp"
+#include "FileBasics.hpp"
 #include "Geometrics.hpp"
 #include "Segmentation.hpp"
 #include "guiimage.h"
@@ -137,8 +139,8 @@ void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D current ) {
     vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ] } };
     vCurrent = { { ( float ) current[ 0 ], ( float ) current[ 1 ] } };
   }
-  Bial::Line imgLine( vLast, vCurrent );
-  imgLine.Draw( seeds, drawType );
+  Bial::Line imgLine( vLast, vCurrent, Bial::Color(drawType) );
+  imgLine.Draw( seeds );
   for( size_t i = 0; i < needUpdate.size( ); ++i ) {
     needUpdate[ i ] = true;
   }

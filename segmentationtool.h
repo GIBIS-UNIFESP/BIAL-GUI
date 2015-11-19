@@ -11,7 +11,7 @@ private:
 
   Bial::Point3D lastPoint;
   bool drawing;
-  int drawType;
+  uint drawType;
   double alpha;
   double beta;
   bool seedsVisible;
