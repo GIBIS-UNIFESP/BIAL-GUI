@@ -46,7 +46,7 @@ void SegmentationWidget::on_SegmentationButton_clicked( ) {
 }
 
 void SegmentationWidget::on_eraserButton_clicked( ) {
-  tool->setDrawType( 3 );
+  tool->setDrawType( 0 );
   tool->setSeedsVisibility(true);
 }
 
@@ -73,4 +73,10 @@ void SegmentationWidget::on_pushButtonShowSeeds_clicked(bool checked) {
 
 void SegmentationWidget::on_pushButtonShowMask_clicked(bool checked) {
   tool->setMaskVisibility(checked);
+}
+
+void SegmentationWidget::on_thickDoubleSpinBox_valueChanged( double arg1 )
+{
+    tool->setThickness( arg1 );
+
 }

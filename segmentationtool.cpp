@@ -1,4 +1,5 @@
 #include "Adjacency.hpp"
+#include <algorithm>
 #include "Draw.hpp"
 #include "File.hpp"
 #include "Geometrics.hpp"
@@ -49,6 +50,12 @@ bool SegmentationTool::getMaskVisible( ) const {
     return( maskVisible );
 }
 
+void SegmentationTool::setThickness(int value)
+{
+    thickness = value;
+    COMMENT( "thickness set to" << thickness,2);
+}
+
 SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : Tool( guiImage,
                                                                                       viewer ), seeds(
                                                                                                     guiImage->getImage( ).Dim( ) ) {
@@ -58,6 +65,7 @@ SegmentationTool::SegmentationTool( GuiImage *guiImage, ImageViewer *viewer ) : 
     setHasLabel( true );
     alpha = 0;
     beta = 0.5;
+    thickness = 0;
     seedsVisible = true;
     maskVisible = true;
 }
@@ -93,10 +101,8 @@ void SegmentationTool::mouseMoved( QPointF pt, size_t axis ) {
         if( lastPoint == actual ) {
             return;
         }
-        if(drawType == 3)
-            eraseSeed(lastPoint, actual);
-        else
-            drawSeed( lastPoint, actual );
+
+        drawSeed( lastPoint, actual );
         lastPoint = actual;
         if( timer.elapsed( ) > 30 ) {
             emit guiImage->imageUpdated( );
@@ -133,23 +139,6 @@ void SegmentationTool::sliceChanged( size_t axis, size_t slice ) {
 void SegmentationTool::drawSeed( Bial::Point3D last, Bial::Point3D current ) {
     Bial::Vector< float > vLast;
     Bial::Vector< float > vCurrent;
-    if( guiImage->modality( ) == Modality::BW3D ) {
-        vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
-        vCurrent = { { ( float ) current[ 0 ], ( float ) current[ 1 ], ( float ) current[ 2 ] } };
-    }
-    else {
-        vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ] } };
-        vCurrent = { { ( float ) current[ 0 ], ( float ) current[ 1 ] } };
-    }
-    Bial::Line imgLine( vLast, vCurrent );
-    imgLine.Draw( seeds, drawType );
-    for( size_t i = 0; i < needUpdate.size( ); ++i ) {
-        needUpdate[ i ] = true;
-    }
-}
-void SegmentationTool::eraseSeed( Bial::Point3D last, Bial::Point3D current ) {
-    Bial::Vector< float > vLast;
-    Bial::Vector< float > vCurrent;
     size_t dims;
     if( guiImage->modality( ) == Modality::BW3D ) {
         vLast = { { ( float ) last[ 0 ], ( float ) last[ 1 ], ( float ) last[ 2 ] } };
@@ -162,13 +151,15 @@ void SegmentationTool::eraseSeed( Bial::Point3D last, Bial::Point3D current ) {
         dims = 2;
     }
     Bial::Line imgLine( vLast, vCurrent );
-    imgLine.Draw( seeds, drawType );
-    Bial::Adjacency adj = Bial::Adjacency::HyperSpheric(8,dims);
-    for(int px = 0; px < seeds.size();px++){
+    imgLine.Draw( seeds, 3 );
+    Bial::Adjacency adj = Bial::Adjacency::HyperSpheric(thickness,dims);
+    int min = std::min(seeds.Position(vLast), seeds.Position(vCurrent));
+    int max = std::max(seeds.Position(vLast), seeds.Position(vCurrent));;
+    for(int px = min; px <= max; px++){
         if(seeds[px] == 3){
             Bial::AdjacencyIterator it = adj.begin(seeds, px);
             for(;(*it)<seeds.size();++it){
-                seeds[*it] = 0;
+                seeds[*it] = drawType;
             }
         }
     }
@@ -176,7 +167,6 @@ void SegmentationTool::eraseSeed( Bial::Point3D last, Bial::Point3D current ) {
         needUpdate[ i ] = true;
     }
 }
-
 
 void SegmentationTool::setDrawType( int type ) {
     drawType = type;

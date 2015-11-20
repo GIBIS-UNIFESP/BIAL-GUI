@@ -34,6 +34,8 @@ private slots:
 
   void on_pushButtonShowMask_clicked(bool checked);
 
+  void on_thickDoubleSpinBox_valueChanged(double arg1);
+
 private:
   Ui::Segmentationwidget *ui;
   SegmentationTool *tool;

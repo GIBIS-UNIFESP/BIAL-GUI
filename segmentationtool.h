@@ -17,6 +17,7 @@ private:
   bool seedsVisible;
   bool maskVisible;
   QTime timer;
+  int thickness;
   std::array<QPixmap, 4> pixmaps;
   std::array<bool, 4> needUpdate;
 
@@ -38,7 +39,6 @@ public:
   QPixmap getLabel( size_t axis );
 
   void drawSeed( Bial::Point3D last, Bial::Point3D actual );
-  void eraseSeed(Bial::Point3D last, Bial::Point3D actual);
   void setDrawType( int type );
   void clearSeeds( );
   Bial::Image< char > segmentationOGS( double alpha, double beta );
@@ -54,6 +54,7 @@ public:
 
   bool getSeedsVisible() const;
   bool getMaskVisible() const;
+  void setThickness(int value);
 };
 
 #endif /* SEGMENTATIONTOOL_H */
