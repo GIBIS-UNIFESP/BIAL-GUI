@@ -38,6 +38,7 @@ public:
   QPixmap getLabel( size_t axis );
 
   void drawSeed( Bial::Point3D last, Bial::Point3D actual );
+  void eraseSeed(Bial::Point3D last, Bial::Point3D actual);
   void setDrawType( int type );
   void clearSeeds( );
   Bial::Image< char > segmentationOGS( double alpha, double beta );

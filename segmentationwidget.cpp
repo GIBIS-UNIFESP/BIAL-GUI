@@ -46,7 +46,7 @@ void SegmentationWidget::on_SegmentationButton_clicked( ) {
 }
 
 void SegmentationWidget::on_eraserButton_clicked( ) {
-  tool->setDrawType( 0 );
+  tool->setDrawType( 3 );
   tool->setSeedsVisibility(true);
 }
 
