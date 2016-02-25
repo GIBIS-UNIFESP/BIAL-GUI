@@ -8,224 +8,267 @@
 #include <QVector>
 #include <Signal.hpp>
 
+enum class image_type {
+    type_int,
+    type_float,
+    type_color
+};
+
 class Tool;
 
 /**
  * @brief The GuiImage class is a bridge to the Bial::Image data structure to the QImage data structure. <br>
  * It have many important functions, such as the views spatial transforms, histogram equalization and others.
  */
+
 class GuiImage : public QObject {
-  Q_OBJECT
-  /**
+    Q_OBJECT
+    /**
    * @brief m_modality is the image modality.
    * @see Modality enum class.
    */
-  Modality m_modality;
-  /**
+    Modality m_modality;
+    /**
    * @brief image is the input image stored in the
    *        Bial::Image data structure.
    */
-  Bial::Image< int > image;
-  /**
+    union {
+        Bial::Image< int > dimage;
+        Bial::Image< float > fimage;
+        Bial::Image< Bial::Color > cimage;
+    };
+    /**
+   * @brief image type to determine the type of the image int the union.
+   */
+    image_type m_type;
+    // if( m_type == image_type::type_int )
+    /**
+   * @brief Shortcut for image dimensions.
+   */
+    Bial::Vector< size_t > m_dims;
+    /**
    * @brief m_fileName is the image absolute path.
    */
-  QString m_fileName;
-  /**
+    QString m_fileName;
+    /**
    * @brief cachedPixmaps holds a copy of the last generated pixmap at each view.
    */
-  QVector< QPixmap > cachedPixmaps;
-  /**
+    QVector< QPixmap > cachedPixmaps;
+    /**
    * @brief needUpdate is a flag that determines if a pixmap needs to be updated.
    */
-  QVector< bool > needUpdate;
-  /**
+    QVector< bool > needUpdate;
+    /**
    * @brief equalization is the equalization transform.
    */
-  QVector< int > equalization;
-  /**
+    QVector< int > equalization;
+    /**
    * @brief histogram is the input image histogram.
    */
-  Bial::Signal histogram;
-  /**
+    Bial::Signal histogram;
+    /**
    * @brief equalized is the equalized image histogram.
    */
-  Bial::Signal equalized;
-  /**
+    Bial::Signal equalized;
+    /**
    * @brief m_equalizeHistogram determines if the image must be equalized.
    */
-  bool m_equalizeHistogram;
-  /**
+    bool m_equalizeHistogram;
+    /**
    * @brief transform is the affine transform related to each view.
    */
-  QVector< Bial::FastTransform > transform;
-  /**
+    QVector< Bial::FastTransform > transform;
+    /**
    * @brief bounding is the bounding box that determines each view boundings.
    */
-  QVector< Bial::BBox > bounding;
-  /**
+    QVector< Bial::BBox > bounding;
+    /**
    * @brief m_currentSlice is the current slice at the z axis of each view.
    */
-  QVector< size_t > m_currentSlice;
-  /**
+    QVector< size_t > m_currentSlice;
+    /**
    * @brief m_max is the maximum value at the input image.
    */
-  int m_max;
-  /**
+    int m_max;
+    /**
    * @brief currentToolPos is the current Tool number.
    */
-  size_t m_currentToolPos;
+    size_t m_currentToolPos;
 private:
-  /**
+    /**
    * @brief updateBoundings is called each time the transformation matrix is updated. <br>
    * This function applys the affone transform to the input image boundings, and fixes
    * negative positions.
    * @param view
    */
-  void updateBoundings( size_t axis );
+    void updateBoundings( size_t axis );
 
 public:
-  /**
+    /**
    * @brief tools is a vector containing the image tools.
    */
-  QVector< Tool* > tools;
-  /**
+    QVector< Tool* > tools;
+    /**
    * @brief GuiImage is the GuiImage class constructor.
    * @param fName is the absolute path to the input image.
    * @param parent is the QObject parent.
    */
-  explicit GuiImage( QString fName, QObject *parent = 0 );
-  /**
+    explicit GuiImage( QString fName, QObject *parent = 0 );
+    /**
    * @brief Destructor
    */
-  virtual ~GuiImage( );
-  /**
+    virtual ~GuiImage( );
+    /**
    * @brief currentTool returns the current Tool.
    * @return
    */
-  Tool* currentTool( );
-  /**
+    Tool* currentTool( );
+    /**
    * @brief modality is the image modality getter.
    * @return
    */
-  Modality modality( );
-  /**
+    Modality modality( );
+    /**
    * @brief fileName is the image absolute path getter.
    * @return
    */
-  QString fileName( );
-  /**
+    QString fileName( );
+    /**
    * @brief getSlice calculates and returns a QImage with the current slice of the view. <br>
    * @see setCurrentSlice
    * @param view
    * @return
    */
-  QPixmap getSlice( size_t view );
-  /**
+    QPixmap getSlice( size_t view );
+    /**
    * @brief width is the view width.
    * @param view
    * @return
    */
-  size_t width( size_t view );
-  /**
+    size_t width( size_t view );
+    /**
    * @brief heigth is the view heigth.
    * @param view
    * @return
    */
-  size_t heigth( size_t view );
-  /**
+    size_t heigth( size_t view );
+    /**
    * @brief depth is the number of slices of the view.
    * @param view
    * @return
    */
-  size_t depth( size_t view );
-  /**
+    size_t depth( size_t view );
+    /**
    * @brief currentSlice is the view's current slice.
    * @param view
    * @return
    */
-  size_t currentSlice( size_t view );
-  /**
+    size_t currentSlice( size_t view );
+    /**
    * @brief currentSlice sets the view's current slice.
    * @param view
    * @param slice
    * @return
    */
-  void setCurrentSlice( size_t view, size_t slice );
-  /**
+    void setCurrentSlice( size_t view, size_t slice );
+    /**
    * @brief getPosition transforms the scene position to the input image coordinates.
    * @param pos is the graphicsscene position.
    * @param view is the view number.
    * @return The input image coordinates.
    */
-  Bial::Point3D getPosition( QPointF pos, size_t view );
-  /**
+    Bial::Point3D getPosition( QPointF pos, size_t view );
+    /**
    * @brief getTransform returns the transform matrix of the views.
    * @param view
    * @return
    */
-  Bial::FastTransform getTransform( size_t axis );
-  /**
-   * @brief getImage returns a reference to the input image.
+    Bial::FastTransform getTransform( size_t axis );
+    /**
+   * @brief getImageType returns the image_type of the image.
    * @return
    */
-  const Bial::Image< int > &getImage( ) const;
-  /**
+    const image_type getImageType( ) const;
+    /**
+   * @brief getIImage returns a reference to the int image.
+   * @return
+   */
+    // TODO: getImageType -> retorna o tipo da imagem utilizada
+    // TODO: getCImage, getDImage, getFImage para pegar as imagens dos respectivos tipos.
+    const Bial::Image< int > &getIImage( ) const;
+    /**
+   * @brief getCImage returns a reference to the color image.
+   * @return
+   */
+    const Bial::Image< Bial::Color > &getCImage( ) const;
+    /**
+   * @brief getFImage returns a reference to the float image.
+   * @return
+   */
+    const Bial::Image< float > &getFImage( ) const;
+
+    /**
    * @brief rotateAll90 rotates all views in 90 degrees.
    */
-  void rotateAll90( );
-  /**
+    void rotateAll90( );
+    /**
    * @brief rotate90 rotates a view in 90 degrees.
    * @param view View number
    */
-  void rotate90( size_t view );
-  /**
+    void rotate90( size_t view );
+    /**
    * @brief flipH mirrors the current view on X axis.
    * @param view View number
    */
-  void flipH( size_t view );
-  /**
+    void flipH( size_t view );
+    /**
    * @brief flipV mirrors the current view on Y axis.
    * @param view View number
    */
-  void flipV( size_t view );
-  /**
+    void flipV( size_t view );
+    /**
    * @brief max is the maximum intensity of the input image.
    * @return
    */
-  int max( );
-  /**
+    // TODO: Evite usar esta função. No futuro, ela será removida. Tirar o máximo da própria imagem.
+    // TODO: Máximo de todos os canais para CIMAGE. Alterar tipo para double.
+    int max( );
+    /**
    * @brief getEqualizeHistogram returns a boolean value that says if the image must be equalized or not.
    * @return
    */
-  bool getEqualizeHistogram( ) const;
-  /**
+    bool getEqualizeHistogram( ) const;
+    /**
    * @brief setEqualizeHistogram updates a boolean value that says if the image must be equalized or not.
    * @param equalizeHistogram
    */
-  void setEqualizeHistogram( bool equalizeHistogram );
-  /**
+    void setEqualizeHistogram( bool equalizeHistogram );
+    /**
    * @brief getHistogram returns the image histogram.
    * @return
    */
-  const Bial::Signal &getHistogram( ) const;
+    //TODO: tratar COLOR. Inicialmente fazer histograma da imagem convertida para cinza.
+    const Bial::Signal &getHistogram( ) const;
 
-  /**
+    /**
    * @brief getPixel returns the pixel intensity of the image at the given position.
    * @param x
    * @param y
    * @param z
    * @return
    */
-  int getPixel( int x, int y, int z = 0 );
-  size_t currentToolPos( ) const;
-  void setCurrentToolPos( const size_t &currentToolPos );
+    //TODO: Não usar esta função. Ela será removida no futuro.
+    //TODO: Retornar double por enquanto.
+    int getPixel( int x, int y, int z = 0 );
+    size_t currentToolPos( ) const;
+    void setCurrentToolPos( const size_t &currentToolPos );
 
 signals:
-  /**
+    /**
    * @brief imageUpdated is called each time a internal property is updated,
    * after that the image views are updated.
    */
-  void imageUpdated( );
+    void imageUpdated( );
 };
 
 #endif /* GUIIMAGE_H */

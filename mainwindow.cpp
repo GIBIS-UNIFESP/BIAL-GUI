@@ -417,18 +417,18 @@ void MainWindow::updateIntensity( QPointF scnPos, Qt::MouseButtons buttons, size
     QString msg;
     int max = img->max( );
     if( img->modality( ) == Modality::BW3D ) {
-      if( img->getImage( ).ValidCoordinate( pt.x, pt.y, pt.z ) ) {
+      if( img->getIImage( ).ValidCoordinate( pt.x, pt.y, pt.z ) ) {
         int color = img->getPixel( pt.x, pt.y, pt.z );
         msg = QString( "Axis %1 : (%2, %3, %4) = %5/%6" ).arg( axis ).arg( ( int ) pt.x ).arg(
                 ( int ) pt.y ).arg( ( int ) pt.z ).arg( color ).arg( max );
       }
     } else if( img->modality( ) == Modality::BW2D ) {
-      if( img->getImage( ).ValidCoordinate( pt.x, pt.y ) ) {
+      if( img->getIImage( ).ValidCoordinate( pt.x, pt.y ) ) {
         int color = img->getPixel( pt.x, pt.y );
         msg = QString( "(%1, %2) = %3/%4" ).arg( ( int ) pt.x ).arg( ( int ) pt.y ).arg( color ).arg( max );
       }
     } else if( img->modality( ) == Modality::RGB2D ) {
-      if( img->getImage( ).ValidCoordinate( pt.x, pt.y ) ) {
+      if( img->getCImage( ).ValidCoordinate( pt.x, pt.y ) ) {
         int r = img->getPixel( pt.x, pt.y, 0 );
         int g = img->getPixel( pt.x, pt.y, 1 );
         int b = img->getPixel( pt.x, pt.y, 2 );

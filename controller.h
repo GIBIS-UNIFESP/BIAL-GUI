@@ -33,8 +33,8 @@ class Controller : public QObject {
    *        and one for the label.
    *
    */
-  QVector< QGraphicsPixmapItem * > m_pixmapItems;
-  QVector< QGraphicsPixmapItem * > m_labelItems;
+  QVector< QGraphicsPixmapItem* > m_pixmapItems;
+  QVector< QGraphicsPixmapItem* > m_labelItems;
   /**
    *
    * @brief m_currentImagePos holds the current image position.

@@ -21,7 +21,11 @@ namespace gdcm {
 
 class GDCM {
 public:
-  static Bial::Image< int > OpenGImage( const std::string &filename );
+  static Bial::Image< int > OpenIImage( const std::string &filename );
+  static Bial::Image< float > OpenFImage( const std::string &filename );
+  static Bial::Image< Bial::Color > OpenCImage( const std::string &filename );
+
+
 };
 
 #endif /* BIALGDCM_HPP */

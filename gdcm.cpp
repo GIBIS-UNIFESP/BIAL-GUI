@@ -105,8 +105,16 @@ Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
 
 #else
 
-Bial::Image< int > GDCM::OpenGImage( const std::string &filename ) {
+Bial::Image< int > GDCM::OpenIImage( const std::string &filename ) {
   return( Bial::Image< int >( Bial::Read< int >( filename ) ) );
+}
+
+Bial::Image< float > GDCM::OpenFImage( const std::string &filename ) {
+  return( Bial::Image< float >( Bial::Read< float >( filename ) ) );
+}
+
+Bial::Image< Bial::Color > GDCM::OpenCImage( const std::string &filename ) {
+  return( Bial::Image< Bial::Color >( Bial::Read( filename ) ) );
 }
 
 #endif
