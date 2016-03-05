@@ -210,9 +210,7 @@ QPixmap GuiImage::getSlice( size_t view ) {
     else if( modality( ) == Modality::RGB2D ) {
       if( needUpdate[ 0 ] ) {
         COMMENT( "Generating RGB view.", 2 );
-        size_t disp1 = m_dims( 0 ) * m_dims( 1 );
-        size_t disp2 = disp1 * 2;
-#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor, disp1, disp2)
+#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor)
         for( size_t y = 0; y < ysize; ++y ) {
           QRgb *scanLine = ( QRgb* ) res.scanLine( y );
           for( size_t x = 0; x < xsize; ++x ) {

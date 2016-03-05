@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=BIAL
+Comment=Biomedical Image Analysis Library
+Exec=bialgui %f
+Icon=bial
+Type=Application
+Categories=Science;
+Terminal=false
+MimeType=image/x-portable-graymap;image/x-portable-pixmap;image/x-portable-bitmap;image/nii;image/gznii;

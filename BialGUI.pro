@@ -8,11 +8,13 @@ QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = BialGUI
+TARGET = bialgui
 TEMPLATE = app
 
 include(../bial/bial.pri)
 include(gdcm.pri)
+include(install.pri)
+
 
 SOURCES += \
     thirdParty/qcustomplot.cpp \
@@ -70,3 +72,8 @@ RESOURCES += \
     qrs/resources.qrc
 
 CONFIG += c++11
+
+DISTFILES += \
+    install.pri \
+    qrs/bial.desktop \
+    qrs/bial-nii.xml
