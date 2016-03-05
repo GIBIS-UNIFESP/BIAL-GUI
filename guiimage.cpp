@@ -161,8 +161,31 @@ QPixmap GuiImage::getSlice( size_t view ) {
     QImage res( xsize, ysize, QImage::Format_ARGB32 );
     double factor = 255.0 / ( double ) m_max;
     const Bial::FastTransform &transf = transform[ view ];
-    if( ( modality( ) == Modality::BW3D ) || ( modality( ) == Modality::BW2D ) ) {
-      COMMENT( "Generating BW view.", 2 );
+    if( modality( ) == Modality::BW2D ) {
+      COMMENT( "Generating BW 2D view.", 2 );
+#pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor)
+      for( size_t y = 0; y < ysize; ++y ) {
+        QRgb *scanLine = ( QRgb* ) res.scanLine( y );
+        for( size_t x = 0; x < xsize; ++x ) {
+          int pixel = 0;
+          int xx, yy, zz;
+          transf( x, y, slice, &xx, &yy, &zz );
+          if( m_type == image_type::type_int ) {
+            pixel = (*dimage)( xx, yy);
+          }
+          if( m_type == image_type::type_float ) {
+            pixel = (*fimage)( xx, yy);
+          }
+          if( m_equalizeHistogram ) {
+            pixel = equalization[ pixel ];
+          }
+          pixel *= factor;
+          scanLine[ x ] = qRgb( pixel, pixel, pixel );
+        }
+      }
+    }
+    else if( modality( ) == Modality::BW3D ) {
+      COMMENT( "Generating BW 3D view.", 2 );
 #pragma omp parallel for default(none) shared(transf, res) firstprivate(slice, factor)
       for( size_t y = 0; y < ysize; ++y ) {
         QRgb *scanLine = ( QRgb* ) res.scanLine( y );
